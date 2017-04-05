@@ -1,0 +1,5 @@
+/core/build/*
+/core/bin/*
+
+/sparse/build/*
+/sparse/bin/*
