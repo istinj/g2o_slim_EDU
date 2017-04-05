@@ -40,6 +40,8 @@ public:
    void printBlock(const int r_) const;
    void printVector(void) const;
 
+   void exportToTxt(const std::string filename_);
+
    inline const int numRows(void) const {return _num_block_rows;};
 
 private:

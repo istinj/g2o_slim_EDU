@@ -65,6 +65,8 @@ public:
    void printBlock(const int r_, const int c_) const;
    void printMatrix(void) const;
 
+   void exportToTxt(const std::string& filename_);
+
    inline const int numRows(void) const {return _num_block_rows;};
    inline const int numCols(void) const {return _num_block_cols;};
 
@@ -74,8 +76,12 @@ protected:
    int _num_block_rows;
    int _num_block_cols;
    int _block_dim = 1;
+
    //! TODO: traits to manage wrong BlockType_
    //! TODO: handle non-squared blocks (pair in the constructor);
+   //! TODO: export matrix to txt -> MATLAB check
+   //! TODO: check Cholesky -> Block(end,end) is a bit wrong
+   //! TODO: CHOLESKY IS HAVING PROBLEMS PORCO DIO
 
    RowBlockContainer _row_container;
 

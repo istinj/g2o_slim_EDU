@@ -77,12 +77,23 @@ private:
 
 	inline Eigen::Matrix3f skew(const Eigen::Vector3f& p)
 	{
-	   Eigen::Matrix3f s;
-	   s <<
-	         0,  -p.z(), p.y(),
-	         p.z(), 0,  -p.x(),
-	         -p.y(), p.x(), 0;
-	   return s;
+		Eigen::Matrix3f s;
+		s <<
+				0,  -p.z(), p.y(),
+				p.z(), 0,  -p.x(),
+				-p.y(), p.x(), 0;
+		return s;
+	}
+
+	inline Pose v2t(const Vector6f& v){
+		Pose T = Pose::Identity();
+		Eigen::Matrix3f Rx, Ry, Rz;
+		Rx = Eigen::AngleAxisf(v(3), Eigen::Vector3f::UnitX());
+		Ry = Eigen::AngleAxisf(v(4), Eigen::Vector3f::UnitY());
+		Rz = Eigen::AngleAxisf(v(5), Eigen::Vector3f::UnitZ());
+		T.linear() = Rx * Ry * Rz;
+		T.translation() = v.block<3,1>(0,0);
+		return T;
 	}
 
 

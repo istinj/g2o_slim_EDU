@@ -195,3 +195,311 @@ Scanning dependencies of target tls_main_app
 Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
 Linking CXX executable ../bin/tls_main_app
 [100%] Built target tls_main_app
+13:34:29 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+13:35:46 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+[100%] Built target test_Cholesky_app
+13:37:38 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+[100%] Built target test_Cholesky_app
+13:39:47 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+13:53:24 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+13:54:13 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+13:58:50 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:01:48 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:02:51 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:04:45 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:06:05 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:07:05 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:08:47 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:11:45 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:18:00 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:18:14 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:26:46 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:27:22 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:27:40 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:29:37 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:31:35 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:36:58 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:38:43 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:38:55 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:40:52 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+14:48:38 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:50:04 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+14:54:23 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+14:54:58 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+In file included from /usr/include/eigen3/Eigen/Core:254:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:18,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/usr/include/eigen3/Eigen/src/Geometry/Transform.h: In instantiation of ‘Eigen::Transform<Scalar, Dim, Mode, _Options>::Transform(const Eigen::Transform<_Scalar, Dim, OtherMode, OtherOptions>&) [with int OtherMode = 32; int OtherOptions = 0; _Scalar = float; int _Dim = 3; int _Mode = 1; int _Options = 0]’:
+/home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:291:79:   required from here
+/usr/include/eigen3/Eigen/src/Core/util/StaticAssert.h:32:40: error: static assertion failed: YOU_PERFORMED_AN_INVALID_TRANSFORMATION_CONVERSION
+     #define EIGEN_STATIC_ASSERT(X,MSG) static_assert(X,#MSG);
+                                        ^
+/usr/include/eigen3/Eigen/src/Geometry/Transform.h:301:5: note: in expansion of macro ‘EIGEN_STATIC_ASSERT’
+     EIGEN_STATIC_ASSERT(EIGEN_IMPLIES(OtherMode==int(Projective), Mode==int(Projective)),
+     ^
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+14:55:33 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+14:55:49 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+14:57:25 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o: nella funzione "optimizer::SparseSolver::oneStep()":
+SparseSolver.cpp:(.text+0x5c1a): riferimento non definito a "v2t(Eigen::Matrix<float, 6, 1, 0, 6, 1> const&)"
+collect2: error: ld returned 1 exit status
+make[2]: *** [../bin/tls_main_app] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+15:00:06 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 66%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+15:06:13 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+15:10:09 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+15:10:19 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+15:13:36 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+15:13:43 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+15:29:08 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+15:47:38 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+15:48:17 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 66%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+16:07:27 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+16:10:38 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+16:12:23 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+16:13:09 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+16:13:14 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 66%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app
+16:32:21 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+16:32:27 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app

@@ -209,3 +209,454 @@ Command-line arguments:  -os linux -ws gtk -arch x86_64 -product org.eclipse.epp
 
 !ENTRY org.eclipse.cdt.core 1 0 2017-04-05 12:47:58.675
 !MESSAGE Indexed 'core' (5 sources, 777 headers) in 36,94 sec: 75.782 declarations; 176.636 references; 0 unresolved inclusions; 0 syntax errors; 291 unresolved names (0,12%)
+
+!ENTRY org.eclipse.jface 2 0 2017-04-05 12:50:59.453
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.453
+!MESSAGE A conflict occurred for F3:
+Binding(F3,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.opendecl,Open Declaration,
+		Open an editor on the selected element's declaration(s),
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@20e25bf7,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(F3,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.opendecl,Open Declaration,
+		Open an editor on the selected element's declaration(s),
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@20e25bf7,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for CTRL+SHIFT+T:
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.opentype,Open Element,
+		Open an element in an Editor,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@9fc125b,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.opentype,Open Element,
+		Open an element in an Editor,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@9fc125b,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for ALT+SHIFT+R:
+Binding(ALT+SHIFT+R,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.text.rename.element,Rename - Refactoring ,
+		Rename the selected element,
+		Category(org.eclipse.cdt.ui.category.refactoring,Refactor - C++,C/C++ Refactorings,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@62129f97,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(ALT+SHIFT+R,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.text.rename.element,Rename - Refactoring ,
+		Rename the selected element,
+		Category(org.eclipse.cdt.ui.category.refactoring,Refactor - C++,C/C++ Refactorings,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@62129f97,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for ALT+CTRL+I:
+Binding(ALT+CTRL+I,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.include.browser,Open Include Browser,
+		Open an include browser on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@22db974d,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(ALT+CTRL+I,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.include.browser,Open Include Browser,
+		Open an include browser on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@22db974d,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for CTRL+SHIFT+G:
+Binding(CTRL+SHIFT+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.findrefs,References,
+		Search for references to the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@10545d02,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+SHIFT+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.findrefs,References,
+		Search for references to the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@10545d02,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for CTRL+G:
+Binding(CTRL+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.finddecl,Declaration,
+		Search for declarations of the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@79d3fb99,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.finddecl,Declaration,
+		Search for declarations of the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@79d3fb99,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for ALT+CTRL+H:
+Binding(ALT+CTRL+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.call.hierarchy,Open Call Hierarchy,
+		Open the call hierarchy for the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@f4b2d13,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(ALT+CTRL+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.call.hierarchy,Open Call Hierarchy,
+		Open the call hierarchy for the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@f4b2d13,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for CTRL+SHIFT+H:
+Binding(CTRL+SHIFT+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.open.type.in.hierarchy,Open Type in Hierarchy,
+		Open a type in the type hierarchy view,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@7154a248,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+SHIFT+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.open.type.in.hierarchy,Open Type in Hierarchy,
+		Open a type in the type hierarchy view,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@7154a248,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 12:50:59.454
+!MESSAGE A conflict occurred for F4:
+Binding(F4,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.type.hierarchy,Open Type Hierarchy,
+		Open a type hierarchy on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@435a4d2d,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(F4,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.type.hierarchy,Open Type Hierarchy,
+		Open a type hierarchy on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@435a4d2d,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SESSION 2017-04-05 13:33:51.881 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_121
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=it_IT
+Framework arguments:  -product org.eclipse.epp.package.cpp.product
+Command-line arguments:  -os linux -ws gtk -arch x86_64 -product org.eclipse.epp.package.cpp.product
+
+!ENTRY org.eclipse.ui 2 0 2017-04-05 13:33:54.823
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2017-04-05 13:33:54.823
+!MESSAGE Commands should really have a category: plug-in='org.eclipse.linuxtools.systemtap.ui.graphing', id='org.eclipse.linuxtools.systemtap.ui.graphing.commands.SaveGraphImage', categoryId='org.eclipse.linuxtools.systemtap.ui.graphing.category.file'
+
+!ENTRY org.eclipse.ui 2 0 2017-04-05 13:33:55.509
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2017-04-05 13:33:55.509
+!MESSAGE Commands should really have a category: plug-in='org.eclipse.linuxtools.systemtap.ui.graphing', id='org.eclipse.linuxtools.systemtap.ui.graphing.commands.SaveGraphImage', categoryId='org.eclipse.linuxtools.systemtap.ui.graphing.category.file'
+
+!ENTRY org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for ALT+CTRL+I:
+Binding(ALT+CTRL+I,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.include.browser,Open Include Browser,
+		Open an include browser on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5126c0cd,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(ALT+CTRL+I,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.include.browser,Open Include Browser,
+		Open an include browser on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5126c0cd,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for F4:
+Binding(F4,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.type.hierarchy,Open Type Hierarchy,
+		Open a type hierarchy on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@6c1e2161,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(F4,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.type.hierarchy,Open Type Hierarchy,
+		Open a type hierarchy on the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@6c1e2161,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for CTRL+SHIFT+T:
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.opentype,Open Element,
+		Open an element in an Editor,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5b7f9eaa,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.opentype,Open Element,
+		Open an element in an Editor,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5b7f9eaa,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for ALT+SHIFT+R:
+Binding(ALT+SHIFT+R,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.text.rename.element,Rename - Refactoring ,
+		Rename the selected element,
+		Category(org.eclipse.cdt.ui.category.refactoring,Refactor - C++,C/C++ Refactorings,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5b344510,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(ALT+SHIFT+R,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.text.rename.element,Rename - Refactoring ,
+		Rename the selected element,
+		Category(org.eclipse.cdt.ui.category.refactoring,Refactor - C++,C/C++ Refactorings,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5b344510,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for CTRL+SHIFT+G:
+Binding(CTRL+SHIFT+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.findrefs,References,
+		Search for references to the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@3c73d613,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+SHIFT+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.findrefs,References,
+		Search for references to the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@3c73d613,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for CTRL+G:
+Binding(CTRL+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.finddecl,Declaration,
+		Search for declarations of the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@21fbfdd5,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+G,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.search.finddecl,Declaration,
+		Search for declarations of the selected element in the workspace,
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@21fbfdd5,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for ALT+CTRL+H:
+Binding(ALT+CTRL+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.call.hierarchy,Open Call Hierarchy,
+		Open the call hierarchy for the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@656bd8e,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(ALT+CTRL+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.open.call.hierarchy,Open Call Hierarchy,
+		Open the call hierarchy for the selected element,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@656bd8e,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for CTRL+SHIFT+H:
+Binding(CTRL+SHIFT+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.open.type.in.hierarchy,Open Type in Hierarchy,
+		Open a type in the type hierarchy view,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@7f336491,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(CTRL+SHIFT+H,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.navigate.open.type.in.hierarchy,Open Type in Hierarchy,
+		Open a type in the type hierarchy view,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@7f336491,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2017-04-05 13:51:16.605
+!MESSAGE A conflict occurred for F3:
+Binding(F3,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.opendecl,Open Declaration,
+		Open an editor on the selected element's declaration(s),
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5dd2e62a,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cEditorScope,,,system)
+Binding(F3,
+	ParameterizedCommand(Command(org.eclipse.cdt.ui.edit.opendecl,Open Declaration,
+		Open an editor on the selected element's declaration(s),
+		Category(org.eclipse.cdt.ui.category.source,Source,Source commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5dd2e62a,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.cdt.ui.cViewScope,,,system)
+
+!ENTRY org.eclipse.cdt.core 1 0 2017-04-05 14:45:25.802
+!MESSAGE Indexed 'core' (5 sources, 777 headers) in 36,69 sec: 75.791 declarations; 176.664 references; 0 unresolved inclusions; 0 syntax errors; 291 unresolved names (0,12%)
+
+!ENTRY org.eclipse.cdt.codan.checkers 4 0 2017-04-05 14:45:40.363
+!MESSAGE org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization$RecursionResolvingBinding cannot be cast to org.eclipse.cdt.core.dom.ast.cpp.ICPPEnumerationSpecialization
+!STACK 0
+java.lang.ClassCastException: org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization$RecursionResolvingBinding cannot be cast to org.eclipse.cdt.core.dom.ast.cpp.ICPPEnumerationSpecialization
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.createSpecialization(CPPTemplates.java:928)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization.specializeMember(CPPClassSpecialization.java:186)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.AbstractCPPClassSpecializationScope.getBindings(AbstractCPPClassSpecializationScope.java:116)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getBindingsFromScope(CPPSemantics.java:1260)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.lookup(CPPSemantics.java:1008)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalID.resolveName(EvalID.java:372)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalID.instantiate(EvalID.java:337)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateValue(CPPTemplates.java:983)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalFixed.instantiate(EvalFixed.java:165)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateArgument(CPPTemplates.java:1216)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateArguments(CPPTemplates.java:1185)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.resolveDeferredClassInstance(CPPTemplates.java:2739)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.resolveUnknown(CPPTemplates.java:2669)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateType(CPPTemplates.java:1296)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.AbstractCPPClassSpecializationScope.getBases(AbstractCPPClassSpecializationScope.java:162)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization.getBases(CPPClassSpecialization.java:232)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper.getBases(ClassTypeHelper.java:244)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:773)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:777)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:777)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:777)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:792)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:766)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getAssociatedScopes(CPPSemantics.java:724)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.doKoenigLookup(CPPSemantics.java:596)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.findOverloadedOperator(CPPSemantics.java:3404)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.findOverloadedBinaryOperator(CPPSemantics.java:3085)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinary.computeOverload(EvalBinary.java:249)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinary.getOverload(EvalBinary.java:230)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinary.getValue(EvalBinary.java:138)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalConditional.getValue(EvalConditional.java:118)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateValue(CPPTemplates.java:986)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.createSpecialization(CPPTemplates.java:918)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization.specializeMember(CPPClassSpecialization.java:186)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateBinding(CPPTemplates.java:1462)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateBinding(CPPTemplates.java:1454)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPEvaluation.instantiateBinding(CPPEvaluation.java:70)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding.instantiate(EvalBinding.java:392)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalConditional.instantiate(EvalConditional.java:339)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateValue(CPPTemplates.java:983)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.createSpecialization(CPPTemplates.java:918)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization.specializeMember(CPPClassSpecialization.java:186)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.createSpecialization(CPPTemplates.java:928)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization.specializeMember(CPPClassSpecialization.java:186)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.AbstractCPPClassSpecializationScope.getBindings(AbstractCPPClassSpecializationScope.java:116)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.getBindingsFromScope(CPPSemantics.java:1260)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.lookup(CPPSemantics.java:1008)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalID.resolveName(EvalID.java:372)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalID.instantiate(EvalID.java:337)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateValue(CPPTemplates.java:983)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalFixed.instantiate(EvalFixed.java:165)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateArgument(CPPTemplates.java:1216)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateArguments(CPPTemplates.java:1185)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.resolveDeferredClassInstance(CPPTemplates.java:2739)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.resolveUnknown(CPPTemplates.java:2669)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.instantiateType(CPPTemplates.java:1296)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.AbstractCPPClassSpecializationScope.getBases(AbstractCPPClassSpecializationScope.java:162)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPClassSpecialization.getBases(CPPClassSpecialization.java:232)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper.getBases(ClassTypeHelper.java:244)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.SemanticUtil.calculateInheritanceDepth(SemanticUtil.java:658)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.SemanticUtil.calculateInheritanceDepth(SemanticUtil.java:669)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.SemanticUtil.calculateInheritanceDepth(SemanticUtil.java:669)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.SemanticUtil.calculateInheritanceDepth(SemanticUtil.java:669)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.SemanticUtil.calculateInheritanceDepth(SemanticUtil.java:644)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.Conversions.nonReferenceConversion(Conversions.java:315)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.Conversions.checkImplicitConversionSequence(Conversions.java:251)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.findImplicitlyCalledConstructor(CPPSemantics.java:3219)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.findImplicitlyCalledConstructor(CPPSemantics.java:3189)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics.findImplicitlyCalledConstructor(CPPSemantics.java:3160)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTDeclarator.getImplicitNames(CPPASTDeclarator.java:304)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTDeclarator.accept(CPPASTDeclarator.java:215)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTSimpleDeclaration.accept(CPPASTSimpleDeclaration.java:105)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTDeclarationStatement.accept(CPPASTDeclarationStatement.java:73)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTCompoundStatement.accept(CPPASTCompoundStatement.java:85)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionDefinition.accept(CPPASTFunctionDefinition.java:198)
+	at org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNamespaceDefinition.accept(CPPASTNamespaceDefinition.java:135)
+	at org.eclipse.cdt.internal.core.dom.parser.ASTTranslationUnit.accept(ASTTranslationUnit.java:265)
+	at org.eclipse.cdt.codan.internal.checkers.ProblemBindingChecker.processAst(ProblemBindingChecker.java:78)
+	at org.eclipse.cdt.codan.core.cxx.model.AbstractIndexAstChecker.processModel(AbstractIndexAstChecker.java:111)
+	at org.eclipse.cdt.codan.internal.core.CodanRunner.processResource(CodanRunner.java:88)
+	at org.eclipse.cdt.codan.internal.core.CodanRunner.runInEditor(CodanRunner.java:42)
+	at org.eclipse.cdt.codan.core.cxx.internal.model.CxxCodanReconciler.reconciledAst(CxxCodanReconciler.java:36)
+	at org.eclipse.cdt.codan.internal.ui.cxx.CodanCReconciler.reconciled(CodanCReconciler.java:57)
+	at org.eclipse.cdt.internal.ui.editor.CEditor.reconciled(CEditor.java:3051)
+	at org.eclipse.cdt.internal.ui.text.CReconcilingStrategy.reconcile(CReconcilingStrategy.java:99)
+	at org.eclipse.cdt.internal.ui.text.CReconcilingStrategy.reconcile(CReconcilingStrategy.java:63)
+	at org.eclipse.cdt.internal.ui.text.CompositeReconcilingStrategy.reconcile(CompositeReconcilingStrategy.java:87)
+	at org.eclipse.cdt.internal.ui.text.CCompositeReconcilingStrategy.reconcile(CCompositeReconcilingStrategy.java:90)
+	at org.eclipse.jface.text.reconciler.MonoReconciler.process(MonoReconciler.java:77)
+	at org.eclipse.cdt.internal.ui.text.CReconciler.process(CReconciler.java:358)
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:206)
+
+!ENTRY org.eclipse.cdt.core 4 0 2017-04-05 15:00:49.698
+!MESSAGE Error while parsing /core/src/SparseSolver.cpp.
+!STACK 0
+java.lang.ClassCastException
