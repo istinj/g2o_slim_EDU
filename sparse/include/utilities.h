@@ -33,11 +33,6 @@
 typedef Eigen::Matrix<float, 6, 1> Vector6f;
 typedef Eigen::Matrix<float, 6, 6> Matrix6f;
 
-struct Association{
-   int x_idx;
-   int h_idx;
-};
-
 Eigen::Matrix4f v2t(const Vector6f& v);
 Eigen::Matrix3f skew(const Eigen::Vector3f& p);
 

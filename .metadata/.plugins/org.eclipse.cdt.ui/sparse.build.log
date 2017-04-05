@@ -1,0 +1,11 @@
+12:40:35 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/SparseMatrix.cpp.o
+[100%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Building CXX object CMakeFiles/test_Cholesky_app.dir/src/utilities.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+
+12:40:41 Build Finished (took 5s.596ms)
+

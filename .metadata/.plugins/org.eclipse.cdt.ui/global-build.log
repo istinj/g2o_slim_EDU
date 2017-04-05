@@ -1,0 +1,197 @@
+12:28:16 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] [100%] [100%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Building CXX object CMakeFiles/test_Cholesky_app.dir/src/utilities.cpp.o
+Building CXX object CMakeFiles/test_Cholesky_app.dir/src/SparseMatrix.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+12:28:54 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+/home/istin/source/g2o_slim_EDU/sparse/src/test.cpp: In function ‘int main(int, const char**)’:
+/home/istin/source/g2o_slim_EDU/sparse/src/test.cpp:76:4: error: ‘deltaX’ was not declared in this scope
+    deltaX->printVector();
+    ^
+make[2]: *** [CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o] Errore 1
+make[1]: *** [CMakeFiles/test_Cholesky_app.dir/all] Errore 2
+make: *** [all] Errore 2
+12:29:03 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+12:34:03 **** Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 50%] [ 50%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+In file included from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:0:
+/home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26:31: fatal error: SparseBlockMatrix.h: File o directory non esistente
+ #include <SparseBlockMatrix.h>
+                               ^
+compilation terminated.
+In file included from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:8:0:
+/home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26:31: fatal error: SparseBlockMatrix.h: File o directory non esistente
+ #include <SparseBlockMatrix.h>
+                               ^
+compilation terminated.
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o] Errore 1
+make[2]: *** Attesa per i processi non terminati....
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+12:35:55 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 25%] [ 50%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+In file included from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:0:
+/home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26:31: fatal error: SparseBlockMatrix.h: File o directory non esistente
+ #include "SparseBlockMatrix.h"
+                               ^
+compilation terminated.
+In file included from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:8:0:
+/home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26:31: fatal error: SparseBlockMatrix.h: File o directory non esistente
+ #include "SparseBlockMatrix.h"
+                               ^
+compilation terminated.
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o] Errore 1
+make[2]: *** Attesa per i processi non terminati....
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+12:39:18 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+[ 50%] [ 50%] Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:36:8: error: redefinition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:25:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:36:8: error: previous definition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:41:38: error: new declaration ‘Eigen::Matrix4f v2t(const Vector6f&)’
+ Eigen::Matrix4f v2t(const Vector6f& v);
+                                      ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:25:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:42:19: error: ambiguates old declaration ‘Eigen::Isometry3f v2t(const Vector6f&)’
+ Eigen::Isometry3f v2t(const Vector6f& v);
+                   ^
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:36:8: error: redefinition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/Graph.h:19:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:7:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:36:8: error: previous definition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:41:38: error: new declaration ‘Eigen::Matrix4f v2t(const Vector6f&)’
+ Eigen::Matrix4f v2t(const Vector6f& v);
+                                      ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/Graph.h:19:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:7:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:42:19: error: ambiguates old declaration ‘Eigen::Isometry3f v2t(const Vector6f&)’
+ Eigen::Isometry3f v2t(const Vector6f& v);
+                   ^
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o] Errore 1
+make[2]: *** Attesa per i processi non terminati....
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+12:40:07 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+[ 25%] [ 50%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:36:8: error: redefinition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/Graph.h:19:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:7:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:36:8: error: previous definition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:41:38: error: new declaration ‘Eigen::Matrix4f v2t(const Vector6f&)’
+ Eigen::Matrix4f v2t(const Vector6f& v);
+                                      ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/Graph.h:19:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/tls_main.cpp:7:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:42:19: error: ambiguates old declaration ‘Eigen::Isometry3f v2t(const Vector6f&)’
+ Eigen::Isometry3f v2t(const Vector6f& v);
+                   ^
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:36:8: error: redefinition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:25:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:36:8: error: previous definition of ‘struct Association’
+ struct Association{
+        ^
+In file included from /home/istin/source/g2o_slim_EDU/sparse/include/SparseBlockMatrix.h:21:0,
+                 from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:26,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/sparse/include/utilities.h:41:38: error: new declaration ‘Eigen::Matrix4f v2t(const Vector6f&)’
+ Eigen::Matrix4f v2t(const Vector6f& v);
+                                      ^
+In file included from /home/istin/source/g2o_slim_EDU/core/include/SparseSolver.h:25:0,
+                 from /home/istin/source/g2o_slim_EDU/core/src/SparseSolver.cpp:8:
+/home/istin/source/g2o_slim_EDU/core/include/utilities.h:42:19: error: ambiguates old declaration ‘Eigen::Isometry3f v2t(const Vector6f&)’
+ Eigen::Isometry3f v2t(const Vector6f& v);
+                   ^
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o] Errore 1
+make[2]: *** Attesa per i processi non terminati....
+make[2]: *** [CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+12:40:35 **** Incremental Build of configuration Default for project sparse ****
+make -j4 all 
+Scanning dependencies of target test_Cholesky_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/SparseMatrix.cpp.o
+[100%] Building CXX object CMakeFiles/test_Cholesky_app.dir/src/test.cpp.o
+Building CXX object CMakeFiles/test_Cholesky_app.dir/src/utilities.cpp.o
+Linking CXX executable ../bin/test_Cholesky_app
+[100%] Built target test_Cholesky_app
+12:43:00 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Linking CXX executable ../bin/tls_main_app
+CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o: nella funzione "optimizer::SparseSolver::errorAndJacobianPosePoint(Eigen::Transform<float, 3, 1, 0> const&, Eigen::Matrix<float, 3, 1, 0, 3, 1> const&, Eigen::Matrix<float, 3, 1, 0, 3, 1> const&, Eigen::Matrix<float, 3, 1, 0, 3, 1>&, Eigen::Matrix<float, 3, 3, 0, 3, 3>&, Eigen::Matrix<float, 3, 6, 0, 3, 6>&)":
+SparseSolver.cpp:(.text+0x2044): riferimento non definito a "skew(Eigen::Matrix<float, 3, 1, 0, 3, 1> const&)"
+CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o: nella funzione "optimizer::SparseSolver::errorAndJacobianPosePose(Eigen::Transform<float, 3, 1, 0> const&, Eigen::Transform<float, 3, 1, 0> const&, Eigen::Transform<float, 3, 1, 0> const&, Eigen::Matrix<float, 12, 1, 0, 12, 1>&, Eigen::Matrix<float, 12, 6, 0, 12, 6>&, Eigen::Matrix<float, 12, 6, 0, 12, 6>&)":
+SparseSolver.cpp:(.text+0x35a8): riferimento non definito a "skew(Eigen::Matrix<float, 3, 1, 0, 3, 1> const&)"
+collect2: error: ld returned 1 exit status
+make[2]: *** [../bin/tls_main_app] Errore 1
+make[1]: *** [CMakeFiles/tls_main_app.dir/all] Errore 2
+make: *** [all] Errore 2
+12:44:40 **** Incremental Build of configuration Default for project core ****
+make -j4 all 
+Scanning dependencies of target tls_main_app
+[ 33%] [ 66%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
+Building CXX object CMakeFiles/tls_main_app.dir/src/tls_main.cpp.o
+Linking CXX executable ../bin/tls_main_app
+[100%] Built target tls_main_app

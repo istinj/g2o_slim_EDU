@@ -75,6 +75,17 @@ private:
 	int getPoseMatrixIndex(int curr_pose_idx);
 	int getLandMatrixIndex(int curr_land_idx);
 
+	inline Eigen::Matrix3f skew(const Eigen::Vector3f& p)
+	{
+	   Eigen::Matrix3f s;
+	   s <<
+	         0,  -p.z(), p.y(),
+	         p.z(), 0,  -p.x(),
+	         -p.y(), p.x(), 0;
+	   return s;
+	}
+
+
 	PosesContainer _robot_poses;
 	LandmarkPointsContainer _land_points;
 
