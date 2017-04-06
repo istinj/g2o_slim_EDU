@@ -221,13 +221,17 @@ void SparseBlockMatrix<BlockType_>::cholesky(SparseBlockMatrix<BlockType_>& bloc
 			return;
 		int starting_col_idx = curr_row.begin()->first;
 
+		cerr << BOLDYELLOW << "r: " << r << RESET << endl;
+
 		//! Looping over cols
 		for (int c = starting_col_idx; c <= r; ++c) {
 			DenseBlock accumulator = DenseBlock::Zero();
 			DenseBlock chol_curr_rc_value = DenseBlock::Zero();
 
 			ColumnsBlockMap& chol_upper_row = block_cholesky_._row_container[c];
+			cerr << BOLDGREEN << "c: " << c << RESET << endl;
 			accumulator = getBlock(r,c) - scalarProd(chol_curr_row, chol_upper_row, c-1);
+			cerr << BOLDYELLOW << "accumulator: " << endl << accumulator << RESET << endl;
 			if(r == c){
 				//! TODO ERROR-> accumulator is not always positive semi definite
 				//! How to handle this problem? Anyway this should not occur since every
@@ -237,6 +241,8 @@ void SparseBlockMatrix<BlockType_>::cholesky(SparseBlockMatrix<BlockType_>& bloc
 			} else {
 				chol_curr_rc_value = accumulator * inverse_transpose_diagonal_blocks[c];
 			}
+			cerr << BOLDWHITE << "inserting the block(" << r << ", " << c << "):" << endl;
+			cerr << chol_curr_rc_value << RESET << endl;
 			chol_curr_row.insert(make_pair(c, chol_curr_rc_value));
 		}
 	}
@@ -259,7 +265,7 @@ bool SparseBlockMatrix<BlockType_>::solveLinearSystem(const DenseVector<VectorBl
 	SparseBlockMatrix<DenseBlock> U(_num_block_cols, _num_block_rows, _block_dim);
 	cholesky(L);
 	L.transpose(U);
-
+/*
 	for (int r = 0; r < _num_block_rows; ++r) {
 		for (int c = 0; c < _num_block_cols; ++c) {
 			cerr << MAGENTA << "H block" << RESET << endl;
@@ -274,10 +280,19 @@ bool SparseBlockMatrix<BlockType_>::solveLinearSystem(const DenseVector<VectorBl
 			cin.get();
 		}
 	}
-
+/**/
 	DenseVector<VectorBlockType_> Y;
 	L.forwSubstitution(RHS_Vector_, Y);
 	U.backSubstitution(Y, result_);
+/*
+	for (int r = 0; r < _num_block_rows; ++r) {
+		cerr << MAGENTA << "Y block" << RESET << endl;
+		Y.printBlock(r);
+		cerr << YELLOW << "L block" << RESET << endl;
+		result_.printBlock(r);
+		cin.get();
+	}
+/**/
 	return true;
 }
 
@@ -352,7 +367,11 @@ BlockType_ SparseBlockMatrix<BlockType_>::scalarProd(const ColumnsBlockMap& row_
 		const ColumnsBlockMap& row_2_, int max_pos_){
 	typename ColumnsBlockMap::const_iterator it_1 = row_1_.begin();
 	typename ColumnsBlockMap::const_iterator it_2 = row_2_.begin();
+	cerr << BOLDMAGENTA << "\tInside scalar prod" << RESET << endl;
 	DenseBlock result = DenseBlock::Zero();
+	cerr << BOLDCYAN << "\tc1: " << it_1->first <<
+			BOLDRED << "\tc2: " << it_2->first <<
+			BOLDBLUE << "\tmax_pos: " << max_pos_ << RESET << endl;
 	while(it_1 != row_1_.end() && it_2 != row_2_.end()){
 		int col_idx_1 = it_1->first;
 		int col_idx_2 = it_2->first;
@@ -360,7 +379,7 @@ BlockType_ SparseBlockMatrix<BlockType_>::scalarProd(const ColumnsBlockMap& row_
 			return result;
 		}
 		if(col_idx_1 == col_idx_2){
-			result.noalias() += it_1->second * it_2->second.transpose();
+			result += it_1->second * it_2->second.transpose();
 			++it_1;
 			++it_2;
 		}
@@ -369,6 +388,8 @@ BlockType_ SparseBlockMatrix<BlockType_>::scalarProd(const ColumnsBlockMap& row_
 		else if(col_idx_1 < col_idx_2)
 			++it_1;
 	}
+	cerr << BOLDMAGENTA << "\tresult:" << RESET << endl;
+	cerr << result << endl;
 	return result;
 }
 

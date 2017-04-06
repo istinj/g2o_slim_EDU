@@ -79,7 +79,6 @@ protected:
 
    //! TODO: traits to manage wrong BlockType_
    //! TODO: handle non-squared blocks (pair in the constructor);
-   //! TODO: export matrix to txt -> MATLAB check
    //! TODO: check Cholesky -> Block(end,end) is a bit wrong
    //! TODO: CHOLESKY IS HAVING PROBLEMS PORCO DIO
 

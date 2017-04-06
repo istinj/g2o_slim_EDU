@@ -7,79 +7,150 @@
 
 int main(int argc, char const *argv[])
 {
-   /*
-    *
-    * A matrix:
-   1.3137    1.9933         0         0    1.4421    1.7743
-   1.9933    3.1610         0         0    2.3542    2.6394
-        0         0    0.2354    0.3563         0         0
-        0         0    0.3563    0.5396         0         0
-   1.4421    2.3542         0         0    2.1761    2.1368
-   1.7743    2.6394         0         0    2.1368    2.6851
 
-    * B RHS vector
-    0.5377
-    1.8339
-   -2.2588
-    0.8622
-    0.3188
-   -1.3077
-    *
-    *
-   /**/
+	sparse::SparseBlockMatrix<Matrix6f> sp_block_mat(11,11,6);
+	sparse::DenseVector<Vector6f> rhs_B(11,6);
+	Matrix6f a, a_plus_a;
+	Vector6f b;
 
-
-   sparse::SparseBlockMatrix<Eigen::Matrix2d> sp_block_mat(3,3,2);
-   sparse::DenseVector<Eigen::Vector2d> rhs_B(3,2);
-   Eigen::Matrix2d a;
-   Eigen::Vector2d b;
-
-   //! Setup the linear system (retarded fashion)
-   a << 1.3137,   1.9933,
-         1.9933, 3.1610;
-   sp_block_mat.setBlock(0,0,a);
-
-   a << 1.4421, 1.7743,
-         2.3542, 2.6394;
-   sp_block_mat.setBlock(0,2,a);
-
-   a << 0.2354, 0.3563,
-         0.3563, 0.5396;
-   sp_block_mat.setBlock(1,1,a);
-
-   a << 1.4421, 2.3542,
-         1.7743, 2.6394;
-   sp_block_mat.setBlock(2,0,a);
-
-   a << 2.1761, 2.1368,
-         2.1368, 2.6851;
-   sp_block_mat.setBlock(2,2,a);
-
-   //! RHS
-   b << 0.5377,
-         1.8339;
-   rhs_B.setBlock(0, b);
-
-   b << -2.2588,
-         0.8622;
-   rhs_B.setBlock(1, b);
-
-   b << 0.3188,
-         -1.3077;
-   rhs_B.setBlock(2, b);
-
-   sp_block_mat.exportToTxt("../data/cpp_L_export.txt");
-
-
-   //! Solving linear system Ax = B
-//   sparse::DenseVector<Eigen::Vector2d> deltaX(3,2);
-//   sp_block_mat.solveLinearSystem(rhs_B, deltaX);
-
-//   cout << endl << BOLDGREEN << "Solution of the system:" << RESET <<  endl;
-//   deltaX.printVector();
+	//! Setup the linear system (retarded fashion)
+	a <<     	163,   118,   135,   107,   190,   144,
+			118,   139,   106,   123,   186,   145,
+			135,   106,   123,    99,   172,   104,
+			107,   123,    99,   155,   202,   117,
+			190,   186,   172,   202,   312,   183,
+			144,   145,   104,   117,   183,   206;
+	a_plus_a <<    326,   236,   270,   214,   380,   288,
+			236,   278,   212,   246,   372,   290,
+			270,   212,   246,   198,   344,   208,
+			214,   246,   198,   310,   404,   234,
+			380,   372,   344,   404,   624,   366,
+			288,   290,   208,   234,   366,   412;
+	for (int i = 0; i < 11; ++i) {
+		if(i == 0){
+			sp_block_mat.setBlock(i,i,a);
+			continue;
+		}
+		sp_block_mat.setBlock(i,i,a_plus_a);
+		if(i > 0)
+			sp_block_mat.setBlock(i,i-1,-a);
+	}
 
 
 
-   return 0;
+	//! RHS
+	b << 3,1,3,1,6,8;
+	rhs_B.setBlock(0, b);
+
+	b << 7,1,1,8,10,6;
+	rhs_B.setBlock(1, b);
+
+	b << 2,9,4,3,8,1;
+	rhs_B.setBlock(2, b);
+
+	b << 1,7,7,6,8,8;
+	rhs_B.setBlock(3, b);
+
+	b <<    8,
+			3,
+			7,
+			6,
+			4,
+			1;
+	rhs_B.setBlock(4, b);
+
+	b <<     8,
+			4,
+			7,
+			8,
+			2,
+			2;
+	rhs_B.setBlock(5, b);
+
+	b <<     6,
+			5,
+			9,
+			8,
+			8,
+			1;
+	rhs_B.setBlock(6, b);
+
+	b <<  1,
+			1,
+			8,
+			10,
+			7,
+			2;
+	rhs_B.setBlock(7, b);
+
+	b <<     8,
+			2,
+			2,
+			7,
+			4,
+			7;
+	rhs_B.setBlock(8, b);
+
+	b <<       8,
+			6,
+			8,
+			3,
+			8,
+			10;
+	rhs_B.setBlock(9, b);
+
+	b <<       9,
+			1,
+			4,
+			4,
+			7,
+			6;
+	rhs_B.setBlock(10, b);
+
+	sparse::SparseBlockMatrix<Matrix6f> true_L(11,11,6);
+	sparse::SparseBlockMatrix<Matrix6f> true_U(11,11,6);
+	Matrix6f l00, l11;
+	l00 <<    		   12.7671,         0,         0,        0,         0,         0,
+			9.2425,    7.3196,         0,        0,         0,         0,
+			10.5740,    1.1298,    3.1486,        0,         0,         0,
+			8.3809,    6.2216,    1.0643,   6.7022,         0,         0,
+			14.8819,    6.6198,    2.2737,   5.0238,    4.0371,         0,
+			11.2790,    5.5679,   -6.8458,  -0.7286,   -0.6157,    0.0987;
+	l11 <<     18.0555,         0,         0,         0,         0,         0,
+			13.0708,   10.3515,         0,         0,         0,         0,
+			14.9539,    1.5978,    4.4528,         0,         0,         0,
+			11.8524,    8.7987,    1.5051,    9.4783,         0,         0,
+			21.0463,    9.3617,    3.2154,    7.1048,    5.7093,         0,
+			15.9508,    7.8742,   -9.6814,   -1.0304,   -0.8707,    0.1396;
+
+	for (int i = 0; i < 11; ++i) {
+		if(i == 0){
+			true_L.setBlock(i,i,l00);
+			continue;
+		}
+		true_L.setBlock(i,i,l11);
+	}
+
+
+
+	//! Solving linear system Ax = B
+	sparse::DenseVector<Vector6f> deltaX(11,6);
+
+	true_L.transpose(true_U);
+	sparse::DenseVector<Vector6f> Y;
+	true_L.forwSubstitution(rhs_B, Y);
+	cout << endl << BOLDGREEN << "Y vector:" << RESET <<  endl;
+	Y.printVector();
+	true_U.backSubstitution(Y, deltaX);
+
+
+	//	sp_block_mat.solveLinearSystem(rhs_B, deltaX);
+
+	cout << endl << BOLDGREEN << "Solution of the system:" << RESET <<  endl;
+	deltaX.printVector();
+
+
+
+	return 0;
 }
 

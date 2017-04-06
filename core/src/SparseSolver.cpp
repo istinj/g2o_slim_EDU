@@ -175,6 +175,8 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_ii_block.noalias() += prev_hii_block;
 		_pose_pose_Hessian->setBlock(h_ii_indices.first,
 				h_ii_indices.second, h_ii_block);
+//		cerr << BOLDMAGENTA <<  "H(" << h_ii_indices.first << ", " << h_ii_indices.second << ")" << endl;
+//		cerr << BOLDWHITE << h_ii_block << RESET << endl;
 
 		//! Second block
 		Matrix6f h_ji_block = Jj.transpose() * Omega * Ji;
@@ -185,6 +187,23 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_ji_block.noalias() += prev_h_ji_block;
 		_pose_pose_Hessian->setBlock(h_ji_indices.first,
 				h_ji_indices.second, h_ji_block);
+//		cerr << BOLDMAGENTA << "H(" << h_ji_indices.first << ", " << h_ji_indices.second << ")" << endl;
+//		cerr << BOLDWHITE << h_ji_block << RESET << endl;
+
+
+		//! Second block transposed
+		Matrix6f h_ij_block = Ji.transpose() * Omega * Jj;
+		HessianIndices h_ij_indices = make_pair(i_hessian_idx,
+				j_hessian_idx);
+		Matrix6f prev_h_ij_block = _pose_pose_Hessian->getBlock(h_ij_indices.first,
+				h_ij_indices.second);
+		h_ij_block.noalias() += prev_h_ij_block;
+		_pose_pose_Hessian->setBlock(h_ij_indices.first,
+				h_ij_indices.second, h_ij_block);
+//		cerr << BOLDMAGENTA << "H(" << h_ji_indices.first << ", " << h_ji_indices.second << ")" << endl;
+//		cerr << BOLDWHITE << h_ji_block << RESET << endl;
+
+
 
 		//! Third block
 		Matrix6f h_jj_block = Jj.transpose() * Omega * Jj;
@@ -195,6 +214,8 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_jj_block.noalias() += prev_hjj_block;
 		_pose_pose_Hessian->setBlock(h_jj_indices.first,
 				h_jj_indices.second, h_jj_block);
+//		cerr << BOLDMAGENTA << "H(" << h_jj_indices.first << ", " << h_jj_indices.second << ")" << endl;
+//		cerr << BOLDWHITE << h_jj_block << RESET << endl;
 
 		//! Building the RHS Vector
 		Vector6f b_i = Ji.transpose() * Omega * e;
@@ -206,7 +227,6 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		Vector6f prev_b_j = _pose_pose_B->getBlock(j_hessian_idx);
 		b_j.noalias() += prev_b_j;
 		_pose_pose_B->setBlock(j_hessian_idx, b_j);
-
 		//! Seems to work fine
 	}
 	return true;
@@ -282,17 +302,20 @@ void SparseSolver::oneStep(void){
 		cerr << GREEN << "inliers odom = " << step_inliers << "\t" << "chi odom = " << step_chi << RESET << endl;
 
 		sparse::DenseVector<Vector6f> dX_pose_pose;
+//		_pose_pose_Hessian->exportToTxt("../data/cppH_INT.txt");
+//		_pose_pose_B->exportToTxt("../data/cppB_INT.txt");
 		_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);
 		dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;
 
+/*
+		for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
+			dX_pose_pose.printBlock(i);
+			cin.get();
 
-//		for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
-//			dX_pose_pose.printBlock(i);
-//			cin.get();
-//
-//			Pose new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
-//			_robot_poses[i].setData(new_pose);
-//		}
+			Pose new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
+			_robot_poses[i].setData(new_pose);
+		}
+/**/
 	} else {
 		throw std::runtime_error("Linearize Pose-Pose Failure");
 	}
