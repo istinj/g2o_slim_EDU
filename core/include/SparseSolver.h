@@ -54,13 +54,14 @@ public:
 			const float l_, const float epsilon_);
 	virtual ~SparseSolver();
 
+	void updateGraph(Graph& graph_);
 	void oneStep(void);
 
 private:
 	bool linearizePosePoint(float& total_chi_, int& inliers_);
 	bool linearizePosePose(float& total_chi_, int& inliers_);
 	void errorAndJacobianPosePoint(const Pose& xr,
-			const LandmarkXYZ& xl,
+			const PointXYZ& xl,
 			const PointMeas& zl,
 			Eigen::Vector3f& error,
 			Eigen::Matrix3f& Jl,

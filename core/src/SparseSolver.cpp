@@ -86,6 +86,7 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 		pair<int, int> hessian_indices = make_pair(pose_hessian_idx,
 				pose_hessian_idx);
 
+		//! This block is useless
 		Matrix6_3f h_pl_data = Jr.transpose() * Jl;
 		hessian_indices = make_pair(pose_hessian_idx,
 				land_hessian_idx);
@@ -147,9 +148,9 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 				e, Ji, Jj);
 
 		//! Evaluate statistics
-		float chi = e.transpose() * e;
+		float chi = e.transpose() * Omega * e;
 		if (chi > _threshold) {
-			e *= sqrt(_threshold / chi);
+			Omega *= sqrt(_threshold / chi);
 			chi = _threshold;
 		} else {
 			inliers_++;
@@ -160,9 +161,7 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		//! Start building the Hessian
 		//! Each meas introduces 3 blocks in the Hessian Matrix, H_ii, H_ji, H_jj,
 		//! Building only the lower triangular part of H;
-		//		int i_hessian_idx = getPoseMatrixIndex(pose_i_iter->index());
-		//		int j_hessian_idx = getPoseMatrixIndex(pose_j_iter->index());
-		//! New block style indices
+		//! Block indices
 		int i_hessian_idx = pose_i_iter->index();
 		int j_hessian_idx = pose_j_iter->index();
 
@@ -186,7 +185,7 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		_pose_pose_Hessian->setBlock(h_ji_indices.first,
 				h_ji_indices.second, h_ji_block);
 
-		//! Second block transposed
+		//! Second block transposed; this block is useless
 		Matrix6f h_ij_block = Ji.transpose() * Omega * Jj;
 		HessianIndices h_ij_indices = make_pair(i_hessian_idx,
 				j_hessian_idx);
@@ -221,7 +220,7 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 	return true;
 }
 void SparseSolver::errorAndJacobianPosePoint(const Pose& xr,
-		const LandmarkXYZ& xl,
+		const PointXYZ& xl,
 		const PointMeas& zl,
 		Eigen::Vector3f& error,
 		Eigen::Matrix3f& Jl,
@@ -234,12 +233,15 @@ void SparseSolver::errorAndJacobianPosePoint(const Pose& xr,
 	Jr.block<3,3>(0,0).setIdentity();
 	Jr.block<3,3>(0,3) = -skew(h_x);
 }
+
 void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 		const Pose& xj,
 		const PoseMeas& zr,
 		Vector12f& error,
 		Matrix12_6f& Ji,
 		Matrix12_6f& Jj){
+
+	//! TODO move to initialization of the solver
 	Matrix3f Rx0, Ry0, Rz0;
 	Rx0 << 0,0,0,  0,0,-1,  0,1,0;
 	Ry0 << 0,0,1,  0,0,0,   -1,0,0;
@@ -282,6 +284,14 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	error.block<3,1>(6,0) = temp_e.matrix().block<3,1>(0,2);
 	error.block<3,1>(9,0) = temp_e.matrix().block<3,1>(0,3);
 }
+
+void SparseSolver::updateGraph(Graph& graph_){
+	cerr << BOLDYELLOW << "Updating the graph..." << RESET << endl;
+	graph_.updateVerticesSE3(_robot_poses);
+//	graph_.updateVerticesXYZ(_land_points);
+	cerr << BOLDGREEN << "Done!" << RESET << endl;
+}
+
 
 void SparseSolver::oneStep(void){
 	float step_chi;

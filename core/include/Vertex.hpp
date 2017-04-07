@@ -15,7 +15,7 @@
 namespace optimizer {
 
 typedef Eigen::Isometry3f Pose;
-typedef Eigen::Vector3f LandmarkXYZ;
+typedef Eigen::Vector3f PointXYZ;
 
 template <class _DataType>
 class Vertex{

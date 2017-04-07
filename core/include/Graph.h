@@ -23,7 +23,7 @@
 namespace optimizer {
 
 	typedef Vertex<Pose> VertexSE3;
-	typedef Vertex<LandmarkXYZ> VertexXYZ;
+	typedef Vertex<PointXYZ> VertexXYZ;
 	typedef Edge<PointMeas, OmegaPoint> EdgePosePoint;
 	typedef Edge<PoseMeas, OmegaPose> EdgePosePose;
 
@@ -35,14 +35,14 @@ namespace optimizer {
 		Graph(const std::string& path_to_graph_);
 		virtual ~Graph();
 
-		//! TODO: load from file
-		//! TODO: add variable
-		//! TODO: add factor (different kinds)
-		void loadFromFile(const std::string& filename);
-		void addVertexSE3(const VertexSE3& vertex);
-		void addVertexXYZ(const VertexXYZ& vertex);
+		void loadFromG2OFile(const std::string& filename_);
+		void exportToG2OFile(const std::string& filename_);
+		void addVertexSE3(const VertexSE3& vertex_);
+		void addVertexXYZ(const VertexXYZ& vertex_);
 		void addEdgePosePoint(const EdgePosePoint& edge_);
 		void addEdgeOdom(const EdgePosePose& edge_);
+		void updateVerticesSE3(const std::vector<VertexSE3>& new_SE3_vertices_);
+		void updateVerticesXYZ(const std::vector<VertexXYZ>& new_XYZ_vertices_);
 
 		inline const std::vector<VertexSE3>& verticesSE3(void) const {return _vertices_SE3;};
 		inline const std::vector<VertexXYZ>& verticesXYZ(void) const {return _vertices_XYZ;};
@@ -56,8 +56,6 @@ namespace optimizer {
 		inline const int numPosePointEdges(void) const {return _edges_pose_point.size();};
 
 	private:
-		//! TODO: List of vertices
-		//! TODO: List of edges
 		std::vector<VertexSE3> _vertices_SE3;
 		std::vector<VertexXYZ> _vertices_XYZ;
 

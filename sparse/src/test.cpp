@@ -8,7 +8,7 @@
 int main(int argc, char const *argv[])
 {
 
-	sparse::SparseBlockMatrix<Matrix6f> sp_block_mat(11,11,6);
+	sparse::SparseBlockMatrix<Matrix6f> sp_block_mat(3,3,6);
 	sparse::DenseVector<Vector6f> rhs_B(11,6);
 	Matrix6f a, a_plus_a;
 	Vector6f b;
@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
 			214,   246,   198,   310,   404,   234,
 			380,   372,   344,   404,   624,   366,
 			288,   290,   208,   234,   366,   412;
-	for (int i = 0; i < 11; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		if(i == 0){
 //			a += Matrix6f::Identity() * 1000;
 			sp_block_mat.setBlock(i,i,a);
@@ -37,8 +37,18 @@ int main(int argc, char const *argv[])
 			sp_block_mat.setBlock(i,i-1,-a);
 	}
 
+	sparse::SparseBlockMatrix<Matrix6f> L, U, result;
+	sp_block_mat.cholesky(L);
+	L.transpose(U);
+	L.rightMultiplyMatrix(U, result);
+	cout << BOLDGREEN << "A:\n" << RESET << endl;
+	sp_block_mat.printMatrix();
+	cout << BOLDGREEN << "L*U:\n" << RESET << endl;
+	result.printMatrix();
 
 
+
+/*
 	//! RHS
 	b << 3,1,3,1,6,8;
 	rhs_B.setBlock(0, b);
@@ -144,14 +154,14 @@ int main(int argc, char const *argv[])
 
 
 	//! Solving linear system Ax = B
-	sparse::DenseVector<Vector6f> deltaX(11,6);
-	sp_block_mat.solveLinearSystem(rhs_B, deltaX);
+//	sparse::DenseVector<Vector6f> deltaX(11,6);
+//	sp_block_mat.solveLinearSystem(rhs_B, deltaX);
+//
+//	cout << endl << BOLDGREEN << "Solution of the system:" << RESET <<  endl;
+//	deltaX.printVector();
 
-	cout << endl << BOLDGREEN << "Solution of the system:" << RESET <<  endl;
-	deltaX.printVector();
 
-
-
+/**/
 	return 0;
 }
 

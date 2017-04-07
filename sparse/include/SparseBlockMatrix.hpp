@@ -181,9 +181,12 @@ void SparseBlockMatrix<BlockType_>::computeCholeskyStructure(SparseBlockMatrix<B
 
 template<typename BlockType_>
 void SparseBlockMatrix<BlockType_>::rightMultiplyMatrix(SparseBlockMatrix<BlockType_>& other_,
-		SparseBlockMatrix<BlockType_> result_){
-	if(other_._num_block_cols != _num_block_cols)
+		SparseBlockMatrix<BlockType_>& result_){
+	if(other_._num_block_rows != _num_block_cols)
 		throw std::runtime_error("Error, matrix dimensions must agree.");
+	if(result_._num_block_rows != _num_block_rows ||
+			result_._num_block_cols != other_._num_block_cols)
+		result_.resize(_num_block_rows, other_._num_block_cols);
 
 	SparseBlockMatrix<DenseBlock> other_transposed;
 	other_.transpose(other_transposed);

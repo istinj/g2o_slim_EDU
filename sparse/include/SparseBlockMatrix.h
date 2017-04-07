@@ -44,8 +44,7 @@ public:
          const ColumnsBlockMap& row_2_, int max_pos_);
 
    void rightMultiplyMatrix(SparseBlockMatrix<BlockType_>& other_,
-		   SparseBlockMatrix<BlockType_> result_);
-   void copyMatrix(SparseBlockMatrix<BlockType_>& dest_);
+		   SparseBlockMatrix<BlockType_>& result_);
    void transpose(SparseBlockMatrix<BlockType_>& transpose_);
    void cholesky(SparseBlockMatrix<BlockType_>& block_cholesky_);
    DenseBlock scalarProd(const ColumnsBlockMap& row_1_,

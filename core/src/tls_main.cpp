@@ -42,9 +42,13 @@ int main(int argc, char const *argv[])
 	solver->oneStep();
 	solver->oneStep();
 
+	//! TODO
+	solver->updateGraph((*graph));
+//	graph->exportToG2OFile(filename);
+
 
 	delete solver;
 	delete graph;
-/**/
+
 	return 0;
 }
