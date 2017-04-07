@@ -180,6 +180,26 @@ void SparseBlockMatrix<BlockType_>::computeCholeskyStructure(SparseBlockMatrix<B
 }
 
 template<typename BlockType_>
+void SparseBlockMatrix<BlockType_>::rightMultiplyMatrix(SparseBlockMatrix<BlockType_>& other_,
+		SparseBlockMatrix<BlockType_> result_){
+	if(other_._num_block_cols != _num_block_cols)
+		throw std::runtime_error("Error, matrix dimensions must agree.");
+
+	SparseBlockMatrix<DenseBlock> other_transposed;
+	other_.transpose(other_transposed);
+
+	for (int r = 0; r < _num_block_rows; ++r) {
+		ColumnsBlockMap& curr_row = _row_container[r];
+		for (int c = 0; c < _num_block_cols; ++c) {
+			ColumnsBlockMap& other_transposed_curr_row = other_transposed._row_container[c];
+			DenseBlock prod_element = scalarProd(curr_row,
+					other_transposed_curr_row, _num_block_cols);
+			result_.setBlock(r,c,prod_element);
+		}
+	}
+}
+
+template<typename BlockType_>
 void SparseBlockMatrix<BlockType_>::transpose(SparseBlockMatrix<BlockType_>& transpose_){
 	transpose_ = SparseBlockMatrix<DenseBlock>(_num_block_cols, _num_block_rows, _block_dim);
 	for (int r = 0; r < _num_block_rows; ++r) {
@@ -230,9 +250,6 @@ void SparseBlockMatrix<BlockType_>::cholesky(SparseBlockMatrix<BlockType_>& bloc
 			accumulator = getBlock(r,c) - scalarProd(chol_curr_row, chol_upper_row, c-1);
 
 			if(r == c){
-				//! TODO ERROR-> accumulator is not always positive semi definite
-				//! How to handle this problem? Anyway this should not occur since every
-				//! block is J^t*Omega*J in this case, so it is a quadratic form;
 				chol_curr_rc_value = accumulator.llt().matrixL();
 				inverse_transpose_diagonal_blocks[r] = chol_curr_rc_value.inverse().transpose();
 			} else {
@@ -262,7 +279,7 @@ bool SparseBlockMatrix<BlockType_>::solveLinearSystem(const DenseVector<VectorBl
 	cholesky(L);
 	L.transpose(U);
 
-/*
+	/*
 	for (int r = 0; r < _num_block_rows; ++r) {
 		for (int c = 0; c < _num_block_cols; ++c) {
 			cerr << MAGENTA << "H block" << RESET << endl;
@@ -281,16 +298,6 @@ bool SparseBlockMatrix<BlockType_>::solveLinearSystem(const DenseVector<VectorBl
 	DenseVector<VectorBlockType_> Y;
 	L.forwSubstitution(RHS_Vector_, Y); // OK tested
 	U.backSubstitution(Y, result_); // Maybe has some problem :/
-
-/*
-	for (int r = 0; r < _num_block_rows; ++r) {
-		cerr << MAGENTA << "Y block" << RESET << endl;
-		Y.printBlock(r);
-		cerr << YELLOW << "L block" << RESET << endl;
-		result_.printBlock(r);
-		cin.get();
-	}
-/**/
 	return true;
 }
 

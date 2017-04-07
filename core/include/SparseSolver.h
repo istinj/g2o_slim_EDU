@@ -72,6 +72,7 @@ private:
 			Matrix12_6f& Ji,
 			Matrix12_6f& Jj);
 
+	//! Delete this shit
 	int getPoseMatrixIndex(int curr_pose_idx);
 	int getLandMatrixIndex(int curr_land_idx);
 
@@ -94,10 +95,6 @@ private:
 		T.translation() = v.block<3,1>(0,0);
 		return T;
 	}
-
-
-	//! TODO: check why the cholesky structure does not match with the real one (from MATLAB)
-	//! 	in the oneStep() function.
 
 	PosesContainer _robot_poses;
 	LandmarkPointsContainer _land_points;

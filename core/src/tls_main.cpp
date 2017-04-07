@@ -39,6 +39,8 @@ int main(int argc, char const *argv[])
 			graph->verticesXYZ(), graph->edgesPosePose(), graph->edgesPosePoint(),
 			0.0, 25.0);
 	solver->oneStep();
+	solver->oneStep();
+	solver->oneStep();
 
 
 	delete solver;

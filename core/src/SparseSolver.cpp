@@ -79,32 +79,32 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 
 
 		//! TODO H?
-				int row_idx_hessian = getPoseMatrixIndex(pose_iter->index());
-				int col_idx_hessian = getPoseMatrixIndex(land_iter->index());
+		int pose_hessian_idx = pose_iter->index();
+		int land_hessian_idx = land_iter->index();
 
-				Matrix6f h_pp_data = Jr.transpose() * Jr;
-				pair<int, int> hessian_indices = make_pair(row_idx_hessian,
-						row_idx_hessian);
+		Matrix6f h_pp_data = Jr.transpose() * Jr;
+		pair<int, int> hessian_indices = make_pair(pose_hessian_idx,
+				pose_hessian_idx);
 
-				Matrix6_3f h_pl_data = Jr.transpose() * Jl;
-				hessian_indices = make_pair(row_idx_hessian,
-						col_idx_hessian);
+		Matrix6_3f h_pl_data = Jr.transpose() * Jl;
+		hessian_indices = make_pair(pose_hessian_idx,
+				land_hessian_idx);
 
-				Matrix3_6f h_lp_data = Jl.transpose() * Jr;
-				hessian_indices = make_pair(col_idx_hessian,
-						row_idx_hessian);
+		Matrix3_6f h_lp_data = Jl.transpose() * Jr;
+		hessian_indices = make_pair(land_hessian_idx,
+				pose_hessian_idx);
 
-				Matrix3f h_ll_data = Jl.transpose() * Jl;
-				hessian_indices = make_pair(col_idx_hessian,
-						col_idx_hessian);
+		Matrix3f h_ll_data = Jl.transpose() * Jl;
+		hessian_indices = make_pair(land_hessian_idx,
+				land_hessian_idx);
 
-				//! TODO B?
-						/*
+		//! TODO B?
+/*
 		b_block_pose.data = Jr.transpose() * e;
-		b_block_pose.blockIndex = row_idx_hessian;
+		b_block_pose.blockIndex = pose_hessian_idx;
 
 		b_block_land.data = Jl.transpose() * e;
-		b_block_land.blockIndex = col_idx_hessian;
+		b_block_land.blockIndex = pose_hessian_idx;
 /**/
 	}
 	return true;
@@ -175,8 +175,6 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_ii_block.noalias() += prev_hii_block;
 		_pose_pose_Hessian->setBlock(h_ii_indices.first,
 				h_ii_indices.second, h_ii_block);
-//		cerr << BOLDMAGENTA <<  "H(" << h_ii_indices.first << ", " << h_ii_indices.second << ")" << endl;
-//		cerr << BOLDWHITE << h_ii_block << RESET << endl;
 
 		//! Second block
 		Matrix6f h_ji_block = Jj.transpose() * Omega * Ji;
@@ -187,9 +185,6 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_ji_block.noalias() += prev_h_ji_block;
 		_pose_pose_Hessian->setBlock(h_ji_indices.first,
 				h_ji_indices.second, h_ji_block);
-//		cerr << BOLDMAGENTA << "H(" << h_ji_indices.first << ", " << h_ji_indices.second << ")" << endl;
-//		cerr << BOLDWHITE << h_ji_block << RESET << endl;
-
 
 		//! Second block transposed
 		Matrix6f h_ij_block = Ji.transpose() * Omega * Jj;
@@ -200,10 +195,6 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_ij_block.noalias() += prev_h_ij_block;
 		_pose_pose_Hessian->setBlock(h_ij_indices.first,
 				h_ij_indices.second, h_ij_block);
-//		cerr << BOLDMAGENTA << "H(" << h_ji_indices.first << ", " << h_ji_indices.second << ")" << endl;
-//		cerr << BOLDWHITE << h_ji_block << RESET << endl;
-
-
 
 		//! Third block
 		Matrix6f h_jj_block = Jj.transpose() * Omega * Jj;
@@ -214,8 +205,6 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		h_jj_block.noalias() += prev_hjj_block;
 		_pose_pose_Hessian->setBlock(h_jj_indices.first,
 				h_jj_indices.second, h_jj_block);
-//		cerr << BOLDMAGENTA << "H(" << h_jj_indices.first << ", " << h_jj_indices.second << ")" << endl;
-//		cerr << BOLDWHITE << h_jj_block << RESET << endl;
 
 		//! Building the RHS Vector
 		Vector6f b_i = Ji.transpose() * Omega * e;
@@ -301,21 +290,25 @@ void SparseSolver::oneStep(void){
 	if(linearizePosePose(step_chi,step_inliers)){
 		cerr << GREEN << "inliers odom = " << step_inliers << "\t" << "chi odom = " << step_chi << RESET << endl;
 
+		//! Solving the Linear System Hx = B. Since it is under-determined (the solution is up-to a
+		//! rigid transformation), it is necessary to introduce a bias on the first element, to fix the
+		//! first point. Moreover, since we want that the starting pose remains the same, it is necessary
+		//! to set to 0 the first dX block.
 		sparse::DenseVector<Vector6f> dX_pose_pose;
-//		_pose_pose_Hessian->exportToTxt("../data/cppH_INT.txt");
-//		_pose_pose_B->exportToTxt("../data/cppB_INT.txt");
+
+		Matrix6f temp = _pose_pose_Hessian->getBlock(0,0);
+		temp += Matrix6f::Identity()*100000.0; //! Bias
+		_pose_pose_Hessian->setBlock(0,0,temp);
+
 		_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);
+
 		dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;
 
-/*
+		//! Apply the dX to the state.
 		for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
-			dX_pose_pose.printBlock(i);
-			cin.get();
-
 			Pose new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
 			_robot_poses[i].setData(new_pose);
 		}
-/**/
 	} else {
 		throw std::runtime_error("Linearize Pose-Pose Failure");
 	}

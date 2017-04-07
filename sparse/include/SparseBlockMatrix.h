@@ -43,10 +43,14 @@ public:
    bool computeScalarProdStructure(const ColumnsBlockMap& row_1_,
          const ColumnsBlockMap& row_2_, int max_pos_);
 
+   void rightMultiplyMatrix(SparseBlockMatrix<BlockType_>& other_,
+		   SparseBlockMatrix<BlockType_> result_);
+   void copyMatrix(SparseBlockMatrix<BlockType_>& dest_);
    void transpose(SparseBlockMatrix<BlockType_>& transpose_);
    void cholesky(SparseBlockMatrix<BlockType_>& block_cholesky_);
    DenseBlock scalarProd(const ColumnsBlockMap& row_1_,
          const ColumnsBlockMap& row_2_, int max_pos_);
+
    //! TODO: pass a pointer?
    template<typename VectorBlockType_>
    bool solveLinearSystem(const DenseVector<VectorBlockType_>& RHS_Vector_,
