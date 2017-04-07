@@ -1,9 +1,0 @@
-12:17:01 **** Incremental Build of configuration Default for project core ****
-make -j4 all 
-Scanning dependencies of target tls_main_app
-[ 33%] Building CXX object CMakeFiles/tls_main_app.dir/src/SparseSolver.cpp.o
-Linking CXX executable ../bin/tls_main_app
-[100%] Built target tls_main_app
-
-12:17:10 Build Finished (took 9s.110ms)
-

@@ -28,6 +28,7 @@ int main(int argc, char const *argv[])
 			288,   290,   208,   234,   366,   412;
 	for (int i = 0; i < 11; ++i) {
 		if(i == 0){
+//			a += Matrix6f::Identity() * 1000;
 			sp_block_mat.setBlock(i,i,a);
 			continue;
 		}
@@ -107,44 +108,44 @@ int main(int argc, char const *argv[])
 			6;
 	rhs_B.setBlock(10, b);
 
-	sparse::SparseBlockMatrix<Matrix6f> true_L(11,11,6);
-	sparse::SparseBlockMatrix<Matrix6f> true_U(11,11,6);
-	Matrix6f l00, l11;
-	l00 <<    		   12.7671,         0,         0,        0,         0,         0,
-			9.2425,    7.3196,         0,        0,         0,         0,
-			10.5740,    1.1298,    3.1486,        0,         0,         0,
-			8.3809,    6.2216,    1.0643,   6.7022,         0,         0,
-			14.8819,    6.6198,    2.2737,   5.0238,    4.0371,         0,
-			11.2790,    5.5679,   -6.8458,  -0.7286,   -0.6157,    0.0987;
-	l11 <<     18.0555,         0,         0,         0,         0,         0,
-			13.0708,   10.3515,         0,         0,         0,         0,
-			14.9539,    1.5978,    4.4528,         0,         0,         0,
-			11.8524,    8.7987,    1.5051,    9.4783,         0,         0,
-			21.0463,    9.3617,    3.2154,    7.1048,    5.7093,         0,
-			15.9508,    7.8742,   -9.6814,   -1.0304,   -0.8707,    0.1396;
 
-	for (int i = 0; i < 11; ++i) {
-		if(i == 0){
-			true_L.setBlock(i,i,l00);
-			continue;
-		}
-		true_L.setBlock(i,i,l11);
-	}
+	//	//! Test for BW/FW sub
+	//	sparse::SparseBlockMatrix<Matrix6f> true_L(11,11,6);
+	//	sparse::SparseBlockMatrix<Matrix6f> true_U(11,11,6);
+	//	Matrix6f l00, l11;
+	//	l00 <<    		   12.7671,         0,         0,        0,         0,         0,
+	//			9.2425,    7.3196,         0,        0,         0,         0,
+	//			10.5740,    1.1298,    3.1486,        0,         0,         0,
+	//			8.3809,    6.2216,    1.0643,   6.7022,         0,         0,
+	//			14.8819,    6.6198,    2.2737,   5.0238,    4.0371,         0,
+	//			11.2790,    5.5679,   -6.8458,  -0.7286,   -0.6157,    0.0987;
+	//	l11 <<     18.0555,         0,         0,         0,         0,         0,
+	//			13.0708,   10.3515,         0,         0,         0,         0,
+	//			14.9539,    1.5978,    4.4528,         0,         0,         0,
+	//			11.8524,    8.7987,    1.5051,    9.4783,         0,         0,
+	//			21.0463,    9.3617,    3.2154,    7.1048,    5.7093,         0,
+	//			15.9508,    7.8742,   -9.6814,   -1.0304,   -0.8707,    0.1396;
+	//
+	//	for (int i = 0; i < 11; ++i) {
+	//		if(i == 0){
+	//			true_L.setBlock(i,i,l00);
+	//			continue;
+	//		}
+	//		true_L.setBlock(i,i,l11);
+	//	}
+
+	//	true_L.transpose(true_U);
+	//	sparse::DenseVector<Vector6f> Y;
+	//	true_L.forwSubstitution(rhs_B, Y);
+	//	cout << endl << BOLDGREEN << "Y vector:" << RESET <<  endl;
+	//	Y.printVector();
+	//	true_U.backSubstitution(Y, deltaX);
 
 
 
 	//! Solving linear system Ax = B
 	sparse::DenseVector<Vector6f> deltaX(11,6);
-
-	true_L.transpose(true_U);
-	sparse::DenseVector<Vector6f> Y;
-	true_L.forwSubstitution(rhs_B, Y);
-	cout << endl << BOLDGREEN << "Y vector:" << RESET <<  endl;
-	Y.printVector();
-	true_U.backSubstitution(Y, deltaX);
-
-
-	//	sp_block_mat.solveLinearSystem(rhs_B, deltaX);
+	sp_block_mat.solveLinearSystem(rhs_B, deltaX);
 
 	cout << endl << BOLDGREEN << "Solution of the system:" << RESET <<  endl;
 	deltaX.printVector();

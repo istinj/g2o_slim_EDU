@@ -79,8 +79,6 @@ protected:
 
    //! TODO: traits to manage wrong BlockType_
    //! TODO: handle non-squared blocks (pair in the constructor);
-   //! TODO: check Cholesky -> Block(end,end) is a bit wrong
-   //! TODO: CHOLESKY IS HAVING PROBLEMS PORCO DIO
 
    RowBlockContainer _row_container;
 

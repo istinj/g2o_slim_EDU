@@ -3,3 +3,6 @@
 
 /sparse/build/*
 /sparse/bin/*
+
+.metadata/*
+RemoteSystemTempFiles/*
