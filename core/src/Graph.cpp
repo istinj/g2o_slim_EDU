@@ -147,6 +147,7 @@ void Graph::loadFromG2OFile(const string& filename_){
 			std::pair<int, int> IDs(-1,-1);
 			int sens_id = -1;
 			ss >> IDs.first >> IDs.second;
+//			ss >> IDs.second >> IDs.first;
 
 			Vector3f t;
 			Quaternionf q;
@@ -168,6 +169,7 @@ void Graph::loadFromG2OFile(const string& filename_){
 				for(int j = i + 1; j < omega_odom.cols(); ++j)
 					omega_odom(j,i) = omega_odom(i,j);
 			EdgePosePose edge_odom;
+			//! TODO inverse??
 			edge_odom.setEdge(IDs, odom_meas, omega_odom);
 			addEdgeOdom(edge_odom);
 		}

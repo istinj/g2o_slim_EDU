@@ -307,7 +307,7 @@ void SparseSolver::oneStep(void){
 		sparse::DenseVector<Vector6f> dX_pose_pose;
 
 		Matrix6f temp = _pose_pose_Hessian->getBlock(0,0);
-		temp += Matrix6f::Identity()*100000.0; //! Bias
+		temp += Matrix6f::Identity()*10000.0; //! Bias
 		_pose_pose_Hessian->setBlock(0,0,temp);
 
 		_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);

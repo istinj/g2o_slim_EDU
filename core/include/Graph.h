@@ -62,6 +62,10 @@ namespace optimizer {
 		std::vector<EdgePosePoint> _edges_pose_point;
 		std::vector<EdgePosePose> _edges_pose_pose;
 
+		//! TODO: check graph edges and vertices (association and inverse)
+		//! TODO: check error function in errorAndJacobianPosePose
+		//! THE GRAPH SHOULD CONVERGE REALLY FAST (2-3 iterations).
+
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 	};

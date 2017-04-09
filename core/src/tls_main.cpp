@@ -38,9 +38,10 @@ int main(int argc, char const *argv[])
 	optimizer::SparseSolver* solver = new optimizer::SparseSolver(graph->verticesSE3(),
 			graph->verticesXYZ(), graph->edgesPosePose(), graph->edgesPosePoint(),
 			0.0, 25.0);
-	solver->oneStep();
-	solver->oneStep();
-	solver->oneStep();
+
+	for (int i = 0; i < 10; ++i) {
+		solver->oneStep();
+	}
 
 	//! TODO
 	solver->updateGraph((*graph));
