@@ -111,7 +111,7 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 	return true;
 }
 
-bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
+void SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 	total_chi_ = 0.0;
 	inliers_ = 0;
 
@@ -129,17 +129,13 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		//! Retrieve the Pose Vertices involved in the current edge
 		PosesContainer::iterator pose_i_iter = std::find(_robot_poses.begin(),
 				_robot_poses.end(), curr_association.first);
-		if(pose_i_iter == _robot_poses.end()){
-			cerr << "Error, bad data association" << endl;
-			return false;
-		}
+		if(pose_i_iter == _robot_poses.end())
+			throw std::runtime_error("Error, bad data association");
 
 		PosesContainer::iterator pose_j_iter = std::find(_robot_poses.begin(),
 				_robot_poses.end(), curr_association.second);
-		if(pose_j_iter == _robot_poses.end()){
-			cerr << "Error, bad data association" << endl;
-			return false;
-		}
+		if(pose_j_iter == _robot_poses.end())
+			throw std::runtime_error("Error, bad data association");
 
 		//! Evaluate error and jacobian
 		errorAndJacobianPosePose(pose_i_iter->data(),
@@ -217,8 +213,8 @@ bool SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		_pose_pose_B->setBlock(j_hessian_idx, b_j);
 		//! Seems to work fine
 	}
-	return true;
 }
+
 void SparseSolver::errorAndJacobianPosePoint(const Pose& xr,
 		const PointXYZ& xl,
 		const PointMeas& zl,
@@ -276,7 +272,7 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	h_x.translation() = Ri.transpose() * t_ij;
 
 	//! Compose e
-	Eigen::Isometry3f temp_e;
+	Eigen::Isometry3f temp_e = Eigen::Isometry3f::Identity();
 	temp_e.matrix() = h_x.matrix() - zr.matrix();
 
 	error.block<3,1>(0,0) = temp_e.matrix().block<3,1>(0,0);
@@ -285,6 +281,9 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	error.block<3,1>(9,0) = temp_e.matrix().block<3,1>(0,3);
 }
 
+//! This fuction updates the graph after the optimization of
+//! poses and landmarks. For now it only updates the poses, but
+//! there will be a refactoring.
 void SparseSolver::updateGraph(Graph& graph_){
 	cerr << BOLDYELLOW << "Updating the graph..." << RESET << endl;
 	graph_.updateVerticesSE3(_robot_poses);
@@ -296,51 +295,44 @@ void SparseSolver::updateGraph(Graph& graph_){
 void SparseSolver::oneStep(void){
 	float step_chi;
 	int step_inliers;
+	cerr << BOLDYELLOW <<  "One step optimization:" << RESET << endl;
+	linearizePosePose(step_chi,step_inliers);
+	cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << step_inliers << "\t" << BOLDWHITE
+			<< "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
 
-	if(linearizePosePose(step_chi,step_inliers)){
-		cerr << GREEN << "inliers odom = " << step_inliers << "\t" << "chi odom = " << step_chi << RESET << endl;
+	//! Solving the Linear System Hx = B. Since it is under-determined (the solution is up-to a
+	//! rigid transformation), it is necessary to introduce a bias on the first element, to fix the
+	//! first point. Moreover, since we want that the starting pose remains the same, it is necessary
+	//! to set to 0 the first dX block.
+	sparse::DenseVector<Vector6f> dX_pose_pose;
 
-		//! Solving the Linear System Hx = B. Since it is under-determined (the solution is up-to a
-		//! rigid transformation), it is necessary to introduce a bias on the first element, to fix the
-		//! first point. Moreover, since we want that the starting pose remains the same, it is necessary
-		//! to set to 0 the first dX block.
-		sparse::DenseVector<Vector6f> dX_pose_pose;
+	Matrix6f temp = _pose_pose_Hessian->getBlock(0,0);
+	temp += Matrix6f::Identity()*1000.0; //! Bias
+	_pose_pose_Hessian->setBlock(0,0,temp);
 
-		Matrix6f temp = _pose_pose_Hessian->getBlock(0,0);
-		temp += Matrix6f::Identity()*10000.0; //! Bias
-		_pose_pose_Hessian->setBlock(0,0,temp);
+	_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);
 
-		_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);
+	//! We want -b
+	for (int i = 0; i < _pose_pose_B->numRows(); ++i) {
+		Vector6f block = _pose_pose_B->getBlock(i);
+		_pose_pose_B->printBlock(i);
+		Vector6f new_block = -block;
+		_pose_pose_B->setBlock(i, new_block);
+		_pose_pose_B->printBlock(i);
+		cin.get();
+	}
 
-		dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;
+	dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;
 
-		//! Apply the dX to the state.
-		for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
-			Pose new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
-			_robot_poses[i].setData(new_pose);
-		}
-	} else {
-		throw std::runtime_error("Linearize Pose-Pose Failure");
+	//! Apply the dX to the state.
+	for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
+		Pose new_pose = Pose::Identity();
+		new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
+		_robot_poses[i].setData(new_pose);
 	}
 
 	//! TODO CLEAN-UP EVERYTHING
 	return; //placeholder
-}
-
-int SparseSolver::getPoseMatrixIndex(int curr_pose_idx){
-	if(curr_pose_idx > _robot_poses.size() - 1){
-		cerr << "Exceeding index\nExit" << endl;
-		return -1;
-	}
-	return curr_pose_idx * X_DIM;
-}
-
-int SparseSolver::getLandMatrixIndex(int curr_land_idx){
-	if(curr_land_idx > _land_points.size() - 1){
-		cerr << "Exceeding index\nExit" << endl;
-		return -1;
-	}
-	return _robot_poses.size() * X_DIM + curr_land_idx * L_DIM;
 }
 
 } /* namespace optimizer */

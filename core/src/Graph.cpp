@@ -169,7 +169,6 @@ void Graph::loadFromG2OFile(const string& filename_){
 				for(int j = i + 1; j < omega_odom.cols(); ++j)
 					omega_odom(j,i) = omega_odom(i,j);
 			EdgePosePose edge_odom;
-			//! TODO inverse??
 			edge_odom.setEdge(IDs, odom_meas, omega_odom);
 			addEdgeOdom(edge_odom);
 		}

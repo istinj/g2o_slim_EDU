@@ -59,7 +59,7 @@ public:
 
 private:
 	bool linearizePosePoint(float& total_chi_, int& inliers_);
-	bool linearizePosePose(float& total_chi_, int& inliers_);
+	void linearizePosePose(float& total_chi_, int& inliers_);
 	void errorAndJacobianPosePoint(const Pose& xr,
 			const PointXYZ& xl,
 			const PointMeas& zl,
@@ -72,10 +72,6 @@ private:
 			Vector12f& error,
 			Matrix12_6f& Ji,
 			Matrix12_6f& Jj);
-
-	//! Delete this shit
-	int getPoseMatrixIndex(int curr_pose_idx);
-	int getLandMatrixIndex(int curr_land_idx);
 
 	inline Eigen::Matrix3f skew(const Eigen::Vector3f& p)
 	{
