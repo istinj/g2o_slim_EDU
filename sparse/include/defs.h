@@ -27,9 +27,9 @@
 #define X_DIM 6
 #define L_DIM 6
 
-#define PRINT_VAR(x) std::cout << #x << std::endl << x << std::endl;
+#define PRINT_VAR(x) std::cerr << #x << std::endl << x << std::endl;
 
-typedef float real_;
+typedef double real_;
 
 typedef Eigen::Matrix<real_, 2, 2> Matrix2;
 typedef Eigen::Matrix<real_, 3, 3> Matrix3;
@@ -45,6 +45,7 @@ typedef Eigen::Matrix<real_, 2, 1> Vector2;
 typedef Eigen::Matrix<real_, 12, 1> Vector12;
 typedef Eigen::Transform<real_,3,Eigen::Isometry> Isometry3;
 typedef Eigen::AngleAxis<real_> AngleAxisReal;
+typedef Eigen::Quaternion<real_> QuaternionReal;
 
 typedef Vector3 PointMeas;
 typedef Isometry3 PoseMeas;
