@@ -147,7 +147,6 @@ void Graph::loadFromG2OFile(const string& filename_){
 			std::pair<int, int> IDs(-1,-1);
 			int sens_id = -1;
 			ss >> IDs.first >> IDs.second;
-//			ss >> IDs.second >> IDs.first;
 
 			Vector3f t;
 			Quaternionf q;

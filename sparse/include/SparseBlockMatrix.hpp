@@ -60,8 +60,7 @@ template<typename BlockType_>
 void SparseBlockMatrix<BlockType_>::setBlock(const int r_, const int c_,
 		DenseBlock block_){
 	if(r_ >= _num_block_rows || c_ >= _num_block_cols){
-		cerr << RED << "set Out of bound" << RESET << endl;
-		return;
+		throw std::runtime_error("set Out of bound");
 	}
 
 	ColumnsBlockMap& curr_row = _row_container[r_];
@@ -85,8 +84,7 @@ BlockType_ SparseBlockMatrix<BlockType_>::getBlock(const int r_, const int c_) c
 	result.setZero();
 
 	if(r_ >= _num_block_rows || c_ >= _num_block_cols){
-		cerr << RED << "get Out of bound" << RESET << endl;
-		return result;
+		throw std::runtime_error("get Out of bound");
 	}
 
 	const ColumnsBlockMap& curr_row = _row_container[r_];
@@ -99,8 +97,7 @@ BlockType_ SparseBlockMatrix<BlockType_>::getBlock(const int r_, const int c_) c
 template<typename BlockType_>
 bool SparseBlockMatrix<BlockType_>::isNonZeroBlock(const int r_, const int c_) const {
 	if(r_ >= _num_block_rows || c_ >= _num_block_cols){
-		cerr << RED << "non zero Out of bound" << RESET << endl;
-		return false;
+		throw std::runtime_error("non zero Out of bound");
 	}
 
 	const ColumnsBlockMap& curr_row = _row_container[r_];
@@ -113,8 +110,7 @@ bool SparseBlockMatrix<BlockType_>::isNonZeroBlock(const int r_, const int c_) c
 template<typename BlockType_>
 void SparseBlockMatrix<BlockType_>::printBlock(const int r_, const int c_) const {
 	if(r_ >= _num_block_rows || c_ >= _num_block_cols){
-		cerr << RED << "print Out of bound" << RESET << endl;
-		return;
+		throw std::runtime_error("print Out of bound");
 	}
 
 	cerr << BOLDWHITE << "Block(" << r_ << "," << c_ << ")" << ":\n" <<
@@ -150,9 +146,7 @@ void SparseBlockMatrix<BlockType_>::exportToTxt(const std::string& filename_){
 template<typename BlockType_>
 void SparseBlockMatrix<BlockType_>::computeCholeskyStructure(SparseBlockMatrix<BlockType_>& block_cholesky_){
 	if(_total_cols != _total_rows){
-		cerr << BOLDRED << "Error: matrix must be squared" <<
-				RESET << endl;
-		return;
+		throw std::runtime_error("Error: matrix must be squared");
 	}
 	block_cholesky_ = SparseBlockMatrix<DenseBlock>(_num_block_rows, _num_block_cols, _block_dim);
 
@@ -225,9 +219,7 @@ void SparseBlockMatrix<BlockType_>::transpose(SparseBlockMatrix<BlockType_>& tra
 template<typename BlockType_>
 void SparseBlockMatrix<BlockType_>::cholesky(SparseBlockMatrix<BlockType_>& block_cholesky_){
 	if(_total_cols != _total_rows){
-		cerr << BOLDRED << "Error: matrix must be squared" <<
-				RESET << endl;
-		return;
+		throw std::runtime_error("Error: matrix must be squared");
 	}
 
 	block_cholesky_ = SparseBlockMatrix<DenseBlock>(_num_block_rows,

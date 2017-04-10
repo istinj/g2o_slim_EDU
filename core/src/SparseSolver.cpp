@@ -78,7 +78,7 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 		total_chi_ += chi;
 
 
-		//! TODO H?
+		//! Hessain
 		int pose_hessian_idx = pose_iter->index();
 		int land_hessian_idx = land_iter->index();
 
@@ -221,13 +221,19 @@ void SparseSolver::errorAndJacobianPosePoint(const Pose& xr,
 		Eigen::Vector3f& error,
 		Eigen::Matrix3f& Jl,
 		Matrix3_6f& Jr){
-	Vector3f h_x = xr.linear() * xl + xr.translation();
+//	Vector3f h_x = xr.linear() * xl + xr.translation();
+	Pose inv_xr = xr.inverse();
+	Vector3f h_x = inv_xr.linear() * xl + inv_xr.translation();
 
 	error = h_x - zl;
 
-	Jl = xr.linear();
-	Jr.block<3,3>(0,0).setIdentity();
-	Jr.block<3,3>(0,3) = -skew(h_x);
+//	Jl = xr.linear();
+//	Jr.block<3,3>(0,0).setIdentity();
+//	Jr.block<3,3>(0,3) = -skew(h_x);
+
+	Jl = inv_xr.linear();
+	Jr.block<3,3>(0,0) = -inv_xr.linear();
+	Jr.block<3,3>(0,3) = inv_xr.linear() * skew(h_x);
 }
 
 void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
@@ -315,11 +321,8 @@ void SparseSolver::oneStep(void){
 	//! We want -b
 	for (int i = 0; i < _pose_pose_B->numRows(); ++i) {
 		Vector6f block = _pose_pose_B->getBlock(i);
-		_pose_pose_B->printBlock(i);
 		Vector6f new_block = -block;
 		_pose_pose_B->setBlock(i, new_block);
-		_pose_pose_B->printBlock(i);
-		cin.get();
 	}
 
 	dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;
@@ -330,9 +333,7 @@ void SparseSolver::oneStep(void){
 		new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
 		_robot_poses[i].setData(new_pose);
 	}
-
-	//! TODO CLEAN-UP EVERYTHING
-	return; //placeholder
+	//! TODO CLEAN-UP EVERYTHING?
 }
 
 } /* namespace optimizer */
