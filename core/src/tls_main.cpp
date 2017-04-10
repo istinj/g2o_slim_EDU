@@ -37,14 +37,14 @@ int main(int argc, char const *argv[])
 	optimizer::Graph* graph = new optimizer::Graph(dataset_path);
 	optimizer::SparseSolver* solver = new optimizer::SparseSolver(graph->verticesSE3(),
 			graph->verticesXYZ(), graph->edgesPosePose(), graph->edgesPosePoint(),
-			0.0, 1000.0);
+			0, 1000.0);
 
 	for (int i = 0; i < 10; ++i) {
 		solver->oneStep();
 	}
 
-	//! TODO
 	solver->updateGraph((*graph));
+	//! TODO
 //	graph->exportToG2OFile(filename);
 
 

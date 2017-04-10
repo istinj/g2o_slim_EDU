@@ -104,8 +104,8 @@ private:
 	sparse::SparseBlockMatrix<Matrix6f>* _pose_pose_Hessian;
 	sparse::DenseVector<Vector6f>* _pose_pose_B;
 
-	float _lambda = -1.0;
-	float _threshold = -1.0;
+	float _lambda = 0.0;
+	float _threshold = 0.0;
 
 
 public:

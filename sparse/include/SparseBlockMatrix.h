@@ -50,7 +50,6 @@ public:
    DenseBlock scalarProd(const ColumnsBlockMap& row_1_,
          const ColumnsBlockMap& row_2_, int max_pos_);
 
-   //! TODO: pass a pointer?
    template<typename VectorBlockType_>
    bool solveLinearSystem(const DenseVector<VectorBlockType_>& RHS_Vector_,
          DenseVector<VectorBlockType_>& result_);
@@ -60,6 +59,7 @@ public:
    template<typename VectorBlockType_>
    void backSubstitution(const DenseVector<VectorBlockType_>& B_vector_,
          DenseVector<VectorBlockType_>& result_);
+   void addDamping(const float damping_);
 
 
    void setBlock(const int r_, const int c_, DenseBlock block_);

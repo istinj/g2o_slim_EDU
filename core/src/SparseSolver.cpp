@@ -291,9 +291,8 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 //! poses and landmarks. For now it only updates the poses, but
 //! there will be a refactoring.
 void SparseSolver::updateGraph(Graph& graph_){
-	cerr << BOLDYELLOW << "Updating the graph..." << RESET << endl;
+	cerr << endl << BOLDYELLOW << "Updating the graph..." << RESET << endl;
 	graph_.updateVerticesSE3(_robot_poses);
-//	graph_.updateVerticesXYZ(_land_points);
 	cerr << BOLDGREEN << "Done!" << RESET << endl;
 }
 
@@ -301,7 +300,8 @@ void SparseSolver::updateGraph(Graph& graph_){
 void SparseSolver::oneStep(void){
 	float step_chi;
 	int step_inliers;
-	cerr << BOLDYELLOW <<  "One step optimization:" << RESET << endl;
+	cerr << BOLDYELLOW <<  "One step with damping = " << BOLDRED << _lambda
+			<< BOLDYELLOW << " and kernel threshold = " << BOLDRED << _threshold << RESET << endl;
 	linearizePosePose(step_chi,step_inliers);
 	cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << step_inliers << "\t" << BOLDWHITE
 			<< "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
@@ -316,13 +316,19 @@ void SparseSolver::oneStep(void){
 	temp += Matrix6f::Identity()*1000.0; //! Bias
 	_pose_pose_Hessian->setBlock(0,0,temp);
 
+
+	//! Add damping
+	if(_lambda != 0)
+		_pose_pose_Hessian->addDamping(_lambda);
+
+	//! Actaully solve the linear system
 	_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);
 
-	//! We want -b
-	for (int i = 0; i < _pose_pose_B->numRows(); ++i) {
-		Vector6f block = _pose_pose_B->getBlock(i);
+	//! We want -dX
+	for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
+		Vector6f block = dX_pose_pose.getBlock(i);
 		Vector6f new_block = -block;
-		_pose_pose_B->setBlock(i, new_block);
+		dX_pose_pose.setBlock(i, new_block);
 	}
 
 	dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;

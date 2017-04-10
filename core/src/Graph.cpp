@@ -72,7 +72,7 @@ void Graph::updateVerticesXYZ(const std::vector<VertexXYZ>& new_XYZ_vertices_){
 
 
 void Graph::loadFromG2OFile(const string& filename_){
-	cout << BOLDYELLOW << "\t" << "Opening file " << filename_ << RESET << endl;
+	cerr << BOLDYELLOW << "\t" << "Opening file " << filename_ << RESET << endl;
 	fstream file(filename_);
 
 	int p_idx = 0;
@@ -172,8 +172,8 @@ void Graph::loadFromG2OFile(const string& filename_){
 			addEdgeOdom(edge_odom);
 		}
 	}
-	cout << BOLDGREEN << "\t" << "File loaded successfully:" << endl;
-	cout << "\t" << _vertices_SE3.size() << " Vertices SE3\n\t" << _vertices_XYZ.size() << " Vertices XYZ" << endl;
-	cout << "\t" <<	_edges_pose_point.size() << " Edges Pose-Point\n\t" << _edges_pose_pose.size() << " Edges Pose-Pose" << RESET << endl;
+	cerr << BOLDGREEN << "\t" << "File loaded successfully:" << endl;
+	cerr << "\t" << _vertices_SE3.size() << " Vertices SE3\n\t" << _vertices_XYZ.size() << " Vertices XYZ" << endl;
+	cerr << "\t" <<	_edges_pose_point.size() << " Edges Pose-Point\n\t" << _edges_pose_pose.size() << " Edges Pose-Pose" << RESET << endl << endl;
 }
 }/* namespace optimizer */

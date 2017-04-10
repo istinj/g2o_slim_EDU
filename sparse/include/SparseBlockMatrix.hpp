@@ -338,6 +338,18 @@ void SparseBlockMatrix<BlockType_>::backSubstitution(const DenseVector<VectorBlo
 	}
 
 }
+
+template<typename BlockType_>
+void SparseBlockMatrix<BlockType_>::addDamping(const float damping_){
+	DenseBlock damped_eye = DenseBlock::Identity() * damping_;
+	for (int r = 0; r < _num_block_rows; ++r) {
+		ColumnsBlockMap& row = _row_container[r];
+		for (int c = 0; c < _num_block_cols; ++c) {
+			DenseBlock new_block = getBlock(r,c) + damped_eye;
+			setBlock(r,c, new_block);
+		}
+	}
+}
 /**/
 
 template<typename BlockType_>
