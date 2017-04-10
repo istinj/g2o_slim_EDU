@@ -22,21 +22,12 @@
 #include <Eigen/Geometry>
 #include <Eigen/Cholesky>
 
-#include "utilities.h"
+#include "defs.h"
 #include "SparseBlockMatrix.h"
 #include "RHSVector.h"
 #include "Graph.h"
 
 namespace optimizer {
-typedef Eigen::Matrix<float, 6, 6> Matrix6f;
-typedef Eigen::Matrix<float, 3, 6> Matrix3_6f;
-typedef Eigen::Matrix<float, 6, 3> Matrix6_3f;
-typedef Eigen::Matrix<float, 2, 3> Matrix2_3f;
-typedef Eigen::Matrix<float, 2, 6> Matrix2_6f;
-typedef Eigen::Matrix<float, 12, 6> Matrix12_6f;
-typedef Eigen::Matrix<float, 6, 1> Vector6f;
-typedef Eigen::Matrix<float, 12, 1> Vector12f;
-
 typedef std::vector<VertexSE3> PosesContainer;
 typedef std::vector<VertexXYZ> LandmarkPointsContainer;
 typedef std::vector<EdgePosePose> PosePoseEdgeContainer;
@@ -51,43 +42,43 @@ public:
 			const LandmarkPointsContainer& land_points_,
 			const PosePoseEdgeContainer& zr_,
 			const PosePointEdgeContainer& zl_,
-			const float l_, const float epsilon_);
+			const real_ l_, const real_ epsilon_);
 	virtual ~SparseSolver();
 
 	void updateGraph(Graph& graph_);
 	void oneStep(void);
 
 private:
-	bool linearizePosePoint(float& total_chi_, int& inliers_);
-	void linearizePosePose(float& total_chi_, int& inliers_);
+	bool linearizePosePoint(real_& total_chi_, int& inliers_);
+	void linearizePosePose(real_& total_chi_, int& inliers_);
 	void errorAndJacobianPosePoint(const Pose& xr,
 			const PointXYZ& xl,
 			const PointMeas& zl,
-			Eigen::Vector3f& error,
-			Eigen::Matrix3f& Jl,
-			Matrix3_6f& Jr);
+			Vector3& error,
+			Matrix3& Jl,
+			Matrix3_6& Jr);
 	void errorAndJacobianPosePose(const Pose& xi,
 			const Pose& xj,
 			const PoseMeas& zr,
-			Vector12f& error,
-			Matrix12_6f& Ji,
-			Matrix12_6f& Jj);
+			Vector12& error,
+			Matrix12_6& Ji,
+			Matrix12_6& Jj);
 
-	inline Eigen::Matrix3f skew(const Eigen::Vector3f& p)
+	inline Matrix3 skew(const Vector3& p)
 	{
-		Eigen::Matrix3f s;
+		Matrix3 s;
 		s <<	0,  -p.z(), p.y(),
 				p.z(), 0,  -p.x(),
 				-p.y(), p.x(), 0;
 		return s;
 	}
 
-	inline Pose v2t(const Vector6f& v){
+	inline Pose v2t(const Vector6& v){
 		Pose T = Pose::Identity();
-		Eigen::Matrix3f Rx, Ry, Rz;
-		Rx = Eigen::AngleAxisf(v(3), Eigen::Vector3f::UnitX());
-		Ry = Eigen::AngleAxisf(v(4), Eigen::Vector3f::UnitY());
-		Rz = Eigen::AngleAxisf(v(5), Eigen::Vector3f::UnitZ());
+		Matrix3 Rx, Ry, Rz;
+		Rx = AngleAxisReal(v(3), Vector3::UnitX());
+		Ry = AngleAxisReal(v(4), Vector3::UnitY());
+		Rz = AngleAxisReal(v(5), Vector3::UnitZ());
 		T.linear() = Rx * Ry * Rz;
 		T.translation() = v.block<3,1>(0,0);
 		return T;
@@ -101,11 +92,11 @@ private:
 
 	//! TODO Remember to clean-up everything in the destructor (or at the end of the iteration)
 	//! TODO Same for the RHSVector;
-	sparse::SparseBlockMatrix<Matrix6f>* _pose_pose_Hessian;
-	sparse::DenseVector<Vector6f>* _pose_pose_B;
+	sparse::SparseBlockMatrix<Matrix6>* _pose_pose_Hessian;
+	sparse::DenseVector<Vector6>* _pose_pose_B;
 
-	float _lambda = 0.0;
-	float _threshold = 0.0;
+	real_ _lambda = 0.0;
+	real_ _threshold = 0.0;
 
 
 public:

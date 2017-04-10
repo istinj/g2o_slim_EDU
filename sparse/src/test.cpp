@@ -4,14 +4,15 @@
 #include "SparseMatrix.h"
 #include "SparseBlockMatrix.h"
 #include "RHSVector.h"
+#include "defs.h"
 
 int main(int argc, char const *argv[])
 {
 
-	sparse::SparseBlockMatrix<Matrix6f> sp_block_mat(11,11,6);
-	sparse::DenseVector<Vector6f> rhs_B(11,6);
-	Matrix6f a, a_plus_a;
-	Vector6f b;
+	sparse::SparseBlockMatrix<Matrix6> sp_block_mat(11,11,6);
+	sparse::DenseVector<Vector6> rhs_B(11,6);
+	Matrix6 a, a_plus_a;
+	Vector6 b;
 
 	//! Setup the linear system (retarded fashion)
 	a <<     	163,   118,   135,   107,   190,   144,
@@ -29,7 +30,7 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < 11; ++i) {
 		if(i == 0){
 			sp_block_mat.setBlock(i,i,a);
-			a += Matrix6f::Identity() * 1000;
+			a += Matrix6::Identity() * 1000;
 			continue;
 		}
 		sp_block_mat.setBlock(i,i,a_plus_a);
@@ -37,7 +38,7 @@ int main(int argc, char const *argv[])
 			sp_block_mat.setBlock(i,i-1,-a);
 	}
 
-	sparse::SparseBlockMatrix<Matrix6f> L, U, result;
+	sparse::SparseBlockMatrix<Matrix6> L, U, result;
 	sp_block_mat.cholesky(L);
 	L.transpose(U);
 	L.rightMultiplyMatrix(U, result);

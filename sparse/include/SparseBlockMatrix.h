@@ -18,7 +18,7 @@
 #include <Eigen/Cholesky>
 #include <boost/unordered_map.hpp>
 
-#include "utilities.h"
+#include "defs.h"
 #include "RHSVector.h"
 
 namespace sparse {
@@ -59,7 +59,7 @@ public:
    template<typename VectorBlockType_>
    void backSubstitution(const DenseVector<VectorBlockType_>& B_vector_,
          DenseVector<VectorBlockType_>& result_);
-   void addDamping(const float damping_);
+   void addDamping(const real_ damping_);
 
 
    void setBlock(const int r_, const int c_, DenseBlock block_);

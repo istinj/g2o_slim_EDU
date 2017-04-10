@@ -18,7 +18,7 @@
 #include <Eigen/Cholesky>
 #include <boost/unordered_map.hpp>
 
-#include "utilities.h"
+#include "defs.h"
 
 namespace sparse {
 

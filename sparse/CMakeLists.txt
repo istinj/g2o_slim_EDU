@@ -28,7 +28,6 @@ include_directories(
 
 set(SRCS 
 	src/test.cpp
-	src/utilities.cpp
 	src/SparseMatrix.cpp)
 
 add_executable(test_Cholesky_app ${SRCS})

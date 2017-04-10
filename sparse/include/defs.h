@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -30,17 +29,27 @@
 
 #define PRINT_VAR(x) std::cout << #x << std::endl << x << std::endl;
 
-typedef Eigen::Matrix<float, 6, 1> Vector6f;
-typedef Eigen::Matrix<float, 6, 6> Matrix6f;
+typedef float real_;
 
-Eigen::Matrix4f v2t(const Vector6f& v);
-Eigen::Matrix3f skew(const Eigen::Vector3f& p);
+typedef Eigen::Matrix<real_, 2, 2> Matrix2;
+typedef Eigen::Matrix<real_, 3, 3> Matrix3;
+typedef Eigen::Matrix<real_, 6, 6> Matrix6;
+typedef Eigen::Matrix<real_, 3, 6> Matrix3_6;
+typedef Eigen::Matrix<real_, 6, 3> Matrix6_3;
+typedef Eigen::Matrix<real_, 2, 3> Matrix2_3;
+typedef Eigen::Matrix<real_, 2, 6> Matrix2_6;
+typedef Eigen::Matrix<real_, 12, 6> Matrix12_6;
+typedef Eigen::Matrix<real_, 6, 1> Vector6;
+typedef Eigen::Matrix<real_, 3, 1> Vector3;
+typedef Eigen::Matrix<real_, 2, 1> Vector2;
+typedef Eigen::Matrix<real_, 12, 1> Vector12;
+typedef Eigen::Transform<real_,3,Eigen::Isometry> Isometry3;
+typedef Eigen::AngleAxis<real_> AngleAxisReal;
 
-void cholesky(const Matrix6f& input_, Matrix6f& L_);
-void loadMatrix(const std::string& name_, Eigen::MatrixXf& data_);
+typedef Vector3 PointMeas;
+typedef Isometry3 PoseMeas;
+typedef Matrix3 OmegaPoint;
+typedef Matrix6 OmegaPose;
 
-//template<int _Dim>
-//void generalCholesky(void){
-//	static const int dim = _Dim;
-//	Eigen::Matrix<float, dim, dim> A;
-//}
+typedef Isometry3 Pose;
+typedef Vector3 PointXYZ;

@@ -16,7 +16,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "utilities.h"
+#include "defs.h"
 #include "Vertex.hpp"
 #include "Edge.hpp"
 

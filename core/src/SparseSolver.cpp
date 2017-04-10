@@ -13,8 +13,8 @@ using namespace Eigen;
 namespace optimizer {
 
 SparseSolver::SparseSolver() {
-	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6f>(1,1,6);
-	_pose_pose_B = new sparse::DenseVector<Vector6f>(1,6);
+	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6>(1,1,6);
+	_pose_pose_B = new sparse::DenseVector<Vector6>(1,6);
 }
 
 SparseSolver::~SparseSolver() {
@@ -27,7 +27,7 @@ SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
 		const LandmarkPointsContainer& land_points_,
 		const PosePoseEdgeContainer& zr_,
 		const PosePointEdgeContainer& zl_,
-		const float l_, const float epsilon_){
+		const real_ l_, const real_ epsilon_){
 	_robot_poses = robot_poses_;
 	_land_points = land_points_;
 	_Zr = zr_;
@@ -35,15 +35,15 @@ SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
 	_lambda = l_;
 	_threshold = epsilon_;
 
-	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6f>(robot_poses_.size(),
+	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6>(robot_poses_.size(),
 			robot_poses_.size(),6);
-	_pose_pose_B = new sparse::DenseVector<Vector6f>(robot_poses_.size(),6);
+	_pose_pose_B = new sparse::DenseVector<Vector6>(robot_poses_.size(),6);
 }
 
-bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
-	Matrix3f Jl = Matrix3f::Zero();
-	Matrix3_6f Jr = Matrix3_6f::Zero();
-	Vector3f e = Vector3f::Zero();
+bool SparseSolver::linearizePosePoint(real_& total_chi_, int& inliers_){
+	Matrix3 Jl = Matrix3::Zero();
+	Matrix3_6 Jr = Matrix3_6::Zero();
+	Vector3 e = Vector3::Zero();
 
 	total_chi_= 0.0;
 	inliers_ = 0;
@@ -68,7 +68,7 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 				it->data(),
 				e, Jl, Jr);
 
-		float chi = e.transpose() * e;
+		real_ chi = e.transpose() * e;
 		if(chi > _threshold){
 			e *= sqrt(_threshold/chi);
 			chi = _threshold;
@@ -82,20 +82,20 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 		int pose_hessian_idx = pose_iter->index();
 		int land_hessian_idx = land_iter->index();
 
-		Matrix6f h_pp_data = Jr.transpose() * Jr;
+		Matrix6 h_pp_data = Jr.transpose() * Jr;
 		pair<int, int> hessian_indices = make_pair(pose_hessian_idx,
 				pose_hessian_idx);
 
 		//! This block is useless
-		Matrix6_3f h_pl_data = Jr.transpose() * Jl;
+		Matrix6_3 h_pl_data = Jr.transpose() * Jl;
 		hessian_indices = make_pair(pose_hessian_idx,
 				land_hessian_idx);
 
-		Matrix3_6f h_lp_data = Jl.transpose() * Jr;
+		Matrix3_6 h_lp_data = Jl.transpose() * Jr;
 		hessian_indices = make_pair(land_hessian_idx,
 				pose_hessian_idx);
 
-		Matrix3f h_ll_data = Jl.transpose() * Jl;
+		Matrix3 h_ll_data = Jl.transpose() * Jl;
 		hessian_indices = make_pair(land_hessian_idx,
 				land_hessian_idx);
 
@@ -111,15 +111,15 @@ bool SparseSolver::linearizePosePoint(float& total_chi_, int& inliers_){
 	return true;
 }
 
-void SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
+void SparseSolver::linearizePosePose(real_& total_chi_, int& inliers_) {
 	total_chi_ = 0.0;
 	inliers_ = 0;
 
-	Matrix12_6f Ji = Matrix12_6f::Zero();
-	Matrix12_6f Jj = Matrix12_6f::Zero();
-	Vector12f e = Vector12f::Zero();
+	Matrix12_6 Ji = Matrix12_6::Zero();
+	Matrix12_6 Jj = Matrix12_6::Zero();
+	Vector12 e = Vector12::Zero();
 
-	Matrix<float, 12, 12> Omega = Matrix<float, 12, 12>::Identity();
+	Matrix<real_, 12, 12> Omega = Matrix<real_, 12, 12>::Identity();
 	Omega.block<9,9>(0,0) *= 1000.0;
 
 	//! For each Pose-Pose edge
@@ -144,7 +144,7 @@ void SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 				e, Ji, Jj);
 
 		//! Evaluate statistics
-		float chi = e.transpose() * Omega * e;
+		real_ chi = e.transpose() * Omega * e;
 		if (chi > _threshold) {
 			Omega *= sqrt(_threshold / chi);
 			chi = _threshold;
@@ -162,53 +162,53 @@ void SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 		int j_hessian_idx = pose_j_iter->index();
 
 		//! First block
-		Matrix6f h_ii_block = Ji.transpose() * Omega * Ji;
+		Matrix6 h_ii_block = Ji.transpose() * Omega * Ji;
 		HessianIndices h_ii_indices = make_pair(i_hessian_idx,
 				i_hessian_idx);
-		Matrix6f prev_hii_block = _pose_pose_Hessian->getBlock(h_ii_indices.first,
+		Matrix6 prev_hii_block = _pose_pose_Hessian->getBlock(h_ii_indices.first,
 				h_ii_indices.second);
 		h_ii_block.noalias() += prev_hii_block;
 		_pose_pose_Hessian->setBlock(h_ii_indices.first,
 				h_ii_indices.second, h_ii_block);
 
 		//! Second block
-		Matrix6f h_ji_block = Jj.transpose() * Omega * Ji;
+		Matrix6 h_ji_block = Jj.transpose() * Omega * Ji;
 		HessianIndices h_ji_indices = make_pair(j_hessian_idx,
 				i_hessian_idx);
-		Matrix6f prev_h_ji_block = _pose_pose_Hessian->getBlock(h_ji_indices.first,
+		Matrix6 prev_h_ji_block = _pose_pose_Hessian->getBlock(h_ji_indices.first,
 				h_ji_indices.second);
 		h_ji_block.noalias() += prev_h_ji_block;
 		_pose_pose_Hessian->setBlock(h_ji_indices.first,
 				h_ji_indices.second, h_ji_block);
 
 		//! Second block transposed; this block is useless
-		Matrix6f h_ij_block = Ji.transpose() * Omega * Jj;
+		Matrix6 h_ij_block = Ji.transpose() * Omega * Jj;
 		HessianIndices h_ij_indices = make_pair(i_hessian_idx,
 				j_hessian_idx);
-		Matrix6f prev_h_ij_block = _pose_pose_Hessian->getBlock(h_ij_indices.first,
+		Matrix6 prev_h_ij_block = _pose_pose_Hessian->getBlock(h_ij_indices.first,
 				h_ij_indices.second);
 		h_ij_block.noalias() += prev_h_ij_block;
 		_pose_pose_Hessian->setBlock(h_ij_indices.first,
 				h_ij_indices.second, h_ij_block);
 
 		//! Third block
-		Matrix6f h_jj_block = Jj.transpose() * Omega * Jj;
+		Matrix6 h_jj_block = Jj.transpose() * Omega * Jj;
 		HessianIndices h_jj_indices = make_pair(j_hessian_idx,
 				j_hessian_idx);
-		Matrix6f prev_hjj_block = _pose_pose_Hessian->getBlock(h_jj_indices.first,
+		Matrix6 prev_hjj_block = _pose_pose_Hessian->getBlock(h_jj_indices.first,
 				h_jj_indices.second);
 		h_jj_block.noalias() += prev_hjj_block;
 		_pose_pose_Hessian->setBlock(h_jj_indices.first,
 				h_jj_indices.second, h_jj_block);
 
 		//! Building the RHS Vector
-		Vector6f b_i = Ji.transpose() * Omega * e;
-		Vector6f prev_b_i = _pose_pose_B->getBlock(i_hessian_idx);
+		Vector6 b_i = Ji.transpose() * Omega * e;
+		Vector6 prev_b_i = _pose_pose_B->getBlock(i_hessian_idx);
 		b_i.noalias() += prev_b_i;
 		_pose_pose_B->setBlock(i_hessian_idx, b_i);
 
-		Vector6f b_j = Jj.transpose() * Omega * e;
-		Vector6f prev_b_j = _pose_pose_B->getBlock(j_hessian_idx);
+		Vector6 b_j = Jj.transpose() * Omega * e;
+		Vector6 prev_b_j = _pose_pose_B->getBlock(j_hessian_idx);
 		b_j.noalias() += prev_b_j;
 		_pose_pose_B->setBlock(j_hessian_idx, b_j);
 		//! Seems to work fine
@@ -218,12 +218,12 @@ void SparseSolver::linearizePosePose(float& total_chi_, int& inliers_) {
 void SparseSolver::errorAndJacobianPosePoint(const Pose& xr,
 		const PointXYZ& xl,
 		const PointMeas& zl,
-		Eigen::Vector3f& error,
-		Eigen::Matrix3f& Jl,
-		Matrix3_6f& Jr){
+		Vector3& error,
+		Matrix3& Jl,
+		Matrix3_6& Jr){
 //	Vector3f h_x = xr.linear() * xl + xr.translation();
 	Pose inv_xr = xr.inverse();
-	Vector3f h_x = inv_xr.linear() * xl + inv_xr.translation();
+	Vector3 h_x = inv_xr.linear() * xl + inv_xr.translation();
 
 	error = h_x - zl;
 
@@ -239,27 +239,27 @@ void SparseSolver::errorAndJacobianPosePoint(const Pose& xr,
 void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 		const Pose& xj,
 		const PoseMeas& zr,
-		Vector12f& error,
-		Matrix12_6f& Ji,
-		Matrix12_6f& Jj){
+		Vector12& error,
+		Matrix12_6& Ji,
+		Matrix12_6& Jj){
 
 	//! TODO move to initialization of the solver
-	Matrix3f Rx0, Ry0, Rz0;
+	Matrix3 Rx0, Ry0, Rz0;
 	Rx0 << 0,0,0,  0,0,-1,  0,1,0;
 	Ry0 << 0,0,1,  0,0,0,   -1,0,0;
 	Rz0 << 0,-1,0, 1,0,0,   0,0,0;
 
-	Matrix3f Ri = xi.linear();
-	Matrix3f Rj = xj.linear();
-	Vector3f ti = xi.translation();
-	Vector3f tj = xj.translation();
-	Vector3f t_ij = tj-ti;
+	Matrix3 Ri = xi.linear();
+	Matrix3 Rj = xj.linear();
+	Vector3 ti = xi.translation();
+	Vector3 tj = xj.translation();
+	Vector3 t_ij = tj-ti;
 
-	Matrix3f dR_x = Ri.transpose() * Rx0 * Rj;
-	Matrix3f dR_y = Ri.transpose() * Ry0 * Rj;
-	Matrix3f dR_z = Ri.transpose() * Rz0 * Rj;
+	Matrix3 dR_x = Ri.transpose() * Rx0 * Rj;
+	Matrix3 dR_y = Ri.transpose() * Ry0 * Rj;
+	Matrix3 dR_z = Ri.transpose() * Rz0 * Rj;
 
-	Matrix<float, 9, 1> dr_x_flattened, dr_y_flattened, dr_z_flattened;
+	Matrix<real_, 9, 1> dr_x_flattened, dr_y_flattened, dr_z_flattened;
 	dr_x_flattened << dR_x.col(0), dR_x.col(1), dR_x.col(2);
 	dr_y_flattened << dR_y.col(0), dR_y.col(1), dR_y.col(2);
 	dr_z_flattened << dR_z.col(0), dR_z.col(1), dR_z.col(2);
@@ -278,7 +278,7 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	h_x.translation() = Ri.transpose() * t_ij;
 
 	//! Compose e
-	Eigen::Isometry3f temp_e = Eigen::Isometry3f::Identity();
+	Isometry3 temp_e = Isometry3::Identity();
 	temp_e.matrix() = h_x.matrix() - zr.matrix();
 
 	error.block<3,1>(0,0) = temp_e.matrix().block<3,1>(0,0);
@@ -298,7 +298,7 @@ void SparseSolver::updateGraph(Graph& graph_){
 
 
 void SparseSolver::oneStep(void){
-	float step_chi;
+	real_ step_chi;
 	int step_inliers;
 	cerr << BOLDYELLOW <<  "One step with damping = " << BOLDRED << _lambda
 			<< BOLDYELLOW << " and kernel threshold = " << BOLDRED << _threshold << RESET << endl;
@@ -310,10 +310,10 @@ void SparseSolver::oneStep(void){
 	//! rigid transformation), it is necessary to introduce a bias on the first element, to fix the
 	//! first point. Moreover, since we want that the starting pose remains the same, it is necessary
 	//! to set to 0 the first dX block.
-	sparse::DenseVector<Vector6f> dX_pose_pose;
+	sparse::DenseVector<Vector6> dX_pose_pose;
 
-	Matrix6f temp = _pose_pose_Hessian->getBlock(0,0);
-	temp += Matrix6f::Identity()*1000.0; //! Bias
+	Matrix6 temp = _pose_pose_Hessian->getBlock(0,0);
+	temp += Matrix6::Identity()*1000000.0; //! Bias
 	_pose_pose_Hessian->setBlock(0,0,temp);
 
 
@@ -324,19 +324,12 @@ void SparseSolver::oneStep(void){
 	//! Actaully solve the linear system
 	_pose_pose_Hessian->solveLinearSystem((*_pose_pose_B), dX_pose_pose);
 
-	//! We want -dX
-	for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
-		Vector6f block = dX_pose_pose.getBlock(i);
-		Vector6f new_block = -block;
-		dX_pose_pose.setBlock(i, new_block);
-	}
-
-	dX_pose_pose.setBlock(0, Vector6f::Zero()); //! Fix the starting pose;
+	dX_pose_pose.setBlock(0, Vector6::Zero()); //! Fix the starting pose;
 
 	//! Apply the dX to the state.
 	for (int i = 0; i < dX_pose_pose.numRows(); ++i) {
 		Pose new_pose = Pose::Identity();
-		new_pose = v2t(dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
+		new_pose = v2t(-dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
 		_robot_poses[i].setData(new_pose);
 	}
 	//! TODO CLEAN-UP EVERYTHING?

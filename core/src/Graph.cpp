@@ -103,7 +103,7 @@ void Graph::loadFromG2OFile(const string& filename_){
 
 		if(element_type == VERTEX_SE3){
 			int id = -1;
-			Vector3f t;
+			Vector3 t;
 			Quaternionf q;
 
 			ss >> id;
@@ -148,7 +148,7 @@ void Graph::loadFromG2OFile(const string& filename_){
 			int sens_id = -1;
 			ss >> IDs.first >> IDs.second;
 
-			Vector3f t;
+			Vector3 t;
 			Quaternionf q;
 			ss >> t.x() >> t.y() >> t.z();
 			ss >> q.x() >> q.y() >> q.z() >> q.w();
