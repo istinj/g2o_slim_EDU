@@ -44,8 +44,6 @@ int main(int argc, char const *argv[])
 	}
 
 	solver->updateGraph((*graph));
-	//! TODO
-//	graph->exportToG2OFile(filename);
 
 
 	delete solver;

@@ -98,6 +98,8 @@ private:
 	real_ _lambda = 0.0;
 	real_ _threshold = 0.0;
 
+	Matrix3 _Rx0, _Ry0, _Rz0;
+
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

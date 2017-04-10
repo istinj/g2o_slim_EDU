@@ -19,8 +19,6 @@ SparseSolver::SparseSolver() {
 
 SparseSolver::~SparseSolver() {
 	// TODO Auto-generated destructor stub
-	delete _pose_pose_B;
-	delete _pose_pose_Hessian;
 }
 
 SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
@@ -34,10 +32,6 @@ SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
 	_Zl = zl_;
 	_lambda = l_;
 	_threshold = epsilon_;
-
-	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6>(robot_poses_.size(),
-			robot_poses_.size(),6);
-	_pose_pose_B = new sparse::DenseVector<Vector6>(robot_poses_.size(),6);
 }
 
 bool SparseSolver::linearizePosePoint(real_& total_chi_, int& inliers_){
@@ -243,11 +237,9 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 		Matrix12_6& Ji,
 		Matrix12_6& Jj){
 
-	//! TODO move to initialization of the solver
-	Matrix3 Rx0, Ry0, Rz0;
-	Rx0 << 0,0,0,  0,0,-1,  0,1,0;
-	Ry0 << 0,0,1,  0,0,0,   -1,0,0;
-	Rz0 << 0,-1,0, 1,0,0,   0,0,0;
+	_Rx0 << 0,0,0,  0,0,-1,  0,1,0;
+	_Ry0 << 0,0,1,  0,0,0,   -1,0,0;
+	_Rz0 << 0,-1,0, 1,0,0,   0,0,0;
 
 	Matrix3 Ri = xi.linear();
 	Matrix3 Rj = xj.linear();
@@ -255,9 +247,9 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	Vector3 tj = xj.translation();
 	Vector3 t_ij = tj-ti;
 
-	Matrix3 dR_x = Ri.transpose() * Rx0 * Rj;
-	Matrix3 dR_y = Ri.transpose() * Ry0 * Rj;
-	Matrix3 dR_z = Ri.transpose() * Rz0 * Rj;
+	Matrix3 dR_x = Ri.transpose() * _Rx0 * Rj;
+	Matrix3 dR_y = Ri.transpose() * _Ry0 * Rj;
+	Matrix3 dR_z = Ri.transpose() * _Rz0 * Rj;
 
 	Matrix<real_, 9, 1> dr_x_flattened, dr_y_flattened, dr_z_flattened;
 	dr_x_flattened << dR_x.col(0), dR_x.col(1), dR_x.col(2);
@@ -281,6 +273,7 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	Isometry3 temp_e = Isometry3::Identity();
 	temp_e.matrix() = h_x.matrix() - zr.matrix();
 
+	error.setZero();
 	error.block<3,1>(0,0) = temp_e.matrix().block<3,1>(0,0);
 	error.block<3,1>(3,0) = temp_e.matrix().block<3,1>(0,1);
 	error.block<3,1>(6,0) = temp_e.matrix().block<3,1>(0,2);
@@ -298,6 +291,10 @@ void SparseSolver::updateGraph(Graph& graph_){
 
 
 void SparseSolver::oneStep(void){
+	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6>(_robot_poses.size(),
+			_robot_poses.size(),6);
+	_pose_pose_B = new sparse::DenseVector<Vector6>(_robot_poses.size(),6);
+
 	real_ step_chi;
 	int step_inliers;
 	cerr << BOLDYELLOW <<  "One step with damping = " << BOLDRED << _lambda
@@ -333,6 +330,8 @@ void SparseSolver::oneStep(void){
 		_robot_poses[i].setData(new_pose);
 	}
 	//! TODO CLEAN-UP EVERYTHING?
+	delete _pose_pose_B;
+	delete _pose_pose_Hessian;
 }
 
 } /* namespace optimizer */
