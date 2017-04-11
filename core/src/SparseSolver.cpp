@@ -18,7 +18,7 @@ SparseSolver::SparseSolver() {
 }
 
 SparseSolver::~SparseSolver() {
-	// TODO Auto-generated destructor stub
+	//! TODO Here??
 }
 
 SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
@@ -32,6 +32,8 @@ SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
 	_Zl = zl_;
 	_lambda = l_;
 	_threshold = epsilon_;
+
+	//! TODO how to solve this warning?
 }
 
 bool SparseSolver::linearizePosePoint(real_& total_chi_, int& inliers_){
@@ -291,12 +293,14 @@ void SparseSolver::updateGraph(Graph& graph_){
 
 
 void SparseSolver::oneStep(void){
+	real_ step_chi;
+	int step_inliers;
+
+	//! Allocate memory for Hessian and B
 	_pose_pose_Hessian = new sparse::SparseBlockMatrix<Matrix6>(_robot_poses.size(),
 			_robot_poses.size(),6);
 	_pose_pose_B = new sparse::DenseVector<Vector6>(_robot_poses.size(),6);
 
-	real_ step_chi;
-	int step_inliers;
 	cerr << BOLDYELLOW <<  "One step with damping = " << BOLDRED << _lambda
 			<< BOLDYELLOW << " and kernel threshold = " << BOLDRED << _threshold << RESET << endl;
 	linearizePosePose(step_chi,step_inliers);
@@ -329,7 +333,7 @@ void SparseSolver::oneStep(void){
 		new_pose = v2t(-dX_pose_pose.getBlock(i)) * _robot_poses[i].data();
 		_robot_poses[i].setData(new_pose);
 	}
-	//! TODO CLEAN-UP EVERYTHING?
+	//! Cleaning up
 	delete _pose_pose_B;
 	delete _pose_pose_Hessian;
 }

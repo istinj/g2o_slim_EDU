@@ -36,7 +36,6 @@ namespace optimizer {
 		virtual ~Graph();
 
 		void loadFromG2OFile(const std::string& filename_);
-		void exportToG2OFile(const std::string& filename_);
 		void addVertexSE3(const VertexSE3& vertex_);
 		void addVertexXYZ(const VertexXYZ& vertex_);
 		void addEdgePosePoint(const EdgePosePoint& edge_);
@@ -61,10 +60,6 @@ namespace optimizer {
 
 		std::vector<EdgePosePoint> _edges_pose_point;
 		std::vector<EdgePosePose> _edges_pose_pose;
-
-		//! TODO: check graph edges and vertices (association and inverse)
-		//! TODO: check error function in errorAndJacobianPosePose
-		//! THE GRAPH SHOULD CONVERGE REALLY FAST (2-3 iterations).
 
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

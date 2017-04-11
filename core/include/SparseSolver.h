@@ -90,8 +90,6 @@ private:
 	PosePoseEdgeContainer _Zr;
 	PosePointEdgeContainer _Zl;
 
-	//! TODO Remember to clean-up everything in the destructor (or at the end of the iteration)
-	//! TODO Same for the RHSVector;
 	sparse::SparseBlockMatrix<Matrix6>* _pose_pose_Hessian;
 	sparse::DenseVector<Vector6>* _pose_pose_B;
 

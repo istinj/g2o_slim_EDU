@@ -2,7 +2,6 @@
 #include <iostream>
 #include <set>
 #include <Eigen/Core>
-//#include <Eigen/Geometry>
 
 #include "Graph.h"
 #include "SparseSolver.h"
