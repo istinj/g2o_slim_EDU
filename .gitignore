@@ -4,5 +4,8 @@
 /sparse/build/*
 /sparse/bin/*
 
+/sparse_ordering/build/*
+/sparse_ordering/bin/*
+
 .metadata/*
 RemoteSystemTempFiles/*
