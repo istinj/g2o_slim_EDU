@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <memory>
 #include <map>
 #include <set>
 #include <string>
@@ -49,9 +50,11 @@ typedef Eigen::Matrix<real_, 6, 3> Matrix6_3;
 typedef Eigen::Matrix<real_, 2, 3> Matrix2_3;
 typedef Eigen::Matrix<real_, 2, 6> Matrix2_6;
 typedef Eigen::Matrix<real_, 12, 6> Matrix12_6;
+typedef Eigen::Matrix<real_, 12, 12> Matrix12;
 typedef Eigen::Matrix<real_, 6, 1> Vector6;
 typedef Eigen::Matrix<real_, 3, 1> Vector3;
 typedef Eigen::Matrix<real_, 2, 1> Vector2;
+typedef Eigen::Matrix<real_, 9, 1> Vector9;
 typedef Eigen::Matrix<real_, 12, 1> Vector12;
 typedef Eigen::Transform<real_,3,Eigen::Isometry> Isometry3;
 typedef Eigen::AngleAxis<real_> AngleAxisReal;
@@ -68,4 +71,7 @@ typedef Vector3 PointXYZ;
 
 typedef Matrix6 SparseMatrixBlock;
 
+typedef Vector6 DenseVectorBlock;
+typedef std::vector<DenseVectorBlock*,
+		Eigen::aligned_allocator<DenseVectorBlock*> > DenseVectorContainer;
 

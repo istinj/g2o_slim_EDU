@@ -29,7 +29,6 @@ set(SRCS
 	src/Vertex.cpp
 	src/Edge.cpp
 	src/Graph.cpp
-	src/Factor.cpp
 	src/SparseBlockMatrix.cpp
 	src/SparseOptimizer.cpp)
 
