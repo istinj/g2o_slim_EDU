@@ -12,6 +12,7 @@
 #include "Vertex.h"
 #include "Edge.h"
 #include "Factor.h"
+#include "SparseBlockMatrix.h"
 
 namespace sparse {
 
@@ -26,14 +27,13 @@ struct DenseBlockVector {
 	}
 
 	inline void init(const int size_){
-		blocks.resize(size_);
 		num_block = size_;
 	}
 };
 
 typedef std::vector<sparse::Vertex> VerticesContainer;
 typedef std::vector<sparse::Edge> EdgesContainer;
-typedef std::vector<sparse::Factor> FactorsContainer;
+typedef std::map<Factor, SparseMatrixBlock*, FactorComparator> FactorsMap;
 
 class SparseOptimizer {
 public:
@@ -45,18 +45,21 @@ public:
 	void oneStep(void);
 
 protected:
-	//! TODO: container + SparseBlockMatrix + DenseVector + LinearSolver
 	void linearizeFactor(real_& total_chi, int& inliers_);
 	void errorAndJacobian(const Pose& xi, const Pose& xj,const PoseMeas& zr,
 			Vector12& error, Matrix12_6& Ji, Matrix12_6& Jj);
 
 	VerticesContainer _vertices;
 	EdgesContainer _edges;
-	FactorsContainer _factors;
+
+	//! TODO: 	is this container for the matrices good? Do i need something more complex?
+	FactorsMap _factors; //! Matrices Pull -> not factors, name must be refactored
 
 	DenseBlockVector _B;
 
 	real_ _kernel_threshold = 1000.0;
+	//! TODO:	How to generate orderigs? How is structured the vector of ints containing
+	//! 		the ordering??
 
 	inline Matrix3 skew(const Vector3& p)
 	{

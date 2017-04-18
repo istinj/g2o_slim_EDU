@@ -17,10 +17,8 @@ SparseOptimizer::SparseOptimizer() {
 }
 
 SparseOptimizer::~SparseOptimizer() {
-	for (int i = 0; i < _factors.size(); ++i) {
-		delete _factors[i].block_ii;
-		delete _factors[i].block_ji;
-		delete _factors[i].block_jj;
+	for (FactorsMap::iterator it = _factors.begin(); it != _factors.end(); ++it){
+		delete it->second;
 	}
 
 	for (int i = 0; i < _B.num_block; ++i) {
@@ -32,27 +30,36 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 		const EdgesContainer& edges_){
 	_vertices = vertices_;
 	_edges = edges_;
-	_factors.resize(_edges.size());
 
 	//! Initialize the Factors' Storage
+	FactorsMap::iterator f_it;
 	for (int i = 0; i < _edges.size(); ++i) {
-		Factor& current_factor = _factors[i];
-
 		VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
 				_vertices.end(), _edges[i].association().first);
 		VerticesContainer::const_iterator pose_j = std::find(_vertices.begin(),
 				_vertices.end(), _edges[i].association().second);
-		current_factor.from = pose_i->index();
-		current_factor.to = pose_j->index();
+		int from = pose_i->index();
+		int to = pose_j->index();
 
 		//! Storage for the Hessian
-		current_factor.block_ii = new SparseMatrixBlock();
-		current_factor.block_ji = new SparseMatrixBlock();
-		current_factor.block_jj = new SparseMatrixBlock();
+		f_it = _factors.find(Factor(from, from));
+		if(f_it == _factors.end()){
+			_factors[Factor(from, from)] = new SparseMatrixBlock();
+			_factors[Factor(from, from)]->setZero();
+		}
 
-		current_factor.block_ii->setZero();
-		current_factor.block_ji->setZero();
-		current_factor.block_jj->setZero();
+		f_it = _factors.find(Factor(to, from));
+		if(f_it == _factors.end()){
+			_factors[Factor(to, from)] = new SparseMatrixBlock();
+			_factors[Factor(to, from)]->setZero();
+		}
+
+		f_it = _factors.find(Factor(to, to));
+		if(f_it == _factors.end()){
+			_factors[Factor(to, to)] = new SparseMatrixBlock();
+			_factors[Factor(to, to)]->setZero();
+		}
+
 	}
 
 
@@ -85,7 +92,14 @@ void SparseOptimizer::oneStep(void){
 	clearFactors();
 	_B.clear();
 /**/
+	SparseBlockMatrix* hessian = new SparseBlockMatrix(_vertices, _factors); //! OK
+	SparseBlockMatrix* U = hessian->transpose(); //! Not ok
+	hessian->printBlock(0,0);
+	U->printBlock(0,0);
 
+	//! COSE
+	delete U;
+	delete hessian;
 }
 void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 	total_chi_ = 0.0;
@@ -101,11 +115,13 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 	//! For each edge, compute - numerically - the relative factor
 	for (int i = 0; i < _edges.size(); ++i) {
 		const Edge& edge = _edges[i];
-		Factor& factor = _factors[i];
 		VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
 				_vertices.end(), edge.association().first);
 		VerticesContainer::const_iterator pose_j = std::find(_vertices.begin(),
 				_vertices.end(), edge.association().second);
+
+		int from = pose_i->index();
+		int to = pose_j->index();
 
 		//! Compute error and jacobian
 		errorAndJacobian(pose_i->data(), pose_j->data(), _edges[i].data(),
@@ -123,13 +139,16 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 
 		//! TODO THIS SHIT SUCKS
 		//! Compute the factor contribution to the Hessian
-		(*factor.block_ii).noalias() += Ji.transpose() * omega * Ji;
-		(*factor.block_ji).noalias() += Jj.transpose() * omega * Ji;
-		(*factor.block_jj).noalias() += Jj.transpose() * omega * Jj;
+		SparseMatrixBlock& H_ii = (*_factors[Factor(from, from)]);
+		SparseMatrixBlock& H_ji = (*_factors[Factor(to, from)]);
+		SparseMatrixBlock& H_jj = (*_factors[Factor(to, to)]);
+		H_ii.noalias() += Ji.transpose() * omega * Ji;
+		H_ji.noalias() += Jj.transpose() * omega * Ji;
+		H_jj.noalias() += Jj.transpose() * omega * Jj;
 
 		//! Compute the factor contribution to the rhs vector
-		DenseVectorBlock& b_i = (*_B.blocks[pose_i->index()]);
-		DenseVectorBlock& b_j = (*_B.blocks[pose_j->index()]);
+		DenseVectorBlock& b_i = (*_B.blocks[from]);
+		DenseVectorBlock& b_j = (*_B.blocks[to]);
 		b_i.noalias() +=  Ji.transpose() * omega * e;
 		b_j.noalias() +=  Jj.transpose() * omega * e;
 	}

@@ -12,9 +12,9 @@ void Factor::clear(void) {
 	from = 0;
 	to = 0;
 
-	block_ii->setZero();
-	block_ji->setZero();
-	block_jj->setZero();
+//	block_ii->setZero();
+//	block_ji->setZero();
+//	block_jj->setZero();
 }
 
 bool Factor::operator ==(const Factor& other_) const {

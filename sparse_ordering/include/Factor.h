@@ -12,6 +12,26 @@
 
 namespace sparse {
 
+struct Factor {
+	Factor(int from_=0, int to_=0): from(from_), to(to_){}
+	bool operator==(const Factor& other_) const;
+	bool operator==(const Association& factor_association_) const;
+	void clear(void);
+
+	int from;
+	int to;
+
+//	SparseMatrixBlock* block_ii;
+//	SparseMatrixBlock* block_ji;
+//	SparseMatrixBlock* block_jj;
+
+
+	//! TODO: use shared ptr
+//	std::shared_ptr<SparseMatrixBlock> block_11;
+//	std::shared_ptr<SparseMatrixBlock> block_21;
+//	std::shared_ptr<SparseMatrixBlock> block_22;
+};
+
 struct FactorComparator {
 	inline bool operator () (const Factor& a, const Factor& b){
 		if(a.from < b.from){
@@ -22,26 +42,6 @@ struct FactorComparator {
 		}
 		return false;
 	}
-};
-
-
-struct Factor {
-	int from;
-	int to;
-
-	SparseMatrixBlock* block_ii;
-	SparseMatrixBlock* block_ji;
-	SparseMatrixBlock* block_jj;
-
-	bool operator==(const Factor& other_) const;
-	bool operator==(const Association& factor_association_) const;
-
-	void clear(void);
-
-	//! TODO: use shared ptr
-//	std::shared_ptr<SparseMatrixBlock> block_11;
-//	std::shared_ptr<SparseMatrixBlock> block_21;
-//	std::shared_ptr<SparseMatrixBlock> block_22;
 };
 
 } /* namespace sparse */

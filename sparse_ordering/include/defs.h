@@ -59,7 +59,6 @@ typedef Eigen::Matrix<real_, 12, 1> Vector12;
 typedef Eigen::Transform<real_,3,Eigen::Isometry> Isometry3;
 typedef Eigen::AngleAxis<real_> AngleAxisReal;
 typedef Eigen::Quaternion<real_> QuaternionReal;
-typedef std::pair<int, int> Association;
 
 typedef Vector3 PointMeas;
 typedef Isometry3 PoseMeas;
@@ -72,6 +71,19 @@ typedef Vector3 PointXYZ;
 typedef Matrix6 SparseMatrixBlock;
 
 typedef Vector6 DenseVectorBlock;
-typedef std::vector<DenseVectorBlock*,
-		Eigen::aligned_allocator<DenseVectorBlock*> > DenseVectorContainer;
+typedef std::map<int, DenseVectorBlock*, std::less<int>,
+		Eigen::aligned_allocator<std::pair<int, DenseVectorBlock*> > > DenseVectorContainer;
+
+typedef std::pair<int, int> Association;
+struct AssociationComparator {
+	inline bool operator () (const Association& a, const Association& b){
+		if(a.first < b.first){
+			return true;
+		} else {
+			if(a.second < b.second)
+				return true;
+		}
+		return false;
+	}
+};
 
