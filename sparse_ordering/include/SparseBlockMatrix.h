@@ -8,17 +8,15 @@
 #ifndef SPARSEBLOCKMATRIX_H_
 #define SPARSEBLOCKMATRIX_H_
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <Eigen/Core>
-
 #include "defs.h"
+#include "Factor.h"
+#include "Vertex.h"
 
 namespace sparse {
+
+typedef std::vector<sparse::Vertex> VerticesContainer;
+typedef std::vector<sparse::Factor> FactorsContainer;
+
 typedef std::map<int, SparseMatrixBlock*, std::less<int>,
 		Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > ColumnsMap;
 typedef std::vector<ColumnsMap> RowsContainer;
@@ -27,11 +25,14 @@ typedef std::vector<ColumnsMap> RowsContainer;
 class SparseBlockMatrix {
 public:
 	SparseBlockMatrix();
+	SparseBlockMatrix(const VerticesContainer& vertices_,
+			const FactorsContainer& factors_);
+	SparseBlockMatrix(const VerticesContainer& vertices_,
+			const FactorsContainer& factors_,
+			const std::vector<int> ordering_);
 	virtual ~SparseBlockMatrix();
 
 protected:
-	int _total_rows;
-	int _total_cols;
 	int _num_block_rows;
 	int _num_block_cols;
 

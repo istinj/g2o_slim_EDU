@@ -11,31 +11,9 @@
 #include "defs.h"
 #include "Vertex.h"
 #include "Edge.h"
+#include "Factor.h"
 
 namespace sparse {
-
-struct Factor {
-	int from;
-	int to;
-
-	SparseMatrixBlock* block_ii;
-	SparseMatrixBlock* block_ji;
-	SparseMatrixBlock* block_jj;
-
-	inline void clear(void) {
-		from = 0;
-		to = 0;
-
-		block_ii->setZero();
-		block_ji->setZero();
-		block_jj->setZero();
-	}
-
-	//! TODO: use shared ptr
-//	std::shared_ptr<SparseMatrixBlock> block_11;
-//	std::shared_ptr<SparseMatrixBlock> block_21;
-//	std::shared_ptr<SparseMatrixBlock> block_22;
-};
 
 struct DenseBlockVector {
 	int num_block;
