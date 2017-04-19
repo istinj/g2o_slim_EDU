@@ -27,8 +27,7 @@ SparseBlockMatrix::SparseBlockMatrix(const int num_block_rows_,
 }
 
 SparseBlockMatrix::SparseBlockMatrix(const VerticesContainer& vertices_,
-		const FactorsMap& factors_,
-		bool has_storage_){
+		const FactorsMap& factors_){
 	_num_block_rows = vertices_.size();
 	_num_block_cols = vertices_.size();
 	_block_rows.resize(_num_block_rows);
@@ -36,17 +35,16 @@ SparseBlockMatrix::SparseBlockMatrix(const VerticesContainer& vertices_,
 	for (FactorsMap::const_iterator factor = factors_.begin(); factor != factors_.end(); ++factor) {
 		setBlock(factor->first.from, factor->first.to, factor->second);
 	}
-	_has_storage = has_storage_;
+	_has_storage = false;
 }
 
 SparseBlockMatrix::SparseBlockMatrix(const std::vector<Vertex>& vertices_,
 		const FactorsMap& factors_,
-		const std::vector<int> ordering_,
-		bool has_storage_){
+		const std::vector<int> ordering_){
 	_num_block_rows = vertices_.size();
 	_num_block_cols = vertices_.size();
 	_block_rows.resize(_num_block_rows);
-	_has_storage = has_storage_;
+	_has_storage = false;
 	//! TODO ORDERING
 }
 

@@ -28,12 +28,10 @@ public:
 	SparseBlockMatrix(const int num_block_rows_,
 			const int num_block_cols_, bool has_storage_ = false);
 	SparseBlockMatrix(const VerticesContainer& vertices_,
-			const FactorsMap& factors_,
-			bool has_storage_ = false);
+			const FactorsMap& factors_);
 	SparseBlockMatrix(const VerticesContainer& vertices_,
 			const FactorsMap& factors_,
-			const std::vector<int> ordering_,
-			bool has_storage_ = false);
+			const std::vector<int> ordering_);
 	virtual ~SparseBlockMatrix();
 
 	inline const int numRows(void) const {return _num_block_rows;};
@@ -67,6 +65,7 @@ protected:
 	bool _has_storage;
 
 	RowsContainer _block_rows;
+	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
 
 	//! TODO 	MEMORY MANAGEMENT when the matrix owns the blocks.
 	//! TODO 	ORDERING
