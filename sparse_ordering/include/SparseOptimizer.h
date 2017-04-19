@@ -16,21 +16,6 @@
 
 namespace sparse {
 
-struct DenseBlockVector {
-	int num_block;
-	DenseVectorContainer blocks;
-
-	inline void clear(void) {
-		for (int i = 0; i < blocks.size(); ++i) {
-			blocks[i]->setZero();
-		}
-	}
-
-	inline void init(const int size_){
-		num_block = size_;
-	}
-};
-
 typedef std::vector<sparse::Vertex> VerticesContainer;
 typedef std::vector<sparse::Edge> EdgesContainer;
 typedef std::map<Factor, SparseMatrixBlock*, FactorComparator> FactorsMap;
@@ -56,10 +41,13 @@ protected:
 	FactorsMap _factors; //! Matrices Pull -> not factors, name must be refactored
 
 	DenseBlockVector _B;
+	DenseBlockVector _dX;
 
 	real_ _kernel_threshold = 1000.0;
 	//! TODO:	How to generate orderigs? How is structured the vector of ints containing
 	//! 		the ordering??
+
+	//! TODO	Initialize memory for L and U in the init function.
 
 	inline Matrix3 skew(const Vector3& p)
 	{

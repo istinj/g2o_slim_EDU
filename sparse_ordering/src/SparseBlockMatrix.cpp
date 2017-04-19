@@ -50,7 +50,11 @@ SparseBlockMatrix::SparseBlockMatrix(const std::vector<Vertex>& vertices_,
 
 //! TODO: how to delete this shit when it owns the memory?
 SparseBlockMatrix::~SparseBlockMatrix() {
-	//! Add something?
+	if (_has_storage){
+		for (std::map<Association, SparseMatrixBlock*, AssociationComparator>::iterator it = _storage.begin(); it != _storage.end(); ++it){
+			delete it->second;
+		}
+	}
 }
 
 void SparseBlockMatrix::setBlock(const int r_, const int c_, SparseMatrixBlock* data_ptr_) {
@@ -116,22 +120,24 @@ SparseBlockMatrix* SparseBlockMatrix::cholesky(void) const {
 		int starting_col_idx = block_row.begin()->first;
 
 		for (int c = starting_col_idx; c <= r; ++c) {
-			std::shared_ptr<SparseMatrixBlock> accumulator_ptr = std::make_shared<SparseMatrixBlock>();
-			std::shared_ptr<SparseMatrixBlock> chol_computed_block = std::make_shared<SparseMatrixBlock>();
+			//! Allocate memory
+			chol->_storage[Association(r,c)] = new SparseMatrixBlock();
+			SparseMatrixBlock& chol_computed_block = (*chol->_storage[Association(r,c)]);
 
-			accumulator_ptr->setZero();
-			chol_computed_block->setZero();
+			SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
+			chol_computed_block.setZero();
 
-			ColumnsMap& chol_upper_row = chol->_block_rows[c];
-			(*accumulator_ptr) = getBlock(r,c) - (*scalarProd(chol_block_row, chol_upper_row, c-1));
-
+			const ColumnsMap& chol_upper_row = chol->_block_rows[c];
+//			cerr << r << ", " << c << endl << scalarProd(chol_block_row, chol_upper_row, c-1) << endl;
+//			cin.get();
+			accumulator = getBlock(r,c) - scalarProd(chol_block_row, chol_upper_row, c-1);
 			if (r == c) {
-				(*chol_computed_block) = (*accumulator_ptr).llt().matrixL();
-				inverse_diag_blocks[r] = (*chol_computed_block).inverse().transpose();
+				chol_computed_block = accumulator.llt().matrixL();
+				inverse_diag_blocks[r] = chol_computed_block.inverse().transpose();
 			} else {
-				(*chol_computed_block) = (*accumulator_ptr) * inverse_diag_blocks[c];
+				chol_computed_block = accumulator * inverse_diag_blocks[c];
 			}
-			chol_block_row[c] = chol_computed_block.get();
+			chol_block_row[c] = chol->_storage[Association(r,c)];
 		}
 	}
 
@@ -152,34 +158,120 @@ SparseBlockMatrix* SparseBlockMatrix::transpose(void) const {
 			if (it == block_row.end())
 				continue;
 			else{
-				std::shared_ptr<SparseMatrixBlock> block = std::make_shared<SparseMatrixBlock>();
-				(*block) = it->second->transpose();
-				transposed_block_row[r] = block.get();
-//				transposed_block_row[r] = it->second;
+				transposed->_storage[Association(c,r)] = new SparseMatrixBlock();
+				(*transposed->_storage[Association(c,r)]) = it->second->transpose();
+				transposed_block_row[r] = transposed->_storage[Association(c,r)];
 			}
 		}
 	}
 	return transposed;
 }
 
-//! TODO: This shit produces memory leak
+//! TODO: This shit segfaulta
 SparseBlockMatrix* SparseBlockMatrix::rightMultiplySparseMatrix(const SparseBlockMatrix* other_) const {
 	if(other_->_num_block_rows != _num_block_cols)
 		throw std::runtime_error("Error, matrices dimensions must agree");
+
 	SparseBlockMatrix* result = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
 	SparseBlockMatrix* other_transposed = other_->transpose();
 
+	cerr << result->_num_block_rows << "\t" << _num_block_rows << endl;
+	cerr << result->_num_block_cols << "\t" << _num_block_cols << endl;
+
 	for (int r = 0; r < _num_block_rows; ++r) {
+		cerr << GREEN << r << "\n" << RESET;
 		const ColumnsMap& block_row = _block_rows[r];
 		for (int c = 0; c < _num_block_cols; ++c) {
+			cerr << BLUE << "\t" << c << endl << RESET;
 			ColumnsMap& other_transposed_block_row = other_transposed->_block_rows[c];
-			shared_ptr<SparseMatrixBlock> result_block = scalarProd(block_row,
-					other_transposed_block_row, _num_block_cols);
-			result->setBlock(r,c,result_block.get());
+			cerr << "there1" << endl;
+			SparseMatrixBlock block = scalarProd(block_row, other_transposed_block_row, _num_block_cols);
+			cerr << "there2" << endl;
+			if(block.isZero())
+				continue;
+			result->_storage[Association(r,c)] = new SparseMatrixBlock();
+			cerr << "block" << endl << block << endl;
+			(*result->_storage[Association(r,c)]) = block;
+			cerr << "there4" << endl;
+			result->setBlock(r, c, result->_storage[Association(r,c)]);
 		}
 	}
 	delete other_transposed;
 	return result;
+}
+/**/
+
+
+void SparseBlockMatrix::solveLinearSystem(DenseBlockVector& rhs_vector_,
+		DenseBlockVector& result_) const {
+	if (result_.size != rhs_vector_.size) {
+		result_.reset();
+		result_.init(rhs_vector_.size);
+	} else {
+		result_.clear();
+	}
+
+	if(_num_block_rows != _num_block_cols)
+		throw std::runtime_error("Error, non squared matrix :(");
+
+	SparseBlockMatrix* L = cholesky();
+	SparseBlockMatrix* U = L->transpose();
+
+	DenseBlockVector y;
+	L->forwSub(rhs_vector_, y);
+	U->backSub(y, result_);
+	y.reset();
+
+	delete U;
+	delete L;
+}
+
+
+void SparseBlockMatrix::forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const {
+	if(_num_block_rows != _num_block_cols || rhs_vector_.size != _num_block_rows)
+		throw std::runtime_error("Error, dimensions must agree");
+
+	if (result_.size != rhs_vector_.size) {
+		result_.reset();
+		result_.init(rhs_vector_.size);
+	} else {
+		result_.clear();
+	}
+
+	for (int r = 0; r < _num_block_rows; ++r) {
+//		DenseVectorBlock res_block = (*rhs_vector_.blocks[r]);
+		DenseVectorBlock& res_block = (*result_.blocks[r]);
+		res_block = (*rhs_vector_.blocks[r]);
+		for (int c = 0; c < r; ++c) {
+			res_block.noalias() -= getBlock(r,c) * (*result_.blocks[c]);
+		}
+		res_block = getBlock(r,r).inverse() * res_block;
+//		(*result_.blocks[r]) = res_block;
+	}
+}
+
+
+void SparseBlockMatrix::backSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const {
+	if(_num_block_rows != _num_block_cols || rhs_vector_.size != _num_block_rows)
+		throw std::runtime_error("Error, dimensions must agree");
+
+	if (result_.size != rhs_vector_.size) {
+		result_.reset();
+		result_.init(rhs_vector_.size);
+	} else {
+		result_.clear();
+	}
+
+	for (int r = _num_block_rows - 1; r >= 0; --r) {
+//		DenseVectorBlock res_block = (*rhs_vector_.blocks[r]);
+		DenseVectorBlock& res_block = (*result_.blocks[r]);
+		res_block = (*rhs_vector_.blocks[r]);
+		for (int c = r + 1; c < _num_block_cols; ++c) {
+			res_block.noalias() -= getBlock(r,c) * (*result_.blocks[c]);
+		}
+		res_block = getBlock(r,r).inverse() * res_block;
+//		(*result_.blocks[r]) = res_block;
+	}
 }
 
 
@@ -200,54 +292,28 @@ void SparseBlockMatrix::printMatrix(void) const {
 	}
 }
 
-std::shared_ptr<SparseMatrixBlock> SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
-		const ColumnsMap& row2_,
-		const int max_pos_) const{
-	ColumnsMap::const_iterator it1 = row1_.begin();
-	ColumnsMap::const_iterator it2 = row2_.begin();
-	shared_ptr<SparseMatrixBlock> result = make_shared<SparseMatrixBlock>();
-	while(it1 != row1_.end() && it2 != row2_.end()){
-		int col_idx_1 = it1->first;
-		int col_idx_2 = it2->first;
-		if(col_idx_1 > max_pos_ || col_idx_2 > max_pos_){
-			return result;
-		}
-		if(col_idx_1 == col_idx_2){
-			//! TODO this shit sucks
-			(*result) += (*it1->second) * (*it2->second).transpose();
-			++it1;
-			++it2;
-		}
-		else if(col_idx_1 > col_idx_2)
-			++it2;
-		else if(col_idx_1 < col_idx_2)
-			++it1;
-	}
-	return result;
-}
-
-SparseMatrixBlock* SparseBlockMatrix::scalarProdPtr(const ColumnsMap& row1_,
+SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
 		const ColumnsMap& row2_,
 		const int max_pos_) const {
-	ColumnsMap::const_iterator it1 = row1_.begin();
-	ColumnsMap::const_iterator it2 = row2_.begin();
-	SparseMatrixBlock* result = new SparseMatrixBlock();
-	while(it1 != row1_.end() && it2 != row2_.end()){
-		int col_idx_1 = it1->first;
-		int col_idx_2 = it2->first;
+	typename ColumnsMap::const_iterator it_1 = row1_.begin();
+	typename ColumnsMap::const_iterator it_2 = row2_.begin();
+
+	SparseMatrixBlock result = SparseMatrixBlock::Zero();
+	while(it_1 != row1_.end() && it_2 != row2_.end()){
+		int col_idx_1 = it_1->first;
+		int col_idx_2 = it_2->first;
 		if(col_idx_1 > max_pos_ || col_idx_2 > max_pos_){
 			return result;
 		}
 		if(col_idx_1 == col_idx_2){
-			//! TODO this shit sucks
-			(*result) += (*it1->second) * (*it2->second).transpose();
-			++it1;
-			++it2;
+			result += (*it_1->second) * it_2->second->transpose();
+			++it_1;
+			++it_2;
 		}
 		else if(col_idx_1 > col_idx_2)
-			++it2;
+			++it_2;
 		else if(col_idx_1 < col_idx_2)
-			++it1;
+			++it_1;
 	}
 	return result;
 }

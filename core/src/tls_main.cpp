@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <set>
+#include <chrono>
 #include <Eigen/Core>
 
 #include "Graph.h"
@@ -38,8 +39,14 @@ int main(int argc, char const *argv[])
 			graph->verticesXYZ(), graph->edgesPosePose(), graph->edgesPosePoint(),
 			0, 1000.0);
 
+
+	std::chrono::high_resolution_clock::time_point t_0, t_1;
 	for (int i = 0; i < 10; ++i) {
+		t_0 = std::chrono::high_resolution_clock::now();
 		solver->oneStep();
+		t_1 = std::chrono::high_resolution_clock::now();
+		double execution_time = (std::chrono::duration_cast<std::chrono::microseconds>(t_1 - t_0).count() / 1e06);
+		std::cerr << BOLDWHITE << "Execution time:\t" << BOLDGREEN << execution_time << std::endl << RESET;
 	}
 
 	solver->updateGraph((*graph));

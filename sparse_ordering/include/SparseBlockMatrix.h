@@ -14,6 +14,31 @@
 
 namespace sparse {
 
+struct DenseBlockVector {
+	int size;
+	DenseVectorContainer blocks;
+
+	inline void reset(void){
+		for (int i = 0; i < size; ++i) {
+			delete blocks[i];
+		}
+	}
+
+	inline void clear(void) {
+		for (int i = 0; i < blocks.size(); ++i) {
+			blocks[i]->setZero();
+		}
+	}
+
+	inline void init(const int size_){
+		size = size_;
+		for (int i = 0; i < size; ++i) {
+			blocks[i] = new DenseVectorBlock();
+			blocks[i]->setZero();
+		}
+	}
+};
+
 typedef std::vector<sparse::Vertex> VerticesContainer;
 typedef std::map<Factor, SparseMatrixBlock*, FactorComparator> FactorsMap;
 
@@ -37,26 +62,26 @@ public:
 	inline const int numRows(void) const {return _num_block_rows;};
 	inline const int numCols(void) const {return _num_block_cols;};
 
-	void setBlock(const int r_,
-			const int c_,
-			SparseMatrixBlock* data_ptr_);
+	void printBlock(const int r_, const int c_) const;
+	void printMatrix(void) const;
+
+	void setBlock(const int r_,	const int c_, SparseMatrixBlock* data_ptr_);
 	SparseMatrixBlock getBlock(const int r_, const int c_) const;
 	SparseMatrixBlock* getBlockPtr(const int r_, const int c_) const;
 
 	SparseBlockMatrix* transpose(void) const;
-	//!TODO: 	this is a shit but does not produce memory leaks
+	//! TODO:	This shit segfaulta
 	SparseBlockMatrix* rightMultiplySparseMatrix(const SparseBlockMatrix* other_) const;
-	//!TODO: 	this is a shit but does not produce memory leaks
 	SparseBlockMatrix* cholesky(void) const;
 
-	void printBlock(const int r_, const int c_) const;
-	void printMatrix(void) const;
+	//! This produces memory access.
+	void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
+	void forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
+	void backSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
+
 protected:
-	SparseMatrixBlock* scalarProdPtr(const ColumnsMap& row1_,
-			const ColumnsMap& row2_,
-			const int max_pos_) const;
 	//!TODO: 	this is a shit but does not produce memory leaks
-	std::shared_ptr<SparseMatrixBlock> scalarProd(const ColumnsMap& row1_,
+	SparseMatrixBlock scalarProd(const ColumnsMap& row1_,
 			const ColumnsMap& row2_,
 			const int max_pos_) const;
 
@@ -67,6 +92,10 @@ protected:
 	RowsContainer _block_rows;
 	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
 
+
+	//! TODO	Method to remove row/column
+	//! TODO	Operator() overload
+	//! TODO	CHECK MEMORY MANAGEMENT
 	//! TODO 	MEMORY MANAGEMENT when the matrix owns the blocks.
 	//! TODO 	ORDERING
 

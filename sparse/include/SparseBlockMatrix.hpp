@@ -243,7 +243,6 @@ void SparseBlockMatrix<BlockType_>::cholesky(SparseBlockMatrix<BlockType_>& bloc
 
 			ColumnsBlockMap& chol_upper_row = block_cholesky_._row_container[c];
 			accumulator = getBlock(r,c) - scalarProd(chol_curr_row, chol_upper_row, c-1);
-
 			if(r == c){
 				chol_curr_rc_value = accumulator.llt().matrixL();
 				inverse_transpose_diagonal_blocks[r] = chol_curr_rc_value.inverse().transpose();
@@ -271,6 +270,7 @@ bool SparseBlockMatrix<BlockType_>::solveLinearSystem(const DenseVector<VectorBl
 	//! TODO POINTERs and NOT REFERENCES?
 	SparseBlockMatrix<DenseBlock> L(_num_block_rows, _num_block_cols, _block_dim);
 	SparseBlockMatrix<DenseBlock> U(_num_block_cols, _num_block_rows, _block_dim);
+
 	cholesky(L);
 	L.transpose(U);
 
@@ -291,8 +291,8 @@ bool SparseBlockMatrix<BlockType_>::solveLinearSystem(const DenseVector<VectorBl
 	}
 /**/
 	DenseVector<VectorBlockType_> Y;
-	L.forwSubstitution(RHS_Vector_, Y); // OK tested
-	U.backSubstitution(Y, result_); // Maybe has some problem :/
+	L.forwSubstitution(RHS_Vector_, Y);
+	U.backSubstitution(Y, result_);
 	return true;
 }
 
