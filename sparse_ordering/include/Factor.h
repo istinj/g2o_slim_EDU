@@ -21,15 +21,6 @@ struct Factor {
 	int from;
 	int to;
 
-//	SparseMatrixBlock* block_ii;
-//	SparseMatrixBlock* block_ji;
-//	SparseMatrixBlock* block_jj;
-
-
-	//! TODO: use shared ptr
-//	std::shared_ptr<SparseMatrixBlock> block_11;
-//	std::shared_ptr<SparseMatrixBlock> block_21;
-//	std::shared_ptr<SparseMatrixBlock> block_22;
 };
 
 struct FactorComparator {

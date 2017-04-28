@@ -78,7 +78,7 @@ typedef std::map<int, DenseVectorBlock*, std::less<int>,
 
 typedef std::pair<int, int> Association;
 struct AssociationComparator {
-	inline bool operator () (const Association& a, const Association& b){
+	inline bool operator () (const Association& a, const Association& b) const {
 		if(a.first < b.first){
 			return true;
 		} else {

@@ -40,7 +40,7 @@ struct DenseBlockVector {
 };
 
 typedef std::vector<sparse::Vertex> VerticesContainer;
-typedef std::map<Factor, SparseMatrixBlock*, FactorComparator> FactorsMap;
+typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> BlocksMap;
 
 typedef std::map<int, SparseMatrixBlock*, std::less<int>,
 		Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > ColumnsMap;
@@ -53,9 +53,9 @@ public:
 	SparseBlockMatrix(const int num_block_rows_,
 			const int num_block_cols_, bool has_storage_ = false);
 	SparseBlockMatrix(const VerticesContainer& vertices_,
-			const FactorsMap& factors_);
+			const BlocksMap& blocks_);
 	SparseBlockMatrix(const VerticesContainer& vertices_,
-			const FactorsMap& factors_,
+			const BlocksMap& blocks_,
 			const std::vector<int> ordering_);
 	virtual ~SparseBlockMatrix();
 

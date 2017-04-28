@@ -17,7 +17,7 @@ SparseOptimizer::SparseOptimizer() {
 }
 
 SparseOptimizer::~SparseOptimizer() {
-	for (FactorsMap::iterator it = _factors.begin(); it != _factors.end(); ++it){
+	for (BlocksMap::iterator it = _blocks_pull.begin(); it != _blocks_pull.end(); ++it){
 		delete it->second;
 	}
 
@@ -36,7 +36,7 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 	_edges = edges_;
 
 	//! Initialize the Factors' Storage
-	FactorsMap::iterator f_it;
+	HessianBlocksMap::iterator f_it;
 	for (int i = 0; i < _edges.size(); ++i) {
 		VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
 				_vertices.end(), _edges[i].association().first);
@@ -48,42 +48,51 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 		cerr << "from: " << from << "\tto: " << to << endl;
 
 		//! Storage for the Hessian
-		f_it = _factors.find(Factor(from, from));
-		if(f_it == _factors.end()){
-			_factors[Factor(from, from)] = new SparseMatrixBlock();
-			_factors[Factor(from, from)]->setIdentity();
+		f_it = _blocks_pull.find(Association(from, from));
+		if(f_it == _blocks_pull.end()){
+			_blocks_pull[Association(from, from)] = new SparseMatrixBlock();
+			_blocks_pull[Association(from, from)]->setIdentity();
+			cerr << BOLDGREEN << "inserted block(" << from << ", " << from << "):" << endl;
+			cerr << *_blocks_pull[Association(from, from)] << endl << RESET;
 		} else {
-			cerr << "block(" << from << ", " << from << ") exists already" << endl;
+			cerr << BOLDYELLOW << "block(" << from << ", " << from << ") already exists:" << endl;
+			cerr << *_blocks_pull[Association(from, from)] << endl << RESET;
 		}
 
-		f_it = _factors.find(Factor(to, from));
-		if(f_it == _factors.end()){
-			_factors[Factor(to, from)] = new SparseMatrixBlock();
-			_factors[Factor(to, from)]->setIdentity();
+		f_it = _blocks_pull.find(Association(to, from));
+		if(f_it == _blocks_pull.end()){
+			_blocks_pull[Association(to, from)] = new SparseMatrixBlock();
+			_blocks_pull[Association(to, from)]->setIdentity();
+			cerr << BOLDGREEN << "inserted block(" << to << ", " << from << "):" << endl;
+			cerr << *_blocks_pull[Association(to, from)] << endl << RESET;
 		} else {
-			cerr << "block(" << to << ", " << from << ") exists already" << endl;
+			cerr << BOLDYELLOW << "block(" << to << ", " << from << ") already exists:" << endl;
+			cerr << *_blocks_pull[Association(to, from)] << endl << RESET;
 		}
 
-		f_it = _factors.find(Factor(to, to));
-		if(f_it == _factors.end()){
-			_factors[Factor(to, to)] = new SparseMatrixBlock();
-			_factors[Factor(to, to)]->setIdentity();
+		//! PROBLEM HERE PORCO DIO:
+		//! does not find block(54, 54) even if it exists -> creates new block but it already exists -> segfault
+		f_it = _blocks_pull.find(Association(to, to));
+		if(f_it == _blocks_pull.end()){
+			_blocks_pull[Association(to, to)] = new SparseMatrixBlock();
+			_blocks_pull[Association(to, to)]->setIdentity();
+			cerr << BOLDGREEN << "inserted block(" << to << ", " << to << "):" << endl;
+			cerr << *_blocks_pull[Association(to, to)] << endl << RESET;
 		} else {
-			cerr << "block(" << to << ", " << to << ") exists already" << endl;
+			cerr << BOLDYELLOW << "block(" << to << ", " << to << ") already exists:" << endl;
+			cerr << *_blocks_pull[Association(to, to)] << endl << RESET;
 		}
-
-		cerr << _factors.size() << endl;
+		cin.get();
 	}
 
-	_H = new SparseBlockMatrix(_vertices, _factors);
-	cerr << "H init" << endl;
+	_H = new SparseBlockMatrix(_vertices, _blocks_pull);
 
 	//! Storage for U and L
 	_L = _H->cholesky();
 	_U = _L->transpose();
 
 	//! Clean-up
-	for (FactorsMap::iterator it = _factors.begin(); it != _factors.end(); ++it){
+	for (BlocksMap::iterator it = _blocks_pull.begin(); it != _blocks_pull.end(); ++it){
 		it->second->setZero();
 	}
 
@@ -104,18 +113,8 @@ void SparseOptimizer::oneStep(void){
 	cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << step_inliers << "\t" << BOLDWHITE
 			<< "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
 
-	//! TODO Build and solve the linear system HdX = B;
-/*
-	hessian = SparseBlockMatrix(_factors, _ordering);
-	SparseMatrixBlock& h_00 = _hessian(0,0) + (SparseMatrixBlock::Identity() * 1000.0);
-
-	hessian.solveLinearSystem(_B, dX);
-	updateVertices(_dX);
-
-	clearFactors();
-	_B.clear();
-/**/
-	SparseMatrixBlock& h_00 = (*_factors[Factor(0,0)]);
+	//! Build and solve the linear system HdX = B;
+	SparseMatrixBlock& h_00 = (*_blocks_pull[Association(0,0)]);
 	h_00 += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
 	_H->updateCholesky(_L);
@@ -124,7 +123,6 @@ void SparseOptimizer::oneStep(void){
 	DenseBlockVector y;
 	_L->forwSub(_B, _Y);
 	_U->backSub(_Y, _dX);
-
 
 //	hessian->solveLinearSystem(_B, _dX);
 
@@ -139,7 +137,7 @@ void SparseOptimizer::oneStep(void){
 	_B.clear();
 
 	//! Clean-up the factors
-	for (FactorsMap::iterator it = _factors.begin(); it != _factors.end(); ++it){
+	for (BlocksMap::iterator it = _blocks_pull.begin(); it != _blocks_pull.end(); ++it){
 		it->second->setZero();
 	}
 }
@@ -181,9 +179,9 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 
 		//! TODO THIS SHIT SUCKS
 		//! Compute the factor contribution to the Hessian
-		SparseMatrixBlock& H_ii = (*_factors[Factor(from, from)]);
-		SparseMatrixBlock& H_ji = (*_factors[Factor(to, from)]);
-		SparseMatrixBlock& H_jj = (*_factors[Factor(to, to)]);
+		SparseMatrixBlock& H_ii = (*_blocks_pull[Association(from, from)]);
+		SparseMatrixBlock& H_ji = (*_blocks_pull[Association(to, from)]);
+		SparseMatrixBlock& H_jj = (*_blocks_pull[Association(to, to)]);
 		H_ii.noalias() += Ji.transpose() * omega * Ji;
 		H_ji.noalias() += Jj.transpose() * omega * Ji;
 		H_jj.noalias() += Jj.transpose() * omega * Jj;

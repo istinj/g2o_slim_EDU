@@ -18,7 +18,7 @@ namespace sparse {
 
 typedef std::vector<sparse::Vertex> VerticesContainer;
 typedef std::vector<sparse::Edge> EdgesContainer;
-typedef std::map<Factor, SparseMatrixBlock*, FactorComparator> FactorsMap;
+typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> HessianBlocksMap;
 
 class SparseOptimizer {
 public:
@@ -38,7 +38,7 @@ protected:
 	EdgesContainer _edges;
 
 	//! TODO: 	is this container for the matrices good? Do i need something more complex?
-	FactorsMap _factors; //! Matrices Pull -> not factors, name must be refactored
+	HessianBlocksMap _blocks_pull;
 
 	DenseBlockVector _B;
 	DenseBlockVector _Y;

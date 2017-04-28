@@ -30,7 +30,6 @@ int main(int argc, char const *argv[]){
 
 	sparse::SparseOptimizer* optimizer = new sparse::SparseOptimizer();
 	optimizer->init(graph->vertices(), graph->edges());
-	std::cerr << "Init done" << std::endl;
 
 	std::chrono::high_resolution_clock::time_point t_0, t_1;
 	for (int i = 0; i < 10; ++i) {

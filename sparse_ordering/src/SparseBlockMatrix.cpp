@@ -28,27 +28,38 @@ SparseBlockMatrix::SparseBlockMatrix(const int num_block_rows_,
 }
 
 SparseBlockMatrix::SparseBlockMatrix(const VerticesContainer& vertices_,
-		const FactorsMap& factors_){
+		const BlocksMap& blocks_){
 	_num_block_rows = vertices_.size();
 	_num_block_cols = vertices_.size();
 	_block_rows.resize(_num_block_rows);
 
-	for (FactorsMap::const_iterator factor = factors_.begin(); factor != factors_.end(); ++factor) {
-		setBlock(factor->first.from, factor->first.to, factor->second);
+	for (BlocksMap::const_iterator block = blocks_.begin(); block != blocks_.end(); ++block) {
+		setBlock(block->first.first, block->first.second, block->second);
 	}
 	_has_storage = false;
 	_is_initialized = true;
 }
 
 SparseBlockMatrix::SparseBlockMatrix(const std::vector<Vertex>& vertices_,
-		const FactorsMap& factors_,
+		const BlocksMap& blocks_,
 		const std::vector<int> ordering_){
 	_num_block_rows = vertices_.size();
 	_num_block_cols = vertices_.size();
 	_block_rows.resize(_num_block_rows);
+
+	//! TODO ORDERING (???)
+	for (BlocksMap::const_iterator block = blocks_.begin(); block != blocks_.end(); ++block) {
+		int r = block->first.first;
+		int c = block->first.second;
+
+		r = ordering_[r];
+		c = ordering_[c];
+
+		setBlock(r,c,block->second);
+	}
+
 	_has_storage = false;
 	_is_initialized = true;
-	//! TODO ORDERING
 }
 
 //! TODO: how to delete this shit when it owns the memory?
