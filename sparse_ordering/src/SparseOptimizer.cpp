@@ -17,9 +17,7 @@ SparseOptimizer::SparseOptimizer() {
 }
 
 SparseOptimizer::~SparseOptimizer() {
-	for (BlocksMap::iterator it = _blocks_pull.begin(); it != _blocks_pull.end(); ++it){
-		delete it->second;
-	}
+	_jacobians_workspace.reset();
 
 	delete _H;
 	delete _L;
@@ -35,66 +33,35 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 	_vertices = vertices_;
 	_edges = edges_;
 
-	//! Initialize the Factors' Storage
+	//! TODO: solve problem here while creating storage -> segfault
+	//! Initialize the Factors
+	bool verbose = false;
 	HessianBlocksMap::iterator f_it;
 	for (int i = 0; i < _edges.size(); ++i) {
 		VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
 				_vertices.end(), _edges[i].association().first);
 		VerticesContainer::const_iterator pose_j = std::find(_vertices.begin(),
 				_vertices.end(), _edges[i].association().second);
-		int from = pose_i->index();
-		int to = pose_j->index();
+		int i_idx = pose_i->index();
+		int j_idx = pose_j->index();
 
-		cerr << "from: " << from << "\tto: " << to << endl;
-
-		//! Storage for the Hessian
-		f_it = _blocks_pull.find(Association(from, from));
-		if(f_it == _blocks_pull.end()){
-			_blocks_pull[Association(from, from)] = new SparseMatrixBlock();
-			_blocks_pull[Association(from, from)]->setIdentity();
-			cerr << BOLDGREEN << "inserted block(" << from << ", " << from << "):" << endl;
-			cerr << *_blocks_pull[Association(from, from)] << endl << RESET;
-		} else {
-			cerr << BOLDYELLOW << "block(" << from << ", " << from << ") already exists:" << endl;
-			cerr << *_blocks_pull[Association(from, from)] << endl << RESET;
+		if (verbose) {
+			cerr << "from: " << i_idx << "\tto: " << j_idx << endl;
 		}
-
-		f_it = _blocks_pull.find(Association(to, from));
-		if(f_it == _blocks_pull.end()){
-			_blocks_pull[Association(to, from)] = new SparseMatrixBlock();
-			_blocks_pull[Association(to, from)]->setIdentity();
-			cerr << BOLDGREEN << "inserted block(" << to << ", " << from << "):" << endl;
-			cerr << *_blocks_pull[Association(to, from)] << endl << RESET;
-		} else {
-			cerr << BOLDYELLOW << "block(" << to << ", " << from << ") already exists:" << endl;
-			cerr << *_blocks_pull[Association(to, from)] << endl << RESET;
-		}
-
-		//! PROBLEM HERE PORCO DIO:
-		//! does not find block(54, 54) even if it exists -> creates new block but it already exists -> segfault
-		f_it = _blocks_pull.find(Association(to, to));
-		if(f_it == _blocks_pull.end()){
-			_blocks_pull[Association(to, to)] = new SparseMatrixBlock();
-			_blocks_pull[Association(to, to)]->setIdentity();
-			cerr << BOLDGREEN << "inserted block(" << to << ", " << to << "):" << endl;
-			cerr << *_blocks_pull[Association(to, to)] << endl << RESET;
-		} else {
-			cerr << BOLDYELLOW << "block(" << to << ", " << to << ") already exists:" << endl;
-			cerr << *_blocks_pull[Association(to, to)] << endl << RESET;
-		}
-		cin.get();
+		_factors.push_back(Factor(i_idx, j_idx));
 	}
 
-	_H = new SparseBlockMatrix(_vertices, _blocks_pull);
+	//! TODO
+	//! FactorsVector ordered_factor = reorder(_factors, ordering_type);
+	//! _jacobians_workspace.allocate(ordered_factors); -> also in the linearize function
+	_jacobians_workspace.allocate(_factors);
+	_H = new SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
 
 	//! Storage for U and L
 	_L = _H->cholesky();
 	_U = _L->transpose();
 
-	//! Clean-up
-	for (BlocksMap::iterator it = _blocks_pull.begin(); it != _blocks_pull.end(); ++it){
-		it->second->setZero();
-	}
+	_jacobians_workspace.setZero();
 
 	//! Storage for the rhs vector
 	_B.init(_vertices.size());
@@ -114,7 +81,7 @@ void SparseOptimizer::oneStep(void){
 			<< "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
 
 	//! Build and solve the linear system HdX = B;
-	SparseMatrixBlock& h_00 = (*_blocks_pull[Association(0,0)]);
+	SparseMatrixBlock& h_00 = (*_jacobians_workspace.map[Association(0,0)]);
 	h_00 += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
 	_H->updateCholesky(_L);
@@ -123,8 +90,6 @@ void SparseOptimizer::oneStep(void){
 	DenseBlockVector y;
 	_L->forwSub(_B, _Y);
 	_U->backSub(_Y, _dX);
-
-//	hessian->solveLinearSystem(_B, _dX);
 
 	for (int i = 0; i < _dX.size; ++i) {
 		Pose new_pose = Pose::Identity();
@@ -136,10 +101,8 @@ void SparseOptimizer::oneStep(void){
 	_Y.clear();
 	_B.clear();
 
-	//! Clean-up the factors
-	for (BlocksMap::iterator it = _blocks_pull.begin(); it != _blocks_pull.end(); ++it){
-		it->second->setZero();
-	}
+	//! cleaning
+	_jacobians_workspace.setZero();
 }
 void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 	total_chi_ = 0.0;
@@ -160,8 +123,8 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 		VerticesContainer::const_iterator pose_j = std::find(_vertices.begin(),
 				_vertices.end(), edge.association().second);
 
-		int from = pose_i->index();
-		int to = pose_j->index();
+		int i_idx = pose_i->index();
+		int j_idx = pose_j->index();
 
 		//! Compute error and jacobian
 		errorAndJacobian(pose_i->data(), pose_j->data(), _edges[i].data(),
@@ -179,16 +142,17 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 
 		//! TODO THIS SHIT SUCKS
 		//! Compute the factor contribution to the Hessian
-		SparseMatrixBlock& H_ii = (*_blocks_pull[Association(from, from)]);
-		SparseMatrixBlock& H_ji = (*_blocks_pull[Association(to, from)]);
-		SparseMatrixBlock& H_jj = (*_blocks_pull[Association(to, to)]);
+		SparseMatrixBlock& H_ii = (*_jacobians_workspace.map[Association(i_idx, i_idx)]);
+		SparseMatrixBlock& H_ji = (*_jacobians_workspace.map[Association(j_idx, i_idx)]);
+		SparseMatrixBlock& H_jj = (*_jacobians_workspace.map[Association(j_idx, j_idx)]);
+
 		H_ii.noalias() += Ji.transpose() * omega * Ji;
 		H_ji.noalias() += Jj.transpose() * omega * Ji;
 		H_jj.noalias() += Jj.transpose() * omega * Jj;
 
 		//! Compute the factor contribution to the rhs vector
-		DenseVectorBlock& b_i = (*_B.blocks[from]);
-		DenseVectorBlock& b_j = (*_B.blocks[to]);
+		DenseVectorBlock& b_i = (*_B.blocks[i_idx]);
+		DenseVectorBlock& b_j = (*_B.blocks[j_idx]);
 		b_i.noalias() +=  Ji.transpose() * omega * e;
 		b_j.noalias() +=  Jj.transpose() * omega * e;
 	}

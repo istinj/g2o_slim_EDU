@@ -30,6 +30,7 @@ set(SRCS
 	src/Edge.cpp
 	src/Graph.cpp
 	src/Factor.cpp
+	src/Workspace.cpp
 	src/SparseBlockMatrix.cpp
 	src/SparseOptimizer.cpp)
 

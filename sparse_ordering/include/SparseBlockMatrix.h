@@ -11,6 +11,7 @@
 #include "defs.h"
 #include "Factor.h"
 #include "Vertex.h"
+#include "Workspace.h"
 
 namespace sparse {
 
@@ -40,11 +41,11 @@ struct DenseBlockVector {
 };
 
 typedef std::vector<sparse::Vertex> VerticesContainer;
-typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> BlocksMap;
 
 typedef std::map<int, SparseMatrixBlock*, std::less<int>,
 		Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > ColumnsMap;
 typedef std::vector<ColumnsMap> RowsContainer;
+typedef std::vector<Factor> FactorsVector;
 
 
 class SparseBlockMatrix {
@@ -54,8 +55,12 @@ public:
 			const int num_block_cols_, bool has_storage_ = false);
 	SparseBlockMatrix(const VerticesContainer& vertices_,
 			const BlocksMap& blocks_);
+	SparseBlockMatrix(const int size_, const Workspace& workspace_);
+
+	//! TODO:	Do I need to modify this contructor?
 	SparseBlockMatrix(const VerticesContainer& vertices_,
 			const BlocksMap& blocks_,
+			const FactorsVector& factors_,
 			const std::vector<int> ordering_);
 	virtual ~SparseBlockMatrix();
 
@@ -72,13 +77,12 @@ public:
 
 	SparseBlockMatrix* transpose(void) const;
 	void updateTranspose(SparseBlockMatrix* result_);
-	//! TODO:	This shit segfaulta
-	SparseBlockMatrix* rightMultiplySparseMatrix(const SparseBlockMatrix* other_) const;
 	SparseBlockMatrix* cholesky(void) const;
 	void updateCholesky(SparseBlockMatrix* result_);
 
 	//! This produces memory access.
 	void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
+
 	void forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
 	void backSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
 
@@ -96,12 +100,12 @@ protected:
 	RowsContainer _block_rows;
 	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
 
+	//! TODO	Is this matrix structure good?
+	//! TODO 	MEMORY MANAGEMENT when the matrix owns the blocks.
+	//! TODO 	ORDERING
 
 	//! TODO	Method to remove row/column
 	//! TODO	Operator() overload
-	//! TODO	CHECK MEMORY MANAGEMENT
-	//! TODO 	MEMORY MANAGEMENT when the matrix owns the blocks.
-	//! TODO 	ORDERING
 
 public:
    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

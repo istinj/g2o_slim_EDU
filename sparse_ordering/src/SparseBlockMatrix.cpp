@@ -42,20 +42,53 @@ SparseBlockMatrix::SparseBlockMatrix(const VerticesContainer& vertices_,
 
 SparseBlockMatrix::SparseBlockMatrix(const std::vector<Vertex>& vertices_,
 		const BlocksMap& blocks_,
+		const FactorsVector& factors_,
 		const std::vector<int> ordering_){
 	_num_block_rows = vertices_.size();
 	_num_block_cols = vertices_.size();
 	_block_rows.resize(_num_block_rows);
 
-	//! TODO ORDERING (???)
-	for (BlocksMap::const_iterator block = blocks_.begin(); block != blocks_.end(); ++block) {
-		int r = block->first.first;
-		int c = block->first.second;
+	//! TODO ORDERING (???) - shit over shit
+	for (int i = 0; i < factors_.size(); ++i) {
+		const Factor& factor = factors_[i];
+		int from_idx = factor.from;
+		int to_idx = factor.to;
 
-		r = ordering_[r];
-		c = ordering_[c];
+		from_idx = ordering_[from_idx];
+		to_idx = ordering_[to_idx];
 
-		setBlock(r,c,block->second);
+		int a = std::min(from_idx, to_idx);
+		int b = std::max(from_idx, to_idx);
+
+		BlocksMap::const_iterator block_ii = blocks_.find(Association(factor.from, factor.from));
+		if(getBlock(a,a) == SparseMatrixBlock::Zero()){
+			setBlock(a,a,block_ii->second);
+		}
+
+		BlocksMap::const_iterator block_ji = blocks_.find(Association(factor.to, factor.from));
+		if(getBlock(b,a) == SparseMatrixBlock::Zero()){
+			setBlock(b,a,block_ji->second);
+		}
+
+		BlocksMap::const_iterator block_jj = blocks_.find(Association(factor.to, factor.to));
+		if(getBlock(b,a) == SparseMatrixBlock::Zero()){
+			setBlock(b,b,block_jj->second);
+		}
+
+	}
+
+	_has_storage = false;
+	_is_initialized = true;
+}
+
+SparseBlockMatrix::SparseBlockMatrix(const int size_, const Workspace& workspace_){
+	_num_block_rows = size_;
+	_num_block_cols = size_;
+	_block_rows.resize(_num_block_rows);
+
+	//! TODO
+	for (WorkspaceMap::const_iterator it = workspace_.map.begin(); it != workspace_.map.end(); ++it){
+		setBlock(it->first.first, it->first.second, it->second);
 	}
 
 	_has_storage = false;
@@ -246,40 +279,6 @@ void SparseBlockMatrix::updateTranspose(SparseBlockMatrix* result_) {
 		}
 	}
 }
-
-//! TODO: This shit segfaulta
-SparseBlockMatrix* SparseBlockMatrix::rightMultiplySparseMatrix(const SparseBlockMatrix* other_) const {
-	if(other_->_num_block_rows != _num_block_cols)
-		throw std::runtime_error("Error, matrices dimensions must agree");
-
-	SparseBlockMatrix* result = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
-	SparseBlockMatrix* other_transposed = other_->transpose();
-
-	cerr << result->_num_block_rows << "\t" << _num_block_rows << endl;
-	cerr << result->_num_block_cols << "\t" << _num_block_cols << endl;
-
-	for (int r = 0; r < _num_block_rows; ++r) {
-		cerr << GREEN << r << "\n" << RESET;
-		const ColumnsMap& block_row = _block_rows[r];
-		for (int c = 0; c < _num_block_cols; ++c) {
-			cerr << BLUE << "\t" << c << endl << RESET;
-			ColumnsMap& other_transposed_block_row = other_transposed->_block_rows[c];
-			cerr << "there1" << endl;
-			SparseMatrixBlock block = scalarProd(block_row, other_transposed_block_row, _num_block_cols);
-			cerr << "there2" << endl;
-			if(block.isZero())
-				continue;
-			result->_storage[Association(r,c)] = new SparseMatrixBlock();
-			cerr << "block" << endl << block << endl;
-			(*result->_storage[Association(r,c)]) = block;
-			cerr << "there4" << endl;
-			result->setBlock(r, c, result->_storage[Association(r,c)]);
-		}
-	}
-	delete other_transposed;
-	return result;
-}
-/**/
 
 
 void SparseBlockMatrix::solveLinearSystem(DenseBlockVector& rhs_vector_,

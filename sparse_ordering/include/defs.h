@@ -89,3 +89,6 @@ struct AssociationComparator {
 	}
 };
 
+typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> BlocksMap;
+
+

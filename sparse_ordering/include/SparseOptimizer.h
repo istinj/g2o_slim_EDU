@@ -12,13 +12,15 @@
 #include "Vertex.h"
 #include "Edge.h"
 #include "Factor.h"
+#include "Workspace.h"
 #include "SparseBlockMatrix.h"
 
 namespace sparse {
 
 typedef std::vector<sparse::Vertex> VerticesContainer;
 typedef std::vector<sparse::Edge> EdgesContainer;
-typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> HessianBlocksMap;
+typedef std::vector<Factor> FactorsVector;
+typedef BlocksMap HessianBlocksMap;
 
 class SparseOptimizer {
 public:
@@ -38,7 +40,12 @@ protected:
 	EdgesContainer _edges;
 
 	//! TODO: 	is this container for the matrices good? Do i need something more complex?
-	HessianBlocksMap _blocks_pull;
+	Workspace _jacobians_workspace;
+	//! TODO:	A Factor contain just indices of the poses involved in the current factor
+	//!			determined by an edge (it creates 3/4 blocks of the H)
+	FactorsVector _factors;
+	//! TODO:	How to create the ordered matrix given the blocks_pull and the factors?
+	//!			Do I need to modify those two structures??
 
 	DenseBlockVector _B;
 	DenseBlockVector _Y;
