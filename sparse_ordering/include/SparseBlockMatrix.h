@@ -62,6 +62,7 @@ public:
 	inline const int numRows(void) const {return _num_block_rows;};
 	inline const int numCols(void) const {return _num_block_cols;};
 
+	void clear(void);
 	void printBlock(const int r_, const int c_) const;
 	void printMatrix(void) const;
 
@@ -70,9 +71,11 @@ public:
 	SparseMatrixBlock* getBlockPtr(const int r_, const int c_) const;
 
 	SparseBlockMatrix* transpose(void) const;
+	void updateTranspose(SparseBlockMatrix* result_);
 	//! TODO:	This shit segfaulta
 	SparseBlockMatrix* rightMultiplySparseMatrix(const SparseBlockMatrix* other_) const;
 	SparseBlockMatrix* cholesky(void) const;
+	void updateCholesky(SparseBlockMatrix* result_);
 
 	//! This produces memory access.
 	void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
@@ -88,6 +91,7 @@ protected:
 	int _num_block_rows;
 	int _num_block_cols;
 	bool _has_storage;
+	bool _is_initialized = false;
 
 	RowsContainer _block_rows;
 	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;

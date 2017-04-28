@@ -21,7 +21,12 @@ SparseOptimizer::~SparseOptimizer() {
 		delete it->second;
 	}
 
+	delete _H;
+	delete _L;
+	delete _U;
+
 	_B.reset();
+	_Y.reset();
 	_dX.reset();
 }
 
@@ -40,34 +45,54 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 		int from = pose_i->index();
 		int to = pose_j->index();
 
+		cerr << "from: " << from << "\tto: " << to << endl;
+
 		//! Storage for the Hessian
 		f_it = _factors.find(Factor(from, from));
 		if(f_it == _factors.end()){
 			_factors[Factor(from, from)] = new SparseMatrixBlock();
-			_factors[Factor(from, from)]->setZero();
+			_factors[Factor(from, from)]->setIdentity();
+		} else {
+			cerr << "block(" << from << ", " << from << ") exists already" << endl;
 		}
 
 		f_it = _factors.find(Factor(to, from));
 		if(f_it == _factors.end()){
 			_factors[Factor(to, from)] = new SparseMatrixBlock();
-			_factors[Factor(to, from)]->setZero();
+			_factors[Factor(to, from)]->setIdentity();
+		} else {
+			cerr << "block(" << to << ", " << from << ") exists already" << endl;
 		}
 
 		f_it = _factors.find(Factor(to, to));
 		if(f_it == _factors.end()){
 			_factors[Factor(to, to)] = new SparseMatrixBlock();
-			_factors[Factor(to, to)]->setZero();
+			_factors[Factor(to, to)]->setIdentity();
+		} else {
+			cerr << "block(" << to << ", " << to << ") exists already" << endl;
 		}
 
+		cerr << _factors.size() << endl;
+	}
+
+	_H = new SparseBlockMatrix(_vertices, _factors);
+	cerr << "H init" << endl;
+
+	//! Storage for U and L
+	_L = _H->cholesky();
+	_U = _L->transpose();
+
+	//! Clean-up
+	for (FactorsMap::iterator it = _factors.begin(); it != _factors.end(); ++it){
+		it->second->setZero();
 	}
 
 	//! Storage for the rhs vector
 	_B.init(_vertices.size());
 
 	//! Storage for the increment vector
+	_Y.init(_vertices.size());
 	_dX.init(_vertices.size());
-
-	//! TODO	Storage for U and L
 	return;
 }
 
@@ -93,8 +118,15 @@ void SparseOptimizer::oneStep(void){
 	SparseMatrixBlock& h_00 = (*_factors[Factor(0,0)]);
 	h_00 += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
-	SparseBlockMatrix* hessian = new SparseBlockMatrix(_vertices, _factors); //! OK
-	hessian->solveLinearSystem(_B, _dX);
+	_H->updateCholesky(_L);
+	_L->updateTranspose(_U);
+
+	DenseBlockVector y;
+	_L->forwSub(_B, _Y);
+	_U->backSub(_Y, _dX);
+
+
+//	hessian->solveLinearSystem(_B, _dX);
 
 	for (int i = 0; i < _dX.size; ++i) {
 		Pose new_pose = Pose::Identity();
@@ -103,8 +135,10 @@ void SparseOptimizer::oneStep(void){
 	}
 
 	_dX.clear();
+	_Y.clear();
 	_B.clear();
-	delete hessian; //! Does not delete the matrices pull (just 72kB);
+
+	//! Clean-up the factors
 	for (FactorsMap::iterator it = _factors.begin(); it != _factors.end(); ++it){
 		it->second->setZero();
 	}

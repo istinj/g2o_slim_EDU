@@ -41,7 +41,12 @@ protected:
 	FactorsMap _factors; //! Matrices Pull -> not factors, name must be refactored
 
 	DenseBlockVector _B;
+	DenseBlockVector _Y;
 	DenseBlockVector _dX;
+
+	SparseBlockMatrix* _H;
+	SparseBlockMatrix* _L;
+	SparseBlockMatrix* _U;
 
 	real_ _kernel_threshold = 1000.0;
 	//! TODO:	How to generate orderigs? How is structured the vector of ints containing
