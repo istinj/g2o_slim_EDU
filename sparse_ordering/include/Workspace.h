@@ -23,8 +23,9 @@ struct Workspace {
 	virtual ~Workspace();
 
 	void reset(void);
-	void setZero(void);
+	void clear(void);
 	void allocate(std::vector<Factor>& factors_);
+	void allocate(std::vector<Association>& indices_);
 
 	//! TODO c-style Matrix of SparseMatrixBlock*
 	WorkspaceMap map;

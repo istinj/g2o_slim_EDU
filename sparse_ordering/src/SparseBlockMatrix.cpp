@@ -27,59 +27,6 @@ SparseBlockMatrix::SparseBlockMatrix(const int num_block_rows_,
 	_is_initialized = true;
 }
 
-SparseBlockMatrix::SparseBlockMatrix(const VerticesContainer& vertices_,
-		const BlocksMap& blocks_){
-	_num_block_rows = vertices_.size();
-	_num_block_cols = vertices_.size();
-	_block_rows.resize(_num_block_rows);
-
-	for (BlocksMap::const_iterator block = blocks_.begin(); block != blocks_.end(); ++block) {
-		setBlock(block->first.first, block->first.second, block->second);
-	}
-	_has_storage = false;
-	_is_initialized = true;
-}
-
-SparseBlockMatrix::SparseBlockMatrix(const std::vector<Vertex>& vertices_,
-		const BlocksMap& blocks_,
-		const FactorsVector& factors_,
-		const std::vector<int> ordering_){
-	_num_block_rows = vertices_.size();
-	_num_block_cols = vertices_.size();
-	_block_rows.resize(_num_block_rows);
-
-	//! TODO ORDERING (???) - shit over shit
-	for (int i = 0; i < factors_.size(); ++i) {
-		const Factor& factor = factors_[i];
-		int from_idx = factor.from;
-		int to_idx = factor.to;
-
-		from_idx = ordering_[from_idx];
-		to_idx = ordering_[to_idx];
-
-		int a = std::min(from_idx, to_idx);
-		int b = std::max(from_idx, to_idx);
-
-		BlocksMap::const_iterator block_ii = blocks_.find(Association(factor.from, factor.from));
-		if(getBlock(a,a) == SparseMatrixBlock::Zero()){
-			setBlock(a,a,block_ii->second);
-		}
-
-		BlocksMap::const_iterator block_ji = blocks_.find(Association(factor.to, factor.from));
-		if(getBlock(b,a) == SparseMatrixBlock::Zero()){
-			setBlock(b,a,block_ji->second);
-		}
-
-		BlocksMap::const_iterator block_jj = blocks_.find(Association(factor.to, factor.to));
-		if(getBlock(b,a) == SparseMatrixBlock::Zero()){
-			setBlock(b,b,block_jj->second);
-		}
-
-	}
-
-	_has_storage = false;
-	_is_initialized = true;
-}
 
 SparseBlockMatrix::SparseBlockMatrix(const int size_,
 		const Workspace& workspace_){
@@ -87,7 +34,6 @@ SparseBlockMatrix::SparseBlockMatrix(const int size_,
 	_num_block_cols = size_;
 	_block_rows.resize(_num_block_rows);
 
-	//! TODO
 	for (WorkspaceMap::const_iterator it = workspace_.map.begin(); it != workspace_.map.end(); ++it){
 		setBlock(it->first.first, it->first.second, it->second);
 	}
@@ -98,26 +44,14 @@ SparseBlockMatrix::SparseBlockMatrix(const int size_,
 
 //! TODO: how to delete this shit when it owns the memory?
 SparseBlockMatrix::~SparseBlockMatrix() {
-	if (_has_storage){
-		for (std::map<Association, SparseMatrixBlock*, AssociationComparator>::iterator it = _storage.begin(); it != _storage.end(); ++it){
-			delete it->second;
-
-			_matrix_workspace.reset();
-		}
-	}
+	if (_has_storage)
+		_matrix_workspace.reset();
 	_is_initialized = false;
 }
 
-//! Why this does not work??
-void SparseBlockMatrix::clear(void) {
+void SparseBlockMatrix::setZero(void) {
 	if (_has_storage) {
-		for (int r = 0; r < 0; ++r) {
-			ColumnsMap& block_row = _block_rows[r];
-			for(ColumnsMap::iterator it = block_row.begin(); it != block_row.end(); ++it) {
-				it->second->setZero();
-			}
-		}
-		_matrix_workspace.setZero();
+		_matrix_workspace.clear();
 	}
 }
 
@@ -145,13 +79,17 @@ SparseMatrixBlock SparseBlockMatrix::getBlock(const int r_, const int c_) const 
 	if(r_ >= _num_block_rows || c_ >= _num_block_cols){
 		throw std::runtime_error("You are trying to access an wrong element - out of bound index");
 	}
-
-	const ColumnsMap& block_row = _block_rows[r_];
-	ColumnsMap::const_iterator it = block_row.find(c_);
-	if (it == block_row.end())
-		return block;
-	return (*it->second);
-
+	if(_has_storage) {
+		WorkspaceMap::const_iterator it = _matrix_workspace.map.find(Association(r_,c_));
+		cerr << (*it->second) << endl;
+		return (*it->second);
+	} else {
+		const ColumnsMap& block_row = _block_rows[r_];
+		ColumnsMap::const_iterator it = block_row.find(c_);
+		if (it == block_row.end())
+			return block;
+		return (*it->second);
+	}
 }
 
 SparseMatrixBlock* SparseBlockMatrix::getBlockPtr(const int r_, const int c_) const {
@@ -167,65 +105,46 @@ SparseMatrixBlock* SparseBlockMatrix::getBlockPtr(const int r_, const int c_) co
 
 }
 
-SparseBlockMatrix* SparseBlockMatrix::cholesky(void) const {
+bool SparseBlockMatrix::isNonZeroBlock(const int r_, const int c_) const {
+	const SparseMatrixBlock& block = getBlock(r_, c_);
+	if(!block.isZero())
+		return true;
+	return false;
+}
+
+void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix* cholesky_) {
 	if(_num_block_rows != _num_block_cols){
 		throw std::runtime_error("Error: matrix must be squared");
 	}
-	cerr << RED << _num_block_rows << " " << _num_block_cols << endl << RESET;
 
-	SparseBlockMatrix* chol = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
-	std::vector<SparseMatrixBlock, Eigen::aligned_allocator<SparseMatrixBlock> > inverse_diag_blocks(_num_block_rows);
+	cholesky_ = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
+	std::vector<Association> indices;
 
 	for (int r = 0; r < _num_block_rows; ++r) {
 		const ColumnsMap& block_row = _block_rows[r];
-		ColumnsMap& chol_block_row = chol->_block_rows[r];
+		ColumnsMap& chol_block_row = cholesky_->_block_rows[r];
 
 		if(block_row.empty())
 			throw std::runtime_error("Something went wrong during the cholesky");
 		int starting_col_idx = block_row.begin()->first;
 
 		for (int c = starting_col_idx; c <= r; ++c) {
-			cerr << BOLDGREEN << "(" << r << ", " << c << ")" << endl << RESET;
-			cerr << "1" << endl;
-
-			//! Allocate memory
-			SparseMatrixBlock* c_block = new SparseMatrixBlock();
-			c_block->setZero();
-			cerr << "2" << endl;
-
-			chol->_storage.insert(make_pair(Association(r,c), c_block));
-			SparseMatrixBlock& chol_computed_block = *c_block;
-			cerr << "3" << endl;
-
-//			chol->_storage[Association(r,c)] = new SparseMatrixBlock();
-//			cerr << "2" << endl;
-//			SparseMatrixBlock& chol_computed_block = (*chol->_storage[Association(r,c)]);
-//			chol->_storage[Association(r,c)]->setZero();
-////			chol_computed_block.setZero();
-//			cerr << "3" << endl;
-
-			SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
-
-			const ColumnsMap& chol_upper_row = chol->_block_rows[c];
-			cerr << BLUE << scalarProd(chol_block_row, chol_upper_row, c-1) << endl << RESET;
-			accumulator = getBlock(r,c) - scalarProd(chol_block_row, chol_upper_row, c-1);
-			cerr << "4" << endl;
-
-			if (r == c) {
-				chol_computed_block = accumulator.llt().matrixL();
-				inverse_diag_blocks[r] = chol_computed_block.inverse().transpose();
-				cerr << "5a" << endl;
+			bool not_empty = false;
+			if(isNonZeroBlock(r,c)){
+				not_empty = true;
 			} else {
-				chol_computed_block = accumulator * inverse_diag_blocks[c];
-				cerr << "5b" << endl;
+				ColumnsMap& chol_upper_row = cholesky_->_block_rows[c];
+				not_empty = scalarProdStructure(chol_block_row, chol_upper_row, c);
 			}
-			cerr << "6" << endl;
-			chol_block_row[c] = chol->_storage[Association(r,c)];
+			if(not_empty) {
+				indices.push_back(Association(r,c));
+			}
 		}
 	}
-	cerr << "end" << endl;
-	return chol;
+
+	cholesky_->_matrix_workspace.allocate(indices);
 }
+
 
 void SparseBlockMatrix::updateCholesky(SparseBlockMatrix* result_) {
 	if (!result_->_is_initialized)
@@ -242,7 +161,7 @@ void SparseBlockMatrix::updateCholesky(SparseBlockMatrix* result_) {
 		int starting_col_idx = block_row.begin()->first;
 
 		for (int c = starting_col_idx; c <= r; ++c) {
-			SparseMatrixBlock& chol_computed_block = (*result_->_storage[Association(r,c)]);
+			SparseMatrixBlock& chol_computed_block = (*result_->_matrix_workspace.map[Association(r,c)]);
 
 			SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
 			chol_computed_block.setZero();
@@ -255,32 +174,33 @@ void SparseBlockMatrix::updateCholesky(SparseBlockMatrix* result_) {
 			} else {
 				chol_computed_block = accumulator * inverse_diag_blocks[c];
 			}
-			chol_block_row[c] = result_->_storage[Association(r,c)];
+			chol_block_row[c] = result_->_matrix_workspace.map[Association(r,c)];
 		}
 	}
 }
 
-SparseBlockMatrix* SparseBlockMatrix::transpose(void) const {
-	SparseBlockMatrix* transposed = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
+
+void SparseBlockMatrix::allocateTransposed(SparseBlockMatrix* transposed_) {
+	transposed_ = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
+	cerr << "here" << endl;
+	std::vector<Association> indices;
 
 	for (int r = 0; r < _num_block_rows; ++r) {
 		const ColumnsMap& block_row = _block_rows[r];
 		if(block_row.empty())
 			throw std::runtime_error("Something went wrong during the transpose");
 		for (int c = 0; c < _num_block_cols; ++c) {
-			ColumnsMap& transposed_block_row = transposed->_block_rows[c];
+			ColumnsMap& transposed_block_row = transposed_->_block_rows[c];
 
 			ColumnsMap::const_iterator it = block_row.find(c);
 			if (it == block_row.end())
 				continue;
 			else{
-				transposed->_storage[Association(c,r)] = new SparseMatrixBlock();
-				(*transposed->_storage[Association(c,r)]) = it->second->transpose();
-				transposed_block_row[r] = transposed->_storage[Association(c,r)];
+				indices.push_back(Association(c,r));
 			}
 		}
 	}
-	return transposed;
+	transposed_->_matrix_workspace.allocate(indices);
 }
 
 void SparseBlockMatrix::updateTranspose(SparseBlockMatrix* result_) {
@@ -298,8 +218,8 @@ void SparseBlockMatrix::updateTranspose(SparseBlockMatrix* result_) {
 			if (it == block_row.end())
 				continue;
 			else{
-				(*result_->_storage[Association(c,r)]) = it->second->transpose();
-				transposed_block_row[r] = result_->_storage[Association(c,r)];
+				(*result_->_matrix_workspace.map[Association(c,r)]) = it->second->transpose();
+				transposed_block_row[r] = result_->_matrix_workspace.map[Association(c,r)];
 			}
 		}
 	}
@@ -308,26 +228,7 @@ void SparseBlockMatrix::updateTranspose(SparseBlockMatrix* result_) {
 
 void SparseBlockMatrix::solveLinearSystem(DenseBlockVector& rhs_vector_,
 		DenseBlockVector& result_) const {
-	if (result_.size != rhs_vector_.size) {
-		result_.reset();
-		result_.init(rhs_vector_.size);
-	} else {
-		result_.clear();
-	}
-
-	if(_num_block_rows != _num_block_cols)
-		throw std::runtime_error("Error, non squared matrix :(");
-
-	SparseBlockMatrix* L = cholesky();
-	SparseBlockMatrix* U = L->transpose();
-
-	DenseBlockVector y;
-	L->forwSub(rhs_vector_, y);
-	U->backSub(y, result_);
-	y.reset();
-
-	delete U;
-	delete L;
+	//! TODO
 }
 
 
@@ -417,6 +318,27 @@ SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
 			++it_1;
 	}
 	return result;
+}
+
+bool SparseBlockMatrix::scalarProdStructure(const ColumnsMap& row1_,
+		const ColumnsMap& row2_,
+		const int max_pos_) const {
+	typename ColumnsMap::const_iterator it_1 = row1_.begin();
+	typename ColumnsMap::const_iterator it_2 = row2_.begin();
+
+	while(it_1 != row1_.end() && it_2 != row2_.end()){
+		int col_idx_1 = it_1->first;
+		int col_idx_2 = it_2->first;
+		if(col_idx_1 > max_pos_ || col_idx_2 > max_pos_)
+			return false;
+		if(col_idx_1 == col_idx_2)
+			return true;
+		else if(col_idx_1 > col_idx_2)
+			++it_2;
+		else if(col_idx_1 < col_idx_2)
+			++it_1;
+	}
+	return false;
 }
 
 } /* namespace sparse */

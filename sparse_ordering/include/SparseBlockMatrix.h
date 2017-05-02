@@ -53,31 +53,27 @@ public:
 	SparseBlockMatrix();
 	SparseBlockMatrix(const int num_block_rows_,
 			const int num_block_cols_, bool has_storage_ = false);
-	SparseBlockMatrix(const VerticesContainer& vertices_,
-			const BlocksMap& blocks_);
 	SparseBlockMatrix(const int size_, const Workspace& workspace_);
 
-	//! TODO:	Do I need to modify this contructor?
-	SparseBlockMatrix(const VerticesContainer& vertices_,
-			const BlocksMap& blocks_,
-			const FactorsVector& factors_,
-			const std::vector<int> ordering_);
+
 	virtual ~SparseBlockMatrix();
 
 	inline const int numRows(void) const {return _num_block_rows;};
 	inline const int numCols(void) const {return _num_block_cols;};
 
-	void clear(void);
+	void setZero(void);
 	void printBlock(const int r_, const int c_) const;
 	void printMatrix(void) const;
 
 	void setBlock(const int r_,	const int c_, SparseMatrixBlock* data_ptr_);
 	SparseMatrixBlock getBlock(const int r_, const int c_) const;
 	SparseMatrixBlock* getBlockPtr(const int r_, const int c_) const;
+	bool isNonZeroBlock(const int r_, const int c_) const;
 
-	SparseBlockMatrix* transpose(void) const;
+	void allocateTransposed(SparseBlockMatrix* transposed_);
 	void updateTranspose(SparseBlockMatrix* result_);
-	SparseBlockMatrix* cholesky(void) const;
+
+	void allocateCholesky(SparseBlockMatrix* cholesky_);
 	void updateCholesky(SparseBlockMatrix* result_);
 
 	//! This produces memory access.
@@ -91,6 +87,9 @@ protected:
 	SparseMatrixBlock scalarProd(const ColumnsMap& row1_,
 			const ColumnsMap& row2_,
 			const int max_pos_) const;
+	bool scalarProdStructure(const ColumnsMap& row1_,
+			const ColumnsMap& row2_,
+			const int max_pos_) const;
 
 	int _num_block_rows;
 	int _num_block_cols;
@@ -98,7 +97,7 @@ protected:
 	bool _is_initialized = false;
 
 	RowsContainer _block_rows;
-	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
+//	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
 	Workspace _matrix_workspace;
 
 	//! TODO	Is this matrix structure good?

@@ -26,7 +26,7 @@ void Workspace::reset(void) {
 	}
 }
 
-void Workspace::setZero(void){
+void Workspace::clear(void){
 	if (dimension == 0)
 		return;
 	for (WorkspaceMap::iterator it = map.begin(); it != map.end(); ++it){
@@ -108,6 +108,26 @@ void Workspace::allocate(std::vector<Factor>& factors_){
 		}
 		if (verbose) {
 			std::cin.get();
+		}
+	}
+	dimension = map.size();
+}
+
+
+void Workspace::allocate(std::vector<Association>& indices_){
+	for (int i = 0; i < indices_.size(); ++i) {
+		int& r = indices_[i].first;
+		int& c = indices_[i].second;
+
+		if(!map.count(Association(r,c))){
+			SparseMatrixBlock* block = new SparseMatrixBlock();
+			block->setIdentity();
+			map.insert(std::make_pair(Association(r,c), block));
+			//! WHY THIS SEGFAULTS???
+//			map[Association(r,c)] = new SparseMatrixBlock();
+//			map[Association(r,c)]->setIdentity();
+		} else {
+			map[Association(r,c)]->setIdentity();
 		}
 	}
 	dimension = map.size();

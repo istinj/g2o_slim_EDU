@@ -57,15 +57,17 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 	_jacobians_workspace.allocate(_factors);
 	_H = new SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
 
-	//! Storage for U and L
+	//! Allocate Matrices
 	cerr << "Allocate Cholesky" << endl;
-	_L = _H->cholesky();
+	_H->allocateCholesky(_L);
+	cerr << "printing block" << endl;
+	cerr << _L->getBlock(0,0) << endl;
 	cerr << "Done" << endl;
 	cerr << "Allocate Cholesky U" << endl;
-	_U = _L->transpose();
+	_L->allocateTransposed(_U);
 	cerr << "Done" << endl;
 
-	_jacobians_workspace.setZero();
+	_jacobians_workspace.clear();
 
 	//! Storage for the rhs vector
 	_B.init(_vertices.size());
@@ -106,7 +108,7 @@ void SparseOptimizer::oneStep(void){
 	_B.clear();
 
 	//! cleaning
-	_jacobians_workspace.setZero();
+	_jacobians_workspace.clear();
 }
 void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 	total_chi_ = 0.0;
