@@ -39,24 +39,75 @@ void Workspace::allocate(std::vector<Factor>& factors_){
 		int a = std::min(factors_[i].from, factors_[i].to);
 		int b = std::max(factors_[i].from, factors_[i].to);
 
+		bool verbose = false;
+
+		if (verbose) {
+			std::cerr << BOLDGREEN << "Factor(" << factors_[i].from << ", " << factors_[i].to << ")" << std::endl << RESET;
+		}
+
 		if(!map.count(Association(a,a))){
-			map[Association(a,a)] = new SparseMatrixBlock();
+			SparseMatrixBlock* block = new SparseMatrixBlock();
+			block->setIdentity();
+			map.insert(std::make_pair(Association(a,a), block));
+
+//			map[Association(a,a)] = new SparseMatrixBlock();
+//			map[Association(a,a)]->setIdentity();
+			if (verbose) {
+				std::cerr << "Inserted (" << a << ", " << a << ")"<< std::endl;
+			}
+		} else {
+			if (verbose)
+				std::cerr << "Skipping (" << a << ", " << a << ")"<< std::endl;
 			map[Association(a,a)]->setIdentity();
 		}
 
 		if(!map.count(Association(b,a))){
-			map[Association(b,a)] = new SparseMatrixBlock();
-			map[Association(b,a)]->setIdentity();
+			SparseMatrixBlock* block = new SparseMatrixBlock();
+			block->setIdentity();
+			map.insert(std::make_pair(Association(b,a), block));
+
+//			map[Association(b,a)] = new SparseMatrixBlock();
+//			map[Association(b,a)]->setIdentity();
+			if (verbose) {
+				std::cerr << "Inserted (" << b << ", " << a << ")"<< std::endl;
+			}
+		} else {
+			if (verbose)
+				std::cerr << "Skipping (" << b << ", " << a << ")"<< std::endl;
+			map[Association(a,a)]->setIdentity();
 		}
 
-//		if(!_workspace_map.count(Association(a,b))){
-//			_workspace_map[Association(a,b)] = new SparseMatrixBlock();
-//			_workspace_map[Association(a,b)]->setIdentity();
-//		}
+/*
+		if(!map.count(Association(a,b))){
+			map[Association(a,b)] = new SparseMatrixBlock();
+			map[Association(a,b)]->setIdentity();
+			if (verbose) {
+				std::cerr << "Inserted (" << a << ", " << b << ")"<< std::endl;
+			}
+		} else {
+			if (verbose)
+				std::cerr << "Skipping (" << a << ", " << b << ")"<< std::endl;
+			map[Association(a,a)]->setIdentity();
+		}
+/**/
 
 		if(!map.count(Association(b,b))){
-			map[Association(b,b)] = new SparseMatrixBlock();
-			map[Association(b,b)]->setIdentity();
+			SparseMatrixBlock* block = new SparseMatrixBlock();
+			block->setIdentity();
+			map.insert(std::make_pair(Association(b,b), block));
+
+//			map[Association(b,b)] = new SparseMatrixBlock();
+//			map[Association(b,b)]->setIdentity();
+			if (verbose) {
+				std::cerr << "Inserted (" << b << ", " << b << ")"<< std::endl;
+			}
+		} else {
+			if (verbose)
+				std::cerr << "Skipping (" << b << ", " << b << ")"<< std::endl;
+			map[Association(a,a)]->setIdentity();
+		}
+		if (verbose) {
+			std::cin.get();
 		}
 	}
 	dimension = map.size();

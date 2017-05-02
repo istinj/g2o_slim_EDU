@@ -90,5 +90,6 @@ struct AssociationComparator {
 };
 
 typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> BlocksMap;
+typedef std::multimap<Association, SparseMatrixBlock*, AssociationComparator> BlocksMultiMap;
 
 

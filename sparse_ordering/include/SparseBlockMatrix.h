@@ -99,6 +99,7 @@ protected:
 
 	RowsContainer _block_rows;
 	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
+	Workspace _matrix_workspace;
 
 	//! TODO	Is this matrix structure good?
 	//! TODO 	MEMORY MANAGEMENT when the matrix owns the blocks.

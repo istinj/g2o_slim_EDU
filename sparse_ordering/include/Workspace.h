@@ -14,6 +14,7 @@
 namespace sparse {
 
 typedef BlocksMap WorkspaceMap;
+typedef BlocksMultiMap WorkspaceMultiMap;
 
 struct Workspace {
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

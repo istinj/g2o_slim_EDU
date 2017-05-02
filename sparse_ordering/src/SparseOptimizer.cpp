@@ -58,8 +58,12 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 	_H = new SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
 
 	//! Storage for U and L
+	cerr << "Allocate Cholesky" << endl;
 	_L = _H->cholesky();
+	cerr << "Done" << endl;
+	cerr << "Allocate Cholesky U" << endl;
 	_U = _L->transpose();
+	cerr << "Done" << endl;
 
 	_jacobians_workspace.setZero();
 

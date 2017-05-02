@@ -81,7 +81,8 @@ SparseBlockMatrix::SparseBlockMatrix(const std::vector<Vertex>& vertices_,
 	_is_initialized = true;
 }
 
-SparseBlockMatrix::SparseBlockMatrix(const int size_, const Workspace& workspace_){
+SparseBlockMatrix::SparseBlockMatrix(const int size_,
+		const Workspace& workspace_){
 	_num_block_rows = size_;
 	_num_block_cols = size_;
 	_block_rows.resize(_num_block_rows);
@@ -100,6 +101,8 @@ SparseBlockMatrix::~SparseBlockMatrix() {
 	if (_has_storage){
 		for (std::map<Association, SparseMatrixBlock*, AssociationComparator>::iterator it = _storage.begin(); it != _storage.end(); ++it){
 			delete it->second;
+
+			_matrix_workspace.reset();
 		}
 	}
 	_is_initialized = false;
@@ -107,14 +110,15 @@ SparseBlockMatrix::~SparseBlockMatrix() {
 
 //! Why this does not work??
 void SparseBlockMatrix::clear(void) {
-	printBlock(0,0);
-	for (int r = 0; r < 0; ++r) {
-		ColumnsMap& block_row = _block_rows[r];
-		for(ColumnsMap::iterator it = block_row.begin(); it != block_row.end(); ++it) {
-			it->second->setZero();
+	if (_has_storage) {
+		for (int r = 0; r < 0; ++r) {
+			ColumnsMap& block_row = _block_rows[r];
+			for(ColumnsMap::iterator it = block_row.begin(); it != block_row.end(); ++it) {
+				it->second->setZero();
+			}
 		}
+		_matrix_workspace.setZero();
 	}
-	printBlock(0,0);
 }
 
 void SparseBlockMatrix::setBlock(const int r_, const int c_, SparseMatrixBlock* data_ptr_) {
@@ -167,6 +171,7 @@ SparseBlockMatrix* SparseBlockMatrix::cholesky(void) const {
 	if(_num_block_rows != _num_block_cols){
 		throw std::runtime_error("Error: matrix must be squared");
 	}
+	cerr << RED << _num_block_rows << " " << _num_block_cols << endl << RESET;
 
 	SparseBlockMatrix* chol = new SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
 	std::vector<SparseMatrixBlock, Eigen::aligned_allocator<SparseMatrixBlock> > inverse_diag_blocks(_num_block_rows);
@@ -180,25 +185,45 @@ SparseBlockMatrix* SparseBlockMatrix::cholesky(void) const {
 		int starting_col_idx = block_row.begin()->first;
 
 		for (int c = starting_col_idx; c <= r; ++c) {
+			cerr << BOLDGREEN << "(" << r << ", " << c << ")" << endl << RESET;
+			cerr << "1" << endl;
+
 			//! Allocate memory
-			chol->_storage[Association(r,c)] = new SparseMatrixBlock();
-			SparseMatrixBlock& chol_computed_block = (*chol->_storage[Association(r,c)]);
+			SparseMatrixBlock* c_block = new SparseMatrixBlock();
+			c_block->setZero();
+			cerr << "2" << endl;
+
+			chol->_storage.insert(make_pair(Association(r,c), c_block));
+			SparseMatrixBlock& chol_computed_block = *c_block;
+			cerr << "3" << endl;
+
+//			chol->_storage[Association(r,c)] = new SparseMatrixBlock();
+//			cerr << "2" << endl;
+//			SparseMatrixBlock& chol_computed_block = (*chol->_storage[Association(r,c)]);
+//			chol->_storage[Association(r,c)]->setZero();
+////			chol_computed_block.setZero();
+//			cerr << "3" << endl;
 
 			SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
-			chol_computed_block.setZero();
 
 			const ColumnsMap& chol_upper_row = chol->_block_rows[c];
+			cerr << BLUE << scalarProd(chol_block_row, chol_upper_row, c-1) << endl << RESET;
 			accumulator = getBlock(r,c) - scalarProd(chol_block_row, chol_upper_row, c-1);
+			cerr << "4" << endl;
+
 			if (r == c) {
 				chol_computed_block = accumulator.llt().matrixL();
 				inverse_diag_blocks[r] = chol_computed_block.inverse().transpose();
+				cerr << "5a" << endl;
 			} else {
 				chol_computed_block = accumulator * inverse_diag_blocks[c];
+				cerr << "5b" << endl;
 			}
+			cerr << "6" << endl;
 			chol_block_row[c] = chol->_storage[Association(r,c)];
 		}
 	}
-
+	cerr << "end" << endl;
 	return chol;
 }
 
@@ -377,7 +402,12 @@ SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
 			return result;
 		}
 		if(col_idx_1 == col_idx_2){
-			result += (*it_1->second) * it_2->second->transpose();
+			SparseMatrixBlock a = (*it_1->second);
+			cerr << "a" << endl;
+			SparseMatrixBlock b = it_2->second->transpose();
+			cerr << "b" << endl;
+			result.noalias() += a*b;
+//			result += (*it_1->second) * it_2->second->transpose();
 			++it_1;
 			++it_2;
 		}
