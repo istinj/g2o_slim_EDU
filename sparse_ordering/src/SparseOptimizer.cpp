@@ -19,10 +19,6 @@ SparseOptimizer::SparseOptimizer() {
 SparseOptimizer::~SparseOptimizer() {
 	_jacobians_workspace.reset();
 
-	delete _H;
-	delete _L;
-	delete _U;
-
 	_B.reset();
 	_Y.reset();
 	_dX.reset();
@@ -35,7 +31,6 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 
 	//! TODO: solve problem here while creating storage -> segfault
 	//! Initialize the Factors
-	bool verbose = false;
 	HessianBlocksMap::iterator f_it;
 	for (int i = 0; i < _edges.size(); ++i) {
 		VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
@@ -45,9 +40,6 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 		int i_idx = pose_i->index();
 		int j_idx = pose_j->index();
 
-		if (verbose) {
-			cerr << "from: " << i_idx << "\tto: " << j_idx << endl;
-		}
 		_factors.push_back(Factor(i_idx, j_idx));
 	}
 
@@ -55,17 +47,12 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 	//! FactorsVector ordered_factor = reorder(_factors, ordering_type);
 	//! _jacobians_workspace.allocate(ordered_factors); -> also in the linearize function
 	_jacobians_workspace.allocate(_factors);
-	_H = new SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
+
+	_H = SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
 
 	//! Allocate Matrices
-	cerr << "Allocate Cholesky" << endl;
-	_H->allocateCholesky(_L);
-	cerr << "printing block" << endl;
-	cerr << _L->getBlock(0,0) << endl;
-	cerr << "Done" << endl;
-	cerr << "Allocate Cholesky U" << endl;
-	_L->allocateTransposed(_U);
-	cerr << "Done" << endl;
+	_H.allocateCholesky(_L);
+	_L.allocateTransposed(_U);
 
 	_jacobians_workspace.clear();
 
@@ -75,6 +62,8 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 	//! Storage for the increment vector
 	_Y.init(_vertices.size());
 	_dX.init(_vertices.size());
+
+	cerr << BOLDGREEN << "Init done" << endl << RESET;
 	return;
 }
 
@@ -87,15 +76,16 @@ void SparseOptimizer::oneStep(void){
 			<< "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
 
 	//! Build and solve the linear system HdX = B;
-	SparseMatrixBlock& h_00 = (*_jacobians_workspace.map[Association(0,0)]);
+	SparseMatrixBlock& h_00 = (*_jacobians_workspace.map.at(Association(0,0)));
 	h_00 += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
-	_H->updateCholesky(_L);
-	_L->updateTranspose(_U);
+	_H.computeCholesky(_L);
+	cerr << *_jacobians_workspace.map.at(Association(0,0)) << endl;
+	_L.computeTranspose(_U);
 
 	DenseBlockVector y;
-	_L->forwSub(_B, _Y);
-	_U->backSub(_Y, _dX);
+	_L.forwSub(_B, _Y);
+	_U.backSub(_Y, _dX);
 
 	for (int i = 0; i < _dX.size; ++i) {
 		Pose new_pose = Pose::Identity();
@@ -148,9 +138,10 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 
 		//! TODO THIS SHIT SUCKS
 		//! Compute the factor contribution to the Hessian
-		SparseMatrixBlock& H_ii = (*_jacobians_workspace.map[Association(i_idx, i_idx)]);
-		SparseMatrixBlock& H_ji = (*_jacobians_workspace.map[Association(j_idx, i_idx)]);
-		SparseMatrixBlock& H_jj = (*_jacobians_workspace.map[Association(j_idx, j_idx)]);
+//		cerr << BOLDYELLOW << "\tEdge(" << i_idx << ", " << j_idx << ")" << endl << RESET;
+		SparseMatrixBlock& H_ii = (*_jacobians_workspace.map.at(Association(i_idx, i_idx)));
+		SparseMatrixBlock& H_ji = (*_jacobians_workspace.map.at(Association(j_idx, i_idx)));
+		SparseMatrixBlock& H_jj = (*_jacobians_workspace.map.at(Association(j_idx, j_idx)));
 
 		H_ii.noalias() += Ji.transpose() * omega * Ji;
 		H_ji.noalias() += Jj.transpose() * omega * Ji;

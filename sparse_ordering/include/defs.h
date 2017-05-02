@@ -89,7 +89,9 @@ struct AssociationComparator {
 	}
 };
 
-typedef std::map<Association, SparseMatrixBlock*, AssociationComparator> BlocksMap;
+typedef std::map<Association, SparseMatrixBlock*, std::less<std::pair<int, int> >,
+		Eigen::aligned_allocator<std::pair<Association, SparseMatrixBlock*> > > BlocksMap;
+//typedef std::map<Association, SparseMatrixBlock*> BlocksMap;
 typedef std::multimap<Association, SparseMatrixBlock*, AssociationComparator> BlocksMultiMap;
 
 

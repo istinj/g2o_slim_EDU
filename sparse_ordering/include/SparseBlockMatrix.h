@@ -70,11 +70,11 @@ public:
 	SparseMatrixBlock* getBlockPtr(const int r_, const int c_) const;
 	bool isNonZeroBlock(const int r_, const int c_) const;
 
-	void allocateTransposed(SparseBlockMatrix* transposed_);
-	void updateTranspose(SparseBlockMatrix* result_);
+	void allocateTransposed(SparseBlockMatrix& transposed_);
+	void computeTranspose(SparseBlockMatrix& result_);
 
-	void allocateCholesky(SparseBlockMatrix* cholesky_);
-	void updateCholesky(SparseBlockMatrix* result_);
+	void allocateCholesky(SparseBlockMatrix& cholesky_);
+	void computeCholesky(SparseBlockMatrix& result_);
 
 	//! This produces memory access.
 	void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
@@ -97,7 +97,6 @@ protected:
 	bool _is_initialized = false;
 
 	RowsContainer _block_rows;
-//	std::map<Association, SparseMatrixBlock*, AssociationComparator> _storage;
 	Workspace _matrix_workspace;
 
 	//! TODO	Is this matrix structure good?
