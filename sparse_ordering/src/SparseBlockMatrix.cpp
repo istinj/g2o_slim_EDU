@@ -119,7 +119,7 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
 		ColumnsMap& chol_block_row = cholesky_._block_rows[r];
 
 		if(block_row.empty())
-			throw std::runtime_error("Something went wrong during the cholesky");
+			throw std::runtime_error("Something went wrong during the cholesky allocation");
 		int starting_col_idx = block_row.begin()->first;
 
 		for (int c = starting_col_idx; c <= r; ++c) {
@@ -128,7 +128,7 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
 				not_empty = true;
 			} else {
 				ColumnsMap& chol_upper_row = cholesky_._block_rows[c];
-				not_empty = scalarProdStructure(chol_block_row, chol_upper_row, c);
+				not_empty = scalarProdStructure(chol_block_row, chol_upper_row, c-1);
 			}
 			if(not_empty) {
 				indices.push_back(Association(r,c));
@@ -144,30 +144,30 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
 }
 
 
-void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& result_) {
-	if (!result_._is_initialized)
+void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
+	if (!cholesky_._is_initialized)
 		throw std::runtime_error("Argument matrix must be already initialized");
 
 	std::vector<SparseMatrixBlock, Eigen::aligned_allocator<SparseMatrixBlock> > inverse_diag_blocks(_num_block_rows);
 
 	for (int r = 0; r < _num_block_rows; ++r) {
 		const ColumnsMap& block_row = _block_rows[r];
-		ColumnsMap& chol_block_row = result_._block_rows[r];
+		ColumnsMap& chol_block_row = cholesky_._block_rows[r];
 
 		if(block_row.empty())
-			throw std::runtime_error("Something went wrong during the cholesky update");
+			throw std::runtime_error("Something went wrong during the cholesky computation");
 		int starting_col_idx = block_row.begin()->first;
 
 		for (int c = starting_col_idx; c <= r; ++c) {
-		  cerr << r << " " << c << endl;
 		  //! TODO: optimize this shit
-			SparseMatrixBlock& chol_computed_block = (*result_._matrix_workspace.map.at(Association(r,c)));
-			cerr << "qui3" << endl;
+		  if(cholesky_._matrix_workspace.map[Association(r,c)] == nullptr)
+		    continue;
+			SparseMatrixBlock& chol_computed_block = (*cholesky_._matrix_workspace.map.at(Association(r,c)));
 
 			SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
 			chol_computed_block.setZero();
 
-			const ColumnsMap& chol_upper_row = result_._block_rows[c];
+			const ColumnsMap& chol_upper_row = cholesky_._block_rows[c];
 			accumulator = getBlock(r,c) - scalarProd(chol_block_row, chol_upper_row, c-1);
 			if (r == c) {
 				chol_computed_block = accumulator.llt().matrixL();
@@ -175,7 +175,7 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& result_) {
 			} else {
 				chol_computed_block = accumulator * inverse_diag_blocks[c];
 			}
-			chol_block_row[c] = result_._matrix_workspace.map.at(Association(r,c));
+			chol_block_row[c] = cholesky_._matrix_workspace.map.at(Association(r,c));
 		}
 	}
 }
@@ -306,10 +306,7 @@ SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
 			return result;
 		}
 		if(col_idx_1 == col_idx_2){
-			SparseMatrixBlock a = (*it_1->second);
-			SparseMatrixBlock b = it_2->second->transpose();
-			result.noalias() += a*b;
-//			result += (*it_1->second) * it_2->second->transpose();
+			result += (*it_1->second) * it_2->second->transpose();
 			++it_1;
 			++it_2;
 		}

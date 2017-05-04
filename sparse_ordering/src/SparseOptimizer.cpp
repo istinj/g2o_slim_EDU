@@ -80,7 +80,6 @@ void SparseOptimizer::oneStep(void){
 	h_00 += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
 	_H.computeCholesky(_L);
-	cerr << *_jacobians_workspace.map.at(Association(0,0)) << endl;
 	_L.computeTranspose(_U);
 
 	DenseBlockVector y;
@@ -138,7 +137,6 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 
 		//! TODO THIS SHIT SUCKS
 		//! Compute the factor contribution to the Hessian
-//		cerr << BOLDYELLOW << "\tEdge(" << i_idx << ", " << j_idx << ")" << endl << RESET;
 		SparseMatrixBlock& H_ii = (*_jacobians_workspace.map.at(Association(i_idx, i_idx)));
 		SparseMatrixBlock& H_ji = (*_jacobians_workspace.map.at(Association(j_idx, i_idx)));
 		SparseMatrixBlock& H_jj = (*_jacobians_workspace.map.at(Association(j_idx, j_idx)));

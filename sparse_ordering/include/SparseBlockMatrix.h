@@ -74,7 +74,7 @@ public:
 	void computeTranspose(SparseBlockMatrix& result_);
 
 	void allocateCholesky(SparseBlockMatrix& cholesky_);
-	void computeCholesky(SparseBlockMatrix& result_);
+	void computeCholesky(SparseBlockMatrix& cholesky_);
 
 	//! This produces memory access.
 	void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
