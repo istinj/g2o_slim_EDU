@@ -14,27 +14,27 @@ namespace sparse {
 
 class Vertex {
 public:
-	Vertex();
-	Vertex(const int& id_, const int& index_, const Pose& data_);
-	virtual ~Vertex();
+  Vertex();
+  Vertex(const int& id_, const int& index_, const Pose& data_);
+  virtual ~Vertex();
 
-	void setVertex(const int& id_, const int& index_, const Pose& data_);
-	void setData(const Pose& data_);
+  void setVertex(const int& id_, const int& index_, const Pose& data_);
+  void setData(const Pose& data_);
 
-	inline bool operator==(const Vertex& other_) const {return this->_id == other_._id;};
-	inline bool operator==(const int& ID) const {return this->_id == ID;};
+  inline bool operator==(const Vertex& other_) const {return this->_id == other_._id;};
+  inline bool operator==(const int& ID) const {return this->_id == ID;};
 
-	inline const Pose& data(void) const {return _data;};
-	inline const int id(void) const {return _id;};
-	inline const int index(void) const {return _index;};
+  inline const Pose& data(void) const {return _data;};
+  inline const int id(void) const {return _id;};
+  inline const int index(void) const {return _index;};
 
 protected:
-	Pose _data;
-	int _id;
-	int _index;
+  Pose _data;
+  int _id;
+  int _index;
 
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 } /* namespace sparse */

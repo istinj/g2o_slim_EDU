@@ -16,24 +16,24 @@ namespace sparse {
 
 class Graph {
 public:
-	Graph();
-	virtual ~Graph();
+  Graph();
+  virtual ~Graph();
 
-	void addVertex(const Vertex& v_);
-	void addEdge(const Edge& e_);
-	//! TODO: REMOVE Vertex/Edge
+  void addVertex(const Vertex& v_);
+  void addEdge(const Edge& e_);
+  //! TODO: REMOVE Vertex/Edge
 
-	void loadFromG2OFile(const std::string& filename_);
+  void loadFromG2OFile(const std::string& filename_);
 
-	inline const std::vector<Vertex>& vertices(void) const {return _vertices;};
-	inline const std::vector<Edge>& edges(void) const {return _edges;};
+  inline const std::vector<Vertex>& vertices(void) const {return _vertices;};
+  inline const std::vector<Edge>& edges(void) const {return _edges;};
 
 protected:
-	std::vector<Vertex> _vertices;
-	std::vector<Edge> _edges;
+  std::vector<Vertex> _vertices;
+  std::vector<Edge> _edges;
 
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 } /* namespace sparse */

@@ -17,19 +17,19 @@ typedef BlocksMap WorkspaceMap;
 typedef BlocksMultiMap WorkspaceMultiMap;
 
 struct Workspace {
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-	Workspace();
-	virtual ~Workspace();
+  Workspace();
+  virtual ~Workspace();
 
-	void reset(void);
-	void clear(void);
-	void allocate(std::vector<Factor>& factors_);
-	void allocate(std::vector<Association>& indices_);
+  void reset(void);
+  void clear(void);
+  void allocate(std::vector<Factor>& factors_);
+  void allocate(std::vector<Association>& indices_);
 
-	//! TODO c-style Matrix of SparseMatrixBlock*
-	WorkspaceMap map;
-	int dimension;
+  //! TODO c-style Matrix of SparseMatrixBlock*
+  WorkspaceMap map;
+  int dimension;
 
 };
 

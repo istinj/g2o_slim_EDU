@@ -14,31 +14,31 @@ namespace sparse {
 
 class Edge {
 public:
-	Edge();
-	virtual ~Edge();
+  Edge();
+  virtual ~Edge();
 
-	void setEdge(const Association& association_,
-			const PoseMeas& data_,
-			const OmegaPose& omega_);
-	void setEdge(const Association& association_,
-			const int& sensor_ID_,
-			const PoseMeas& data_,
-			const OmegaPose& omega_);
+  void setEdge(const Association& association_,
+      const PoseMeas& data_,
+      const OmegaPose& omega_);
+  void setEdge(const Association& association_,
+      const int& sensor_ID_,
+      const PoseMeas& data_,
+      const OmegaPose& omega_);
 
-	inline const int sensorID(void) const {return _sensor_id;};
-	inline const Association& association(void) const {return _id_association;};
-	inline const PoseMeas& data(void) const {return _data;};
-	inline const OmegaPose& omega(void) const {return _omega;};
+  inline const int sensorID(void) const {return _sensor_id;};
+  inline const Association& association(void) const {return _id_association;};
+  inline const PoseMeas& data(void) const {return _data;};
+  inline const OmegaPose& omega(void) const {return _omega;};
 
 protected:
-	Association _id_association;
-	int _sensor_id;
+  Association _id_association;
+  int _sensor_id;
 
-	PoseMeas _data;
-	OmegaPose _omega;
+  PoseMeas _data;
+  OmegaPose _omega;
 
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 } /* namespace sparse */

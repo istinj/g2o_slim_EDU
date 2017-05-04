@@ -74,23 +74,23 @@ typedef Matrix6 SparseMatrixBlock;
 
 typedef Vector6 DenseVectorBlock;
 typedef std::map<int, DenseVectorBlock*, std::less<int>,
-		Eigen::aligned_allocator<std::pair<int, DenseVectorBlock*> > > DenseVectorContainer;
+    Eigen::aligned_allocator<std::pair<int, DenseVectorBlock*> > > DenseVectorContainer;
 
 typedef std::pair<int, int> Association;
 struct AssociationComparator {
-	inline bool operator () (const Association& a, const Association& b) const {
-		if(a.first < b.first){
-			return true;
-		} else {
-			if(a.second < b.second)
-				return true;
-		}
-		return false;
-	}
+  inline bool operator () (const Association& a, const Association& b) const {
+    if(a.first < b.first){
+      return true;
+    } else {
+      if(a.second < b.second)
+        return true;
+    }
+    return false;
+  }
 };
 
 typedef std::map<Association, SparseMatrixBlock*, std::less<std::pair<int, int> >,
-		Eigen::aligned_allocator<std::pair<Association, SparseMatrixBlock*> > > BlocksMap;
+    Eigen::aligned_allocator<std::pair<Association, SparseMatrixBlock*> > > BlocksMap;
 //typedef std::map<Association, SparseMatrixBlock*> BlocksMap;
 typedef std::multimap<Association, SparseMatrixBlock*, AssociationComparator> BlocksMultiMap;
 
