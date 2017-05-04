@@ -9,6 +9,7 @@
 #define SPARSEOPTIMIZER_H_
 
 #include "defs.h"
+#include "Graph.h"
 #include "Vertex.h"
 #include "Edge.h"
 #include "Factor.h"
@@ -27,11 +28,18 @@ public:
   SparseOptimizer();
   virtual ~SparseOptimizer();
 
+  //! This will allocate all the memory that will contain the Hessian, its Cholesky and the transposed
+  //! of the Cholesky.
   void init(const VerticesContainer& vertices_,
       const EdgesContainer& edges_);
+  //! This function acutally computes all the stuff allocated during the INIT function
   void oneStep(void);
 
+  void updateGraph(Graph& graph_);
+
 protected:
+  void computeRetardedPermutation(std::vector<int>& permutation_);
+  void updateVertices(void);
   void linearizeFactor(real_& total_chi, int& inliers_);
   void errorAndJacobian(const Pose& xi, const Pose& xj,const PoseMeas& zr,
       Vector12& error, Matrix12_6& Ji, Matrix12_6& Jj);

@@ -28,6 +28,64 @@ void Graph::addEdge(const Edge& e_){
   _edges.push_back(e_);
 }
 
+
+void Graph::updateVertices(const std::vector<Vertex>& new_vertices_){
+  for (int i = 0; i < _vertices.size(); ++i) {
+    Vertex new_vertex = new_vertices_[i];
+    _vertices[i].setData(new_vertex.data());
+  }
+}
+
+
+
+void Graph::exportToG2OFile(const std::string& filename_) {
+  cerr << BOLDYELLOW << "\t" << "Exporting updated graph to: " << filename_ << RESET << endl;
+  ofstream file(filename_);
+
+  //! Writing SE3 Vertices
+  for (int i = 0; i < _vertices.size(); ++i) {
+    Vertex& v = _vertices[i];
+
+    file << VERTEX_SE3 << " " << v.id() << " ";
+
+    Vector3 t = v.data().translation();
+    file << t.x() << " " << t.y() << " " << t.z() << " ";
+
+    QuaternionReal q(v.data().linear());
+    file << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << " " << endl;
+  }
+
+  file << endl << endl << endl;
+
+  //! Writing SE3 Edge
+  for (int i = 0; i < _edges.size(); ++i) {
+    Edge& e = _edges[i];
+
+    file << EDGE_SE3 << " " << e.association().first << " " << e.association().second << " ";
+
+    Vector3 t = e.data().translation();
+    file << t.x() << " " << t.y() << " " << t.z() << " ";
+
+    QuaternionReal q(e.data().linear());
+    file << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << " " << endl;
+
+    OmegaPose omega = e.omega();
+    file << omega.row(0)(0) << " " << omega.row(0)(1) << " " << omega.row(0)(2) << " " << omega.row(0)(3) << " " << omega.row(0)(4) << " " << omega.row(0)(5) << " " <<
+            omega.row(1)(1) << " " << omega.row(1)(2) << " " << omega.row(1)(3) << " " << omega.row(1)(4) << " " << omega.row(1)(5) << " " <<
+            omega.row(2)(2) << " " << omega.row(2)(3) << " " << omega.row(2)(4) << " " << omega.row(2)(5) << " " <<
+            omega.row(3)(3) << " " << omega.row(3)(4) << " " << omega.row(3)(5) << " " <<
+            omega.row(4)(4) << " " << omega.row(4)(5) << " " <<
+            omega.row(5)(5);
+    file << endl;
+  }
+
+  file.close();
+  cerr << BOLDGREEN << "\t" << "File exported successfully:" << endl;
+  cerr << "\t" << _vertices.size() << " Vertices SE3" << endl;
+  cerr << "\t" << _edges.size() << " Edges Pose-Pose" << RESET << endl << endl;
+}
+
+
 void Graph::loadFromG2OFile(const std::string& filename_){
   cerr << BOLDYELLOW << "\t" << "Opening file " << filename_ << RESET << endl;
   fstream file(filename_);
@@ -106,7 +164,7 @@ void Graph::loadFromG2OFile(const std::string& filename_){
       continue;
     }
 
-    if(element_type == EDGE_ODOM){
+    if(element_type == EDGE_SE3){
       std::pair<int, int> IDs(-1,-1);
       int sens_id = -1;
       ss >> IDs.first >> IDs.second;

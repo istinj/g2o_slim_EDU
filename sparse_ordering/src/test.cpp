@@ -40,47 +40,13 @@ int main(int argc, char const *argv[]){
     std::cerr << BOLDWHITE << "Execution time:\t" << BOLDGREEN << execution_time << std::endl << RESET;
   }
 
+  optimizer->updateGraph(*graph);
+
+  std::string output_file("../data/world_updated.g2o");
+  std::cerr << BOLDWHITE << "\n\nExporting world in " << output_file << RESET << std::endl;
+  graph->exportToG2OFile(output_file);
+
   delete optimizer;
   delete graph;
   return 0;
-  //
-  //
-  //  //			map[indices] = new SparseMatrixBlock();
-  //  //			map[indices]->setIdentity();
-
-  //  typedef std::map<std::string, SparseMatrixBlock*> StringMap;
-  //
-  //  Matrix6*** memory_map = new Matrix6**[50];
-  //  for (size_t i = 0; i < 50; ++i){
-  //    memory_map[i] = new Matrix6*[100];
-  //  }
-  //
-  //  sparse::WorkspaceMap pointers_map;
-  //  StringMap map3;
-  //  for (int i = 0; i < 50; ++i){
-  //    for (int j = 0; j < 100; ++j){
-  //
-  //
-  //      Association indices(i,j);
-  //      std::cerr << GREEN << indices.first << " " << CYAN <<
-  //          indices.second << std::endl << RESET;
-  //
-  //      Matrix6* block = new Matrix6();
-  //      block->setIdentity();
-  //
-  //      memory_map[i][j] = block;
-  //
-  ////      map3.insert(std::make_pair(std::to_string(i)+":"+std::to_string(j),block));
-  //
-  //      pointers_map.insert(std::make_pair(indices, memory_map[i][j]));
-  //      *pointers_map.at(indices)->setIdentity();
-  ////      Matrix6 block2 = Matrix6::Identity();
-  ////
-  ////      map2.insert(std::make_pair(indices, block2));
-  //
-  ////      std::cerr << *map3.at(std::to_string(i)+":"+std::to_string(j)) << std::endl;
-  //      std::cerr << pointers_map.at(Association(i,j)) << std::endl;
-  //    }
-  //  }
-  //  return 0;
 }

@@ -23,7 +23,10 @@ public:
   void addEdge(const Edge& e_);
   //! TODO: REMOVE Vertex/Edge
 
+  void updateVertices(const std::vector<Vertex>& new_vertices_);
+
   void loadFromG2OFile(const std::string& filename_);
+  void exportToG2OFile(const std::string& filename_);
 
   inline const std::vector<Vertex>& vertices(void) const {return _vertices;};
   inline const std::vector<Edge>& edges(void) const {return _edges;};

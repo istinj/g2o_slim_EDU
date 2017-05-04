@@ -35,7 +35,7 @@
 #define VERTEX_3F "VERTEX_TRACKXYZ"
 #define VERTEX_SE3 "VERTEX_SE3:QUAT"
 #define EDGE_POSE_POINT "EDGE_SE3_TRACKXYZ"
-#define EDGE_ODOM "EDGE_SE3:QUAT"
+#define EDGE_SE3 "EDGE_SE3:QUAT"
 
 #define X_DIM 6
 #define L_DIM 6
@@ -77,21 +77,7 @@ typedef std::map<int, DenseVectorBlock*, std::less<int>,
     Eigen::aligned_allocator<std::pair<int, DenseVectorBlock*> > > DenseVectorContainer;
 
 typedef std::pair<int, int> Association;
-struct AssociationComparator {
-  inline bool operator () (const Association& a, const Association& b) const {
-    if(a.first < b.first){
-      return true;
-    } else {
-      if(a.second < b.second)
-        return true;
-    }
-    return false;
-  }
-};
-
 typedef std::map<Association, SparseMatrixBlock*, std::less<std::pair<int, int> >,
     Eigen::aligned_allocator<std::pair<Association, SparseMatrixBlock*> > > BlocksMap;
-//typedef std::map<Association, SparseMatrixBlock*> BlocksMap;
-typedef std::multimap<Association, SparseMatrixBlock*, AssociationComparator> BlocksMultiMap;
 
 

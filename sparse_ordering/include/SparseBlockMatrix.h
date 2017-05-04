@@ -71,12 +71,12 @@ public:
   bool isNonZeroBlock(const int r_, const int c_) const;
 
   void allocateTransposed(SparseBlockMatrix& transposed_);
-  void computeTranspose(SparseBlockMatrix& result_);
+  void computeTranspose(SparseBlockMatrix& transposed_);
 
   void allocateCholesky(SparseBlockMatrix& cholesky_);
   void computeCholesky(SparseBlockMatrix& cholesky_);
 
-  //! This produces memory access.
+  //! TODO
   void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
 
   void forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;

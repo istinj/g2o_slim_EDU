@@ -12,8 +12,6 @@ using namespace std;
 namespace sparse {
 
 SparseOptimizer::SparseOptimizer() {
-  // TODO Auto-generated constructor stub
-
 }
 
 SparseOptimizer::~SparseOptimizer() {
@@ -29,8 +27,7 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
   _vertices = vertices_;
   _edges = edges_;
 
-  //! TODO: solve problem here while creating storage -> segfault
-  //! Initialize the Factors
+  //! Create the Factors
   HessianBlocksMap::iterator f_it;
   for (int i = 0; i < _edges.size(); ++i) {
     VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
@@ -43,7 +40,7 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
     _factors.push_back(Factor(i_idx, j_idx));
   }
 
-  //! TODO
+  //! TODO REORDER THE FACTORS
   //! FactorsVector ordered_factor = reorder(_factors, ordering_type);
   //! _jacobians_workspace.allocate(ordered_factors); -> also in the linearize function
   _jacobians_workspace.allocate(_factors);
@@ -62,8 +59,6 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
   //! Storage for the increment vector
   _Y.init(_vertices.size());
   _dX.init(_vertices.size());
-
-  cerr << BOLDGREEN << "Init done" << endl << RESET;
   return;
 }
 
@@ -76,8 +71,7 @@ void SparseOptimizer::oneStep(void){
       << "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
 
   //! Build and solve the linear system HdX = B;
-  SparseMatrixBlock& h_00 = (*_jacobians_workspace.map.at(Association(0,0)));
-  h_00 += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
+  _jacobians_workspace(0,0) += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
   _H.computeCholesky(_L);
   _L.computeTranspose(_U);
@@ -86,19 +80,40 @@ void SparseOptimizer::oneStep(void){
   _L.forwSub(_B, _Y);
   _U.backSub(_Y, _dX);
 
-  for (int i = 0; i < _dX.size; ++i) {
-    Pose new_pose = Pose::Identity();
-    new_pose = v2t(-(*_dX.blocks[i])) * _vertices[i].data();
-    _vertices[i].setData(new_pose);
-  }
+  updateVertices();
 
+  //! cleaning
   _dX.clear();
   _Y.clear();
   _B.clear();
 
-  //! cleaning
   _jacobians_workspace.clear();
 }
+
+
+void SparseOptimizer::updateGraph(Graph& graph_) {
+  if (graph_.vertices().size() != _vertices.size())
+    throw std::runtime_error("Error, number of vertices must remain the same");
+  graph_.updateVertices(_vertices);
+}
+
+void SparseOptimizer::computeRetardedPermutation(std::vector<int>& permutation_) {
+  //! TODO
+  int num_variables = _vertices.size();
+  std::vector<int> oldest_parents(num_variables);
+}
+
+
+void SparseOptimizer::updateVertices(void) {
+  Pose new_pose;
+  for (int i = 0; i < _dX.size; ++i) {
+    new_pose.setIdentity();
+    new_pose = v2t(-(*_dX.blocks[i])) * _vertices[i].data();
+    _vertices[i].setData(new_pose);
+  }
+}
+
+
 void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
   total_chi_ = 0.0;
   inliers_ = 0;
@@ -135,11 +150,10 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
     }
     total_chi_ += chi;
 
-    //! TODO THIS SHIT SUCKS
     //! Compute the factor contribution to the Hessian
-    SparseMatrixBlock& H_ii = (*_jacobians_workspace.map.at(Association(i_idx, i_idx)));
-    SparseMatrixBlock& H_ji = (*_jacobians_workspace.map.at(Association(j_idx, i_idx)));
-    SparseMatrixBlock& H_jj = (*_jacobians_workspace.map.at(Association(j_idx, j_idx)));
+    SparseMatrixBlock& H_ii = _jacobians_workspace(i_idx, i_idx);
+    SparseMatrixBlock& H_ji = _jacobians_workspace(j_idx, i_idx);
+    SparseMatrixBlock& H_jj = _jacobians_workspace(j_idx, j_idx);
 
     H_ii.noalias() += Ji.transpose() * omega * Ji;
     H_ji.noalias() += Jj.transpose() * omega * Ji;
@@ -152,6 +166,7 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
     b_j.noalias() +=  Jj.transpose() * omega * e;
   }
 }
+
 
 void SparseOptimizer::errorAndJacobian(const Pose& xi, const Pose& xj,const PoseMeas& zr,
     Vector12& error, Matrix12_6& Ji, Matrix12_6& Jj){

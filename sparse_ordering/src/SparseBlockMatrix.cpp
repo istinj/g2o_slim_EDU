@@ -34,7 +34,7 @@ SparseBlockMatrix::SparseBlockMatrix(const int size_,
   _num_block_cols = size_;
   _block_rows.resize(_num_block_rows);
 
-  for (WorkspaceMap::const_iterator it = workspace_.map.begin(); it != workspace_.map.end(); ++it){
+  for (WorkspaceMap::const_iterator it = workspace_.memory_map.begin(); it != workspace_.memory_map.end(); ++it){
     setBlock(it->first.first, it->first.second, it->second);
   }
 
@@ -42,7 +42,7 @@ SparseBlockMatrix::SparseBlockMatrix(const int size_,
   _is_initialized = true;
 }
 
-//! TODO: how to delete this shit when it owns the memory?
+
 SparseBlockMatrix::~SparseBlockMatrix() {
   if (_has_storage)
     _matrix_workspace.reset();
@@ -138,7 +138,7 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
 
   cholesky_._matrix_workspace.allocate(indices);
 
-  for(WorkspaceMap::const_iterator it = cholesky_._matrix_workspace.map.begin(); it != cholesky_._matrix_workspace.map.end();++it){
+  for(WorkspaceMap::const_iterator it = cholesky_._matrix_workspace.memory_map.begin(); it != cholesky_._matrix_workspace.memory_map.end();++it){
     cholesky_.setBlock(it->first.first, it->first.second, it->second);
   }
 }
@@ -161,9 +161,10 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
     for (int c = starting_col_idx; c <= r; ++c) {
 
       //! If this block has not been allocated then skip.
-      if(cholesky_._matrix_workspace.map[Association(r,c)] == nullptr)
+      if(cholesky_._matrix_workspace.memory_map[Association(r,c)] == nullptr)
         continue;
-      SparseMatrixBlock& chol_computed_block = (*cholesky_._matrix_workspace.map.at(Association(r,c)));
+//      SparseMatrixBlock& chol_computed_block = (*cholesky_._matrix_workspace.memory_map.at(Association(r,c)));
+      SparseMatrixBlock& chol_computed_block = cholesky_._matrix_workspace(r,c);
 
       SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
       chol_computed_block.setZero();
@@ -176,7 +177,7 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
       } else {
         chol_computed_block = accumulator * inverse_diag_blocks[c];
       }
-      chol_block_row[c] = cholesky_._matrix_workspace.map.at(Association(r,c));
+      chol_block_row[c] = cholesky_._matrix_workspace.memory_map.at(Association(r,c));
     }
   }
 }
@@ -202,13 +203,13 @@ void SparseBlockMatrix::allocateTransposed(SparseBlockMatrix& transposed_) {
     }
   }
   transposed_._matrix_workspace.allocate(indices);
-  for(WorkspaceMap::const_iterator it = transposed_._matrix_workspace.map.begin(); it != transposed_._matrix_workspace.map.end();++it){
+  for(WorkspaceMap::const_iterator it = transposed_._matrix_workspace.memory_map.begin(); it != transposed_._matrix_workspace.memory_map.end();++it){
     transposed_.setBlock(it->first.first, it->first.second, it->second);
   }
 }
 
-void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& result_) {
-  if (!result_._is_initialized)
+void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& transposed_) {
+  if (!transposed_._is_initialized)
     throw std::runtime_error("Argument matrix must be already initialized");
 
   for (int r = 0; r < _num_block_rows; ++r) {
@@ -216,14 +217,15 @@ void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& result_) {
     if(block_row.empty())
       throw std::runtime_error("Something went wrong during the transpose update");
     for (int c = 0; c < _num_block_cols; ++c) {
-      ColumnsMap& transposed_block_row = result_._block_rows[c];
+      ColumnsMap& transposed_block_row = transposed_._block_rows[c];
 
       ColumnsMap::const_iterator it = block_row.find(c);
       if (it == block_row.end())
         continue;
       else{
-        (*result_._matrix_workspace.map[Association(c,r)]) = it->second->transpose();
-        transposed_block_row[r] = result_._matrix_workspace.map[Association(c,r)];
+//        (*transposed_._matrix_workspace.memory_map[Association(c,r)]) = it->second->transpose();
+        transposed_._matrix_workspace(c,r) = it->second->transpose();
+        transposed_block_row[r] = transposed_._matrix_workspace.memory_map[Association(c,r)];
       }
     }
   }
