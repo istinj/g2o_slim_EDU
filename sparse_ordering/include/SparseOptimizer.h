@@ -33,8 +33,9 @@ public:
   void init(const VerticesContainer& vertices_,
       const EdgesContainer& edges_);
   //! This function acutally computes all the stuff allocated during the INIT function
+  //|! TODO: converge with prev_error - total_error
+  bool converge(void);
   void oneStep(void);
-
   void updateGraph(Graph& graph_);
 
 protected:
@@ -63,7 +64,7 @@ protected:
   SparseBlockMatrix _L;
   SparseBlockMatrix _U;
 
-  real_ _kernel_threshold = 1000.0;
+  real_ _kernel_threshold = 500.0;
   //! TODO:	How to generate orderigs? How is structured the vector of ints containing
   //! 		the ordering??
   //! TODO	Initialize memory for L and U in the init function.
