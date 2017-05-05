@@ -12,6 +12,9 @@ using namespace std;
 namespace sparse {
 
 SparseOptimizer::SparseOptimizer() {
+  _kernel_threshold = 100.0;
+  _convergence_threshold = 1e-5;
+  _num_iterations = 100;
 }
 
 SparseOptimizer::~SparseOptimizer() {
@@ -27,6 +30,7 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
   _vertices = vertices_;
   _edges = edges_;
 
+  cerr << BOLDWHITE << "Allocating memory for the optimizer" << endl << RESET;
   //! Create the Factors
   HessianBlocksMap::iterator f_it;
   for (int i = 0; i < _edges.size(); ++i) {
@@ -51,6 +55,9 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
   _H.allocateCholesky(_L);
   _L.allocateTransposed(_U);
 
+  real_ fill_in_rate = _L.nnz()/(real_)(_H.nnz() - _factors.size());
+  cerr << BOLDWHITE << "Cholesky fill-in rate: \t" << BOLDGREEN << fill_in_rate << endl << endl;
+
   _jacobians_workspace.clear();
 
   //! Storage for the rhs vector
@@ -62,9 +69,41 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
   return;
 }
 
-void SparseOptimizer::oneStep(void){
-  real_ step_chi = 0.0;
-  int step_inliers = 0;
+
+void SparseOptimizer::converge(void) {
+  real_ total_chi = 0.0;
+  real_ prev_total_chi = 0.0;
+  int total_inliers = 0;
+  int iter_cnt = 0;
+
+  for (int i = 0; i < _num_iterations; ++i) {
+    oneStep(total_chi, total_inliers);
+    ++iter_cnt;
+
+    const real_ delta_total_chi = fabs(prev_total_chi - total_chi);
+    if (_kernel_threshold > delta_total_chi) {
+      oneStep(total_chi, total_inliers);
+      oneStep(total_chi, total_inliers);
+      oneStep(total_chi, total_inliers);
+      iter_cnt += 3;
+      break;
+    } else {
+      prev_total_chi = total_chi;
+    }
+
+    if ( i == _num_iterations - 1) {
+      cerr << BOLDRED << "System did not converged| total error: " << delta_total_chi << RESET << endl;
+      return;
+    }
+  }
+  cerr << BOLDGREEN << "System converged in " << iter_cnt << " iterations" << RESET << endl;
+}
+
+void SparseOptimizer::oneStep(real_& step_chi, int& step_inliers){
+  std::chrono::high_resolution_clock::time_point t_0, t_1;
+  t_0 = std::chrono::high_resolution_clock::now();
+  step_chi = 0.0;
+  step_inliers = 0;
 
   linearizeFactor(step_chi, step_inliers);
   cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << step_inliers << "\t" << BOLDWHITE
@@ -88,6 +127,9 @@ void SparseOptimizer::oneStep(void){
   _B.clear();
 
   _jacobians_workspace.clear();
+  t_1 = std::chrono::high_resolution_clock::now();
+  double execution_time = (std::chrono::duration_cast<std::chrono::microseconds>(t_1 - t_0).count() / 1e06);
+  std::cerr << BOLDWHITE << "Step time:\t" << BOLDGREEN << execution_time << "s" << std::endl << RESET;
 }
 
 

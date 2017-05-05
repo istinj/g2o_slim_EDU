@@ -34,7 +34,7 @@ void Workspace::clear(void){
   }
 }
 
-void Workspace::allocate(std::vector<Factor>& factors_){
+void Workspace::allocate(const std::vector<Factor>& factors_){
   for (int i = 0; i < factors_.size(); ++i) {
     int a = std::min(factors_[i].from, factors_[i].to);
     int b = std::max(factors_[i].from, factors_[i].to);
@@ -76,10 +76,10 @@ void Workspace::allocate(std::vector<Factor>& factors_){
 }
 
 
-void Workspace::allocate(std::vector<Association>& indices_){
+void Workspace::allocate(const std::vector<Association>& indices_) {
   for (int i = 0; i < indices_.size(); ++i) {
-    int& r = indices_[i].first;
-    int& c = indices_[i].second;
+    const int& r = indices_[i].first;
+    const int& c = indices_[i].second;
 
     if(!memory_map.count(Association(r,c))){
       SparseMatrixBlock* block = new SparseMatrixBlock();
@@ -90,6 +90,29 @@ void Workspace::allocate(std::vector<Association>& indices_){
     }
   }
   dimension = memory_map.size();
+}
+
+void Workspace::allocateOneBlock(const int r_, const int c_) {
+  if(!memory_map.count(Association(r_,c_))){
+    SparseMatrixBlock* block = new SparseMatrixBlock();
+    block->setIdentity();
+    memory_map.insert(std::make_pair(Association(r_,c_), block));
+  } else {
+    memory_map[Association(r_,c_)]->setIdentity();
+  }
+  ++dimension;
+}
+
+
+void Workspace::allocateOneBlock(const Association& indices_) {
+  if(!memory_map.count(indices_)){
+    SparseMatrixBlock* block = new SparseMatrixBlock();
+    block->setIdentity();
+    memory_map.insert(std::make_pair(indices_, block));
+  } else {
+    memory_map[indices_]->setIdentity();
+  }
+  ++dimension;
 }
 
 

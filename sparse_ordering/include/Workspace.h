@@ -26,8 +26,10 @@ struct Workspace {
   //! Sets to 0 all the blocks allocated
   void clear(void);
   //! ALLOCATES blocks and sets them to identity
-  void allocate(std::vector<Factor>& factors_);
-  void allocate(std::vector<Association>& indices_);
+  void allocate(const std::vector<Factor>& factors_);
+  void allocate(const std::vector<Association>& indices_);
+  void allocateOneBlock(const Association& indices_);
+  void allocateOneBlock(const int r_, const int c_);
 
   SparseMatrixBlock& operator()(const Association& indices_) const;
   SparseMatrixBlock& operator()(const int r_, const int c_) const;

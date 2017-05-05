@@ -82,6 +82,8 @@ public:
   void forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
   void backSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
 
+  inline int nnz(void) const {return _nnz;}
+
 protected:
   //!TODO: 	this is a shit but does not produce memory leaks
   SparseMatrixBlock scalarProd(const ColumnsMap& row1_,
@@ -93,14 +95,15 @@ protected:
 
   int _num_block_rows;
   int _num_block_cols;
+  int _nnz;
   bool _has_storage;
   bool _is_initialized = false;
 
   RowsContainer _block_rows;
   Workspace _matrix_workspace;
 
-  //! TODO	Is this matrix structure good?
-  //! TODO 	MEMORY MANAGEMENT when the matrix owns the blocks.
+  //! TODO  in allocate cholesky -> setBlock while allocating blocks because otherwise scalarProdStructure is always 0
+  //! TODO  NNZ
   //! TODO 	ORDERING
 
   //! TODO	Method to remove row/column

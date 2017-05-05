@@ -31,19 +31,12 @@ int main(int argc, char const *argv[]){
   sparse::SparseOptimizer* optimizer = new sparse::SparseOptimizer();
   optimizer->init(graph->vertices(), graph->edges());
 
-  std::chrono::high_resolution_clock::time_point t_0, t_1;
-  for (int i = 0; i < 5; ++i) {
-    t_0 = std::chrono::high_resolution_clock::now();
-    optimizer->oneStep();
-    t_1 = std::chrono::high_resolution_clock::now();
-    double execution_time = (std::chrono::duration_cast<std::chrono::microseconds>(t_1 - t_0).count() / 1e06);
-    std::cerr << BOLDWHITE << "Execution time:\t" << BOLDGREEN << execution_time << std::endl << RESET;
-  }
+  optimizer->converge();
 
   optimizer->updateGraph(*graph);
 
   std::string output_file("../data/world_updated.g2o");
-  std::cerr << BOLDWHITE << "\n\nExporting world in " << output_file << RESET << std::endl;
+  std::cerr << BOLDWHITE << "\n\nExporting optimized world in " << output_file << RESET << std::endl;
   graph->exportToG2OFile(output_file);
 
   delete optimizer;

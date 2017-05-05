@@ -14,6 +14,7 @@ namespace sparse {
 SparseBlockMatrix::SparseBlockMatrix() {
   _num_block_rows = 0;
   _num_block_cols = 0;
+  _nnz = 0;
   _has_storage = false;
 }
 
@@ -25,6 +26,7 @@ SparseBlockMatrix::SparseBlockMatrix(const int num_block_rows_,
   _block_rows.resize(_num_block_rows);
   _has_storage = has_storage_;
   _is_initialized = true;
+  _nnz = 0;
 }
 
 
@@ -40,6 +42,7 @@ SparseBlockMatrix::SparseBlockMatrix(const int size_,
 
   _has_storage = false;
   _is_initialized = true;
+  _nnz = workspace_.dimension;
 }
 
 
@@ -106,6 +109,8 @@ bool SparseBlockMatrix::isNonZeroBlock(const int r_, const int c_) const {
   return false;
 }
 
+
+//! TODO: Sove error here
 void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
   if(_num_block_rows != _num_block_cols){
     throw std::runtime_error("Error: matrix must be squared");
@@ -114,6 +119,7 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
   cholesky_ = SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
   std::vector<Association> indices;
 
+  int nnz = 0;
   for (int r = 0; r < _num_block_rows; ++r) {
     const ColumnsMap& block_row = _block_rows[r];
     ColumnsMap& chol_block_row = cholesky_._block_rows[r];
@@ -132,15 +138,18 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
       }
       if(not_empty) {
         indices.push_back(Association(r,c));
+        cholesky_._matrix_workspace.allocateOneBlock(r,c);
+        cholesky_.setBlock(r,c,cholesky_._matrix_workspace.memory_map[Association(r,c)]);
+        ++nnz;
       }
     }
   }
-
-  cholesky_._matrix_workspace.allocate(indices);
-
-  for(WorkspaceMap::const_iterator it = cholesky_._matrix_workspace.memory_map.begin(); it != cholesky_._matrix_workspace.memory_map.end();++it){
-    cholesky_.setBlock(it->first.first, it->first.second, it->second);
-  }
+  cholesky_._nnz = nnz;
+//  cholesky_._matrix_workspace.allocate(indices);
+//
+//  for(WorkspaceMap::const_iterator it = cholesky_._matrix_workspace.memory_map.begin(); it != cholesky_._matrix_workspace.memory_map.end();++it){
+//    cholesky_.setBlock(it->first.first, it->first.second, it->second);
+//  }
 }
 
 
@@ -223,7 +232,6 @@ void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& transposed_) {
       if (it == block_row.end())
         continue;
       else{
-//        (*transposed_._matrix_workspace.memory_map[Association(c,r)]) = it->second->transpose();
         transposed_._matrix_workspace(c,r) = it->second->transpose();
         transposed_block_row[r] = transposed_._matrix_workspace.memory_map[Association(c,r)];
       }
@@ -322,11 +330,9 @@ SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
 }
 
 bool SparseBlockMatrix::scalarProdStructure(const ColumnsMap& row1_,
-    const ColumnsMap& row2_,
-    const int max_pos_) const {
+    const ColumnsMap& row2_, const int max_pos_) const {
   typename ColumnsMap::const_iterator it_1 = row1_.begin();
   typename ColumnsMap::const_iterator it_2 = row2_.begin();
-
   while(it_1 != row1_.end() && it_2 != row2_.end()){
     int col_idx_1 = it_1->first;
     int col_idx_2 = it_2->first;
