@@ -20,6 +20,8 @@ public:
 
   void setVertex(const int& id_, const int& index_, const Pose& data_);
   void setData(const Pose& data_);
+  //! TODO
+//  void setFixed(bool flag_);
 
   inline bool operator==(const Vertex& other_) const {return this->_id == other_._id;};
   inline bool operator==(const int& ID) const {return this->_id == ID;};
@@ -31,6 +33,7 @@ public:
 protected:
   Pose _data;
   int _id;
+  //! TODO STATIC index
   int _index;
 
 public:

@@ -18,7 +18,7 @@
 
 namespace sparse {
 
-typedef std::vector<sparse::Vertex> VerticesContainer;
+typedef std::vector<sparse::Vertex> VerticesVector;
 typedef std::vector<sparse::Edge> EdgesContainer;
 typedef std::vector<Factor> FactorsVector;
 typedef BlocksMap HessianBlocksMap;
@@ -30,16 +30,17 @@ public:
 
   //! This will allocate all the memory that will contain the Hessian, its Cholesky and the transposed
   //! of the Cholesky.
-  void init(const VerticesContainer& vertices_,
+  void init(const VerticesVector& vertices_,
             const EdgesContainer& edges_);
   //! This function acutally computes all the stuff allocated during the INIT function
   //|! TODO: converge with prev_error - total_error
   void converge(void);
-  void oneStep(bool suppress_outliers_);
   void updateGraph(Graph& graph_);
 
 protected:
-  void computeRetardedPermutation(std::vector<int>& permutation_);
+  void computeAMDPermutation(IntVector& permutation_AMD_,
+                             SparseBlockMatrix& matrix_);
+  void oneStep(bool suppress_outliers_);
   void updateVertices(void);
   void linearizeFactor(real_& total_chi,
                        int& inliers_,
@@ -51,7 +52,7 @@ protected:
                         Matrix12_6& Ji,
                         Matrix12_6& Jj);
 
-  VerticesContainer _vertices;
+  VerticesVector _vertices;
   EdgesContainer _edges;
 
   //! TODO: 	is this container for the matrices good? Do i need something more complex?
@@ -61,6 +62,7 @@ protected:
   FactorsVector _factors;
   //! TODO:	How to create the ordered matrix given the blocks_pull and the factors?
   //!			Do I need to modify those two structures??
+  IntVector _hessian_permutation;
 
   DenseBlockVector _B;
   DenseBlockVector _Y;

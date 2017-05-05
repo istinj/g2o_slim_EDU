@@ -40,11 +40,11 @@ struct DenseBlockVector {
   }
 };
 
-typedef std::vector<sparse::Vertex> VerticesContainer;
+typedef std::vector<sparse::Vertex> VerticesVector;
 
 typedef std::map<int, SparseMatrixBlock*, std::less<int>,
-        Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > ColumnsMap;
-typedef std::vector<ColumnsMap> RowsContainer;
+        Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > IntSparseMatrixBlockPtrMap;
+typedef std::vector<IntSparseMatrixBlockPtrMap> IntSparseMatrixBlockPtrMapVector;
 typedef std::vector<Factor> FactorsVector;
 
 
@@ -76,30 +76,29 @@ public:
   bool isNonZeroBlock(const int r_,
                       const int c_) const;
 
+  void reorder(const IntVector& permutation_,
+               const Workspace& workspace_,
+               const FactorsVector& factors_);
+
   void allocateTransposed(SparseBlockMatrix& transposed_);
   void computeTranspose(SparseBlockMatrix& transposed_);
 
   void allocateCholesky(SparseBlockMatrix& cholesky_);
   void computeCholesky(SparseBlockMatrix& cholesky_);
 
-  //! TODO
-  void solveLinearSystem(DenseBlockVector& rhs_vector_,
-                         DenseBlockVector& result_) const;
-
   void forwSub(DenseBlockVector& rhs_vector_,
                DenseBlockVector& result_) const;
   void backSub(DenseBlockVector& rhs_vector_,
                DenseBlockVector& result_) const;
 
-
+  cs* toCs(void) const;
 
 protected:
-  //!TODO: 	this is a shit but does not produce memory leaks
-  SparseMatrixBlock scalarProd(const ColumnsMap& row1_,
-                               const ColumnsMap& row2_,
+  SparseMatrixBlock scalarProd(const IntSparseMatrixBlockPtrMap& row1_,
+                               const IntSparseMatrixBlockPtrMap& row2_,
                                const int max_pos_) const;
-  bool scalarProdStructure(const ColumnsMap& row1_,
-                           const ColumnsMap& row2_,
+  bool scalarProdStructure(const IntSparseMatrixBlockPtrMap& row1_,
+                           const IntSparseMatrixBlockPtrMap& row2_,
                            const int max_pos_) const;
 
   int _num_block_rows;
@@ -108,7 +107,7 @@ protected:
   bool _has_storage;
   bool _is_initialized = false;
 
-  RowsContainer _block_rows;
+  IntSparseMatrixBlockPtrMapVector _block_rows;
   Workspace _matrix_workspace;
 
 
@@ -119,6 +118,8 @@ protected:
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
+
+std::ostream& operator <<(std::ostream& os, const SparseBlockMatrix& m);
 
 } /* namespace sparse */
 

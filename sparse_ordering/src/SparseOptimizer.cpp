@@ -27,7 +27,7 @@ SparseOptimizer::~SparseOptimizer() {
   _dX.reset();
 }
 
-void SparseOptimizer::init(const VerticesContainer& vertices_,
+void SparseOptimizer::init(const VerticesVector& vertices_,
                            const EdgesContainer& edges_){
   cerr << BOLDWHITE << "Allocating memory for the optimizer" << endl << RESET;
 
@@ -37,9 +37,9 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
   //! Create the Factors
   HessianBlocksMap::iterator f_it;
   for (int i = 0; i < _edges.size(); ++i) {
-    VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
+    VerticesVector::const_iterator pose_i = std::find(_vertices.begin(),
         _vertices.end(), _edges[i].association().first);
-    VerticesContainer::const_iterator pose_j = std::find(_vertices.begin(),
+    VerticesVector::const_iterator pose_j = std::find(_vertices.begin(),
         _vertices.end(), _edges[i].association().second);
     int i_idx = pose_i->index();
     int j_idx = pose_j->index();
@@ -49,15 +49,47 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 
   //! Allocate memory for the Hessian
   _jacobians_workspace.allocate(_factors);
+
   //! Create the sparseblockmatrix using the jacbian_workspace as memory
+  bool exp = false;
   _H = SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
+  if (exp) {
+    ofstream file_plain("../data/h_PLAIN.txt");
+    file_plain << _H << endl;
+    file_plain.close();
+  }
+  computeAMDPermutation(_hessian_permutation, _H);
+  _H.reorder(_hessian_permutation, _jacobians_workspace, _factors);
+
+
+  if (exp) {
+    ofstream file_amd("../data/h_AMD.txt");
+    file_amd << _H << endl;
+    file_amd.close();
+  }
+
 
   //! Allocate other matrices
   _H.allocateCholesky(_L);
+
+  if (exp) {
+    ofstream file_l("../data/chol_lower_AMD.txt");
+    file_l << _L << endl;
+    file_l.close();
+  }
+
   _L.allocateTransposed(_U);
 
-  real_ fill_in_rate = _L.nnz()/(real_)(_H.nnz() - _factors.size());
-  cerr << BOLDWHITE << "Cholesky fill-in rate: \t" << BOLDGREEN << fill_in_rate << endl << endl;
+  if (exp) {
+    ofstream file_u("../data/chol_upper_AMD.txt");
+    file_u << _U << endl;
+    file_u.close();
+  }
+
+  real_ fill_in_H = (_vertices.size()+(_edges.size()*2))/(real_)(_vertices.size()*_vertices.size());
+  real_ rate = _L.nnz()/(real_)(_H.nnz() - _factors.size());
+  cerr << BOLDWHITE << "Hessian fill-in rate: \t" << BOLDGREEN << fill_in_H << endl;
+  cerr << BOLDWHITE << "Cholesky fill-in rate: \t" << BOLDGREEN << rate * fill_in_H << endl << endl;
 
   _jacobians_workspace.clear();
 
@@ -113,6 +145,7 @@ void SparseOptimizer::oneStep(bool suppress_outliers_){
   //! Build and solve the linear system HdX = B;
   _jacobians_workspace(0,0) += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
+  _U.printBlock(2,2);
   _H.computeCholesky(_L);
   _L.computeTranspose(_U);
 
@@ -140,10 +173,19 @@ void SparseOptimizer::updateGraph(Graph& graph_) {
   graph_.updateVertices(_vertices);
 }
 
-void SparseOptimizer::computeRetardedPermutation(std::vector<int>& permutation_) {
-  //! TODO
-  int num_variables = _vertices.size();
-  std::vector<int> oldest_parents(num_variables);
+void SparseOptimizer::computeAMDPermutation(IntVector& permutation_AMD_,
+                                            SparseBlockMatrix& matrix_) {
+  cs* cs_matrix = matrix_.toCs();
+  int* amd_odering = cs_amd(1,cs_matrix);
+
+  permutation_AMD_.resize(matrix_.numRows());
+
+  for (int i = 0; i < matrix_.numRows(); ++i) {
+    permutation_AMD_[amd_odering[i]] = i;
+  }
+
+  cs_spfree(cs_matrix);
+  cs_free(amd_odering);
 }
 
 
@@ -173,9 +215,9 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_,
   //! For each edge, compute - numerically - the relative factor
   for (int i = 0; i < _edges.size(); ++i) {
     const Edge& edge = _edges[i];
-    VerticesContainer::const_iterator pose_i = std::find(_vertices.begin(),
+    VerticesVector::const_iterator pose_i = std::find(_vertices.begin(),
         _vertices.end(), edge.association().first);
-    VerticesContainer::const_iterator pose_j = std::find(_vertices.begin(),
+    VerticesVector::const_iterator pose_j = std::find(_vertices.begin(),
         _vertices.end(), edge.association().second);
 
     int i_idx = pose_i->index();

@@ -52,7 +52,7 @@ void Workspace::allocate(const std::vector<Factor>& factors_){
       block->setIdentity();
       memory_map.insert(std::make_pair(Association(b,a), block));
     } else {
-      memory_map[Association(a,a)]->setIdentity();
+      memory_map[Association(b,a)]->setIdentity();
     }
 
     if(!memory_map.count(Association(a,b))){
@@ -60,7 +60,7 @@ void Workspace::allocate(const std::vector<Factor>& factors_){
       block->setIdentity();
       memory_map.insert(std::make_pair(Association(a,b), block));
     } else {
-      memory_map[Association(a,a)]->setIdentity();
+      memory_map[Association(a,b)]->setIdentity();
     }
 
     if(!memory_map.count(Association(b,b))){
@@ -68,7 +68,7 @@ void Workspace::allocate(const std::vector<Factor>& factors_){
       block->setIdentity();
       memory_map.insert(std::make_pair(Association(b,b), block));
     } else {
-      memory_map[Association(a,a)]->setIdentity();
+      memory_map[Association(b,b)]->setIdentity();
     }
   }
 

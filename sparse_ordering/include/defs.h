@@ -12,6 +12,9 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/Cholesky>
+#include <suitesparse/cs.h>
+#include <suitesparse/amd.h>
+#include <suitesparse/colamd.h>
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -79,5 +82,8 @@ typedef std::map<int, DenseVectorBlock*, std::less<int>,
 typedef std::pair<int, int> Association;
 typedef std::map<Association, SparseMatrixBlock*, std::less<std::pair<int, int> >,
     Eigen::aligned_allocator<std::pair<Association, SparseMatrixBlock*> > > BlocksMap;
+
+typedef std::vector<int> IntVector;
+
 
 

@@ -15,8 +15,8 @@
 
 //! Generic sparse matrix stored in a effient way
 namespace sparse {
-typedef std::map<int, real_> ColumnsMap;
-typedef std::vector<ColumnsMap> RowContainer;
+typedef std::map<int, real_> IntSparseMatrixBlockPtrMap;
+typedef std::vector<IntSparseMatrixBlockPtrMap> RowContainer;
 class SparseMatrix
 {
 public:
@@ -30,12 +30,12 @@ public:
    void loadFromTXT(const std::string& path_to_file_);
 
    void evaluateCholeskyStructure(SparseMatrix& cholesky_);
-   bool evaluateScalarProdStructure(const ColumnsMap& row_1_,
-         const ColumnsMap& row_2_, int max_pos_);
+   bool evaluateScalarProdStructure(const IntSparseMatrixBlockPtrMap& row_1_,
+         const IntSparseMatrixBlockPtrMap& row_2_, int max_pos_);
 
    void cholesky(SparseMatrix& cholesky_);
-   real_ scalarProd(const ColumnsMap& row_1_,
-         const ColumnsMap& row_2_, const int max_pos_);
+   real_ scalarProd(const IntSparseMatrixBlockPtrMap& row_1_,
+         const IntSparseMatrixBlockPtrMap& row_2_, const int max_pos_);
 
    void printElement(const int r_, const int c_) const;
    bool isNonZeroElement(const int r_, const int c_) const;

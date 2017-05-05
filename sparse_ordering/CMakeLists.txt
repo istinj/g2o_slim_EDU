@@ -11,10 +11,11 @@ if(COMPILER_SUPPORTS_CXX11)
 endif()
 
 #find macros and libraries
-find_package(Eigen3 REQUIRED
-	Boost 1.54.0.1 REQUIRED
-	OpenCV REQUIRED
-	CSparse REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+find_package(Boost  REQUIRED)
+
+find_package(SuiteSparse REQUIRED)
 
 #include directories
 include_directories(
@@ -36,5 +37,5 @@ set(SRCS
 
 add_executable(sparse_ordering_test ${SRCS})
 # Specify libraries to link a library or executable target against
-target_link_libraries(sparse_ordering_test ${Boost_LIBRARIES})
+target_link_libraries(sparse_ordering_test ${Boost_LIBRARIES} ${CSPARSE_LIBRARY})
 set_target_properties( sparse_ordering_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin )
