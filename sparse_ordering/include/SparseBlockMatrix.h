@@ -43,7 +43,7 @@ struct DenseBlockVector {
 typedef std::vector<sparse::Vertex> VerticesContainer;
 
 typedef std::map<int, SparseMatrixBlock*, std::less<int>,
-    Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > ColumnsMap;
+        Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > ColumnsMap;
 typedef std::vector<ColumnsMap> RowsContainer;
 typedef std::vector<Factor> FactorsVector;
 
@@ -52,23 +52,29 @@ class SparseBlockMatrix {
 public:
   SparseBlockMatrix();
   SparseBlockMatrix(const int num_block_rows_,
-      const int num_block_cols_, bool has_storage_ = false);
-  SparseBlockMatrix(const int size_, const Workspace& workspace_);
-
-
+                    const int num_block_cols_,
+                    bool has_storage_ = false);
+  SparseBlockMatrix(const int size_,
+                    const Workspace& workspace_);
   virtual ~SparseBlockMatrix();
 
-  inline const int numRows(void) const {return _num_block_rows;};
-  inline const int numCols(void) const {return _num_block_cols;};
+  inline const int numRows(void) const {return _num_block_rows;}
+  inline const int numCols(void) const {return _num_block_cols;}
+  inline const int nnz(void) const {return _nnz;}
 
   void setZero(void);
   void printBlock(const int r_, const int c_) const;
   void printMatrix(void) const;
 
-  void setBlock(const int r_,	const int c_, SparseMatrixBlock* data_ptr_);
-  SparseMatrixBlock getBlock(const int r_, const int c_) const;
-  SparseMatrixBlock* getBlockPtr(const int r_, const int c_) const;
-  bool isNonZeroBlock(const int r_, const int c_) const;
+  void setBlock(const int r_,
+                const int c_,
+                SparseMatrixBlock* data_ptr_);
+  SparseMatrixBlock getBlock(const int r_,
+                             const int c_) const;
+  SparseMatrixBlock* getBlockPtr(const int r_,
+                                 const int c_) const;
+  bool isNonZeroBlock(const int r_,
+                      const int c_) const;
 
   void allocateTransposed(SparseBlockMatrix& transposed_);
   void computeTranspose(SparseBlockMatrix& transposed_);
@@ -77,21 +83,24 @@ public:
   void computeCholesky(SparseBlockMatrix& cholesky_);
 
   //! TODO
-  void solveLinearSystem(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
+  void solveLinearSystem(DenseBlockVector& rhs_vector_,
+                         DenseBlockVector& result_) const;
 
-  void forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
-  void backSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const;
+  void forwSub(DenseBlockVector& rhs_vector_,
+               DenseBlockVector& result_) const;
+  void backSub(DenseBlockVector& rhs_vector_,
+               DenseBlockVector& result_) const;
 
-  inline int nnz(void) const {return _nnz;}
+
 
 protected:
   //!TODO: 	this is a shit but does not produce memory leaks
   SparseMatrixBlock scalarProd(const ColumnsMap& row1_,
-      const ColumnsMap& row2_,
-      const int max_pos_) const;
+                               const ColumnsMap& row2_,
+                               const int max_pos_) const;
   bool scalarProdStructure(const ColumnsMap& row1_,
-      const ColumnsMap& row2_,
-      const int max_pos_) const;
+                           const ColumnsMap& row2_,
+                           const int max_pos_) const;
 
   int _num_block_rows;
   int _num_block_cols;
@@ -102,10 +111,8 @@ protected:
   RowsContainer _block_rows;
   Workspace _matrix_workspace;
 
-  //! TODO  in allocate cholesky -> setBlock while allocating blocks because otherwise scalarProdStructure is always 0
-  //! TODO  NNZ
-  //! TODO 	ORDERING
 
+  //! TODO 	ORDERING
   //! TODO	Method to remove row/column
   //! TODO	Operator() overload
 

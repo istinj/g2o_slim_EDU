@@ -31,19 +31,25 @@ public:
   //! This will allocate all the memory that will contain the Hessian, its Cholesky and the transposed
   //! of the Cholesky.
   void init(const VerticesContainer& vertices_,
-      const EdgesContainer& edges_);
+            const EdgesContainer& edges_);
   //! This function acutally computes all the stuff allocated during the INIT function
   //|! TODO: converge with prev_error - total_error
   void converge(void);
-  void oneStep(real_& step_chi_, int& step_inliers_);
+  void oneStep(bool suppress_outliers_);
   void updateGraph(Graph& graph_);
 
 protected:
   void computeRetardedPermutation(std::vector<int>& permutation_);
   void updateVertices(void);
-  void linearizeFactor(real_& total_chi, int& inliers_);
-  void errorAndJacobian(const Pose& xi, const Pose& xj,const PoseMeas& zr,
-      Vector12& error, Matrix12_6& Ji, Matrix12_6& Jj);
+  void linearizeFactor(real_& total_chi,
+                       int& inliers_,
+                       bool suppress_outliers_);
+  void errorAndJacobian(const Pose& xi,
+                        const Pose& xj,
+                        const PoseMeas& zr,
+                        Vector12& error,
+                        Matrix12_6& Ji,
+                        Matrix12_6& Jj);
 
   VerticesContainer _vertices;
   EdgesContainer _edges;
@@ -66,6 +72,8 @@ protected:
 
   real_ _kernel_threshold;
   real_ _convergence_threshold;
+  real_ _total_chi;
+  int _total_inliers;
   int _num_iterations;
   //! TODO:	How to generate orderigs? How is structured the vector of ints containing
   //! 		the ordering??

@@ -19,8 +19,8 @@ SparseBlockMatrix::SparseBlockMatrix() {
 }
 
 SparseBlockMatrix::SparseBlockMatrix(const int num_block_rows_,
-    const int num_block_cols_,
-    bool has_storage_) {
+                                     const int num_block_cols_,
+                                     bool has_storage_) {
   _num_block_rows = num_block_rows_;
   _num_block_cols = num_block_cols_;
   _block_rows.resize(_num_block_rows);
@@ -31,7 +31,7 @@ SparseBlockMatrix::SparseBlockMatrix(const int num_block_rows_,
 
 
 SparseBlockMatrix::SparseBlockMatrix(const int size_,
-    const Workspace& workspace_){
+                                     const Workspace& workspace_){
   _num_block_rows = size_;
   _num_block_cols = size_;
   _block_rows.resize(_num_block_rows);
@@ -58,7 +58,9 @@ void SparseBlockMatrix::setZero(void) {
   }
 }
 
-void SparseBlockMatrix::setBlock(const int r_, const int c_, SparseMatrixBlock* data_ptr_) {
+void SparseBlockMatrix::setBlock(const int r_,
+                                 const int c_,
+                                 SparseMatrixBlock* data_ptr_) {
   if(r_ >= _num_block_rows || c_ >= _num_block_cols){
     throw std::runtime_error("You are trying to set an wrong element - out of bound index");
   }
@@ -77,7 +79,8 @@ void SparseBlockMatrix::setBlock(const int r_, const int c_, SparseMatrixBlock* 
   }
 }
 
-SparseMatrixBlock SparseBlockMatrix::getBlock(const int r_, const int c_) const {
+SparseMatrixBlock SparseBlockMatrix::getBlock(const int r_,
+                                              const int c_) const {
   SparseMatrixBlock block = SparseMatrixBlock::Zero();
   if(r_ >= _num_block_rows || c_ >= _num_block_cols){
     throw std::runtime_error("You are trying to access an wrong element - out of bound index");
@@ -89,7 +92,8 @@ SparseMatrixBlock SparseBlockMatrix::getBlock(const int r_, const int c_) const 
   return (*it->second);
 }
 
-SparseMatrixBlock* SparseBlockMatrix::getBlockPtr(const int r_, const int c_) const {
+SparseMatrixBlock* SparseBlockMatrix::getBlockPtr(const int r_,
+                                                  const int c_) const {
   if(r_ >= _num_block_rows || c_ >= _num_block_cols){
     throw std::runtime_error("You are trying to access an wrong element - out of bound index");
   }
@@ -102,7 +106,8 @@ SparseMatrixBlock* SparseBlockMatrix::getBlockPtr(const int r_, const int c_) co
 
 }
 
-bool SparseBlockMatrix::isNonZeroBlock(const int r_, const int c_) const {
+bool SparseBlockMatrix::isNonZeroBlock(const int r_,
+                                       const int c_) const {
   const SparseMatrixBlock& block = getBlock(r_, c_);
   if(!block.isZero())
     return true;
@@ -145,11 +150,6 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
     }
   }
   cholesky_._nnz = nnz;
-//  cholesky_._matrix_workspace.allocate(indices);
-//
-//  for(WorkspaceMap::const_iterator it = cholesky_._matrix_workspace.memory_map.begin(); it != cholesky_._matrix_workspace.memory_map.end();++it){
-//    cholesky_.setBlock(it->first.first, it->first.second, it->second);
-//  }
 }
 
 
@@ -172,9 +172,8 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
       //! If this block has not been allocated then skip.
       if(cholesky_._matrix_workspace.memory_map[Association(r,c)] == nullptr)
         continue;
-//      SparseMatrixBlock& chol_computed_block = (*cholesky_._matrix_workspace.memory_map.at(Association(r,c)));
-      SparseMatrixBlock& chol_computed_block = cholesky_._matrix_workspace(r,c);
 
+      SparseMatrixBlock& chol_computed_block = cholesky_._matrix_workspace(r,c);
       SparseMatrixBlock accumulator = SparseMatrixBlock::Zero();
       chol_computed_block.setZero();
 
@@ -241,12 +240,13 @@ void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& transposed_) {
 
 
 void SparseBlockMatrix::solveLinearSystem(DenseBlockVector& rhs_vector_,
-    DenseBlockVector& result_) const {
+                                          DenseBlockVector& result_) const {
   //! TODO
 }
 
 
-void SparseBlockMatrix::forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const {
+void SparseBlockMatrix::forwSub(DenseBlockVector& rhs_vector_,
+                                DenseBlockVector& result_) const {
   if(_num_block_rows != _num_block_cols || rhs_vector_.size != _num_block_rows)
     throw std::runtime_error("Error, dimensions must agree");
 
@@ -266,7 +266,8 @@ void SparseBlockMatrix::forwSub(DenseBlockVector& rhs_vector_, DenseBlockVector&
 }
 
 
-void SparseBlockMatrix::backSub(DenseBlockVector& rhs_vector_, DenseBlockVector& result_) const {
+void SparseBlockMatrix::backSub(DenseBlockVector& rhs_vector_,
+                                DenseBlockVector& result_) const {
   if(_num_block_rows != _num_block_cols || rhs_vector_.size != _num_block_rows)
     throw std::runtime_error("Error, dimensions must agree");
 
@@ -304,8 +305,9 @@ void SparseBlockMatrix::printMatrix(void) const {
 }
 
 SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
-    const ColumnsMap& row2_,
-    const int max_pos_) const {
+                                                const ColumnsMap& row2_,
+                                                const int max_pos_) const {
+
   typename ColumnsMap::const_iterator it_1 = row1_.begin();
   typename ColumnsMap::const_iterator it_2 = row2_.begin();
 
@@ -330,7 +332,9 @@ SparseMatrixBlock SparseBlockMatrix::scalarProd(const ColumnsMap& row1_,
 }
 
 bool SparseBlockMatrix::scalarProdStructure(const ColumnsMap& row1_,
-    const ColumnsMap& row2_, const int max_pos_) const {
+                                            const ColumnsMap& row2_,
+                                            const int max_pos_) const {
+
   typename ColumnsMap::const_iterator it_1 = row1_.begin();
   typename ColumnsMap::const_iterator it_2 = row2_.begin();
   while(it_1 != row1_.end() && it_2 != row2_.end()){

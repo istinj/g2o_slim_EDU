@@ -15,6 +15,8 @@ SparseOptimizer::SparseOptimizer() {
   _kernel_threshold = 100.0;
   _convergence_threshold = 1e-5;
   _num_iterations = 100;
+  _total_chi = 0.0;
+  _total_inliers = 0;
 }
 
 SparseOptimizer::~SparseOptimizer() {
@@ -26,11 +28,12 @@ SparseOptimizer::~SparseOptimizer() {
 }
 
 void SparseOptimizer::init(const VerticesContainer& vertices_,
-    const EdgesContainer& edges_){
+                           const EdgesContainer& edges_){
+  cerr << BOLDWHITE << "Allocating memory for the optimizer" << endl << RESET;
+
   _vertices = vertices_;
   _edges = edges_;
 
-  cerr << BOLDWHITE << "Allocating memory for the optimizer" << endl << RESET;
   //! Create the Factors
   HessianBlocksMap::iterator f_it;
   for (int i = 0; i < _edges.size(); ++i) {
@@ -44,14 +47,12 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
     _factors.push_back(Factor(i_idx, j_idx));
   }
 
-  //! TODO REORDER THE FACTORS
-  //! FactorsVector ordered_factor = reorder(_factors, ordering_type);
-  //! _jacobians_workspace.allocate(ordered_factors); -> also in the linearize function
+  //! Allocate memory for the Hessian
   _jacobians_workspace.allocate(_factors);
-
+  //! Create the sparseblockmatrix using the jacbian_workspace as memory
   _H = SparseBlockMatrix(_vertices.size(), _jacobians_workspace);
 
-  //! Allocate Matrices
+  //! Allocate other matrices
   _H.allocateCholesky(_L);
   _L.allocateTransposed(_U);
 
@@ -71,24 +72,24 @@ void SparseOptimizer::init(const VerticesContainer& vertices_,
 
 
 void SparseOptimizer::converge(void) {
-  real_ total_chi = 0.0;
   real_ prev_total_chi = 0.0;
-  int total_inliers = 0;
   int iter_cnt = 0;
+  bool suppress_outliers = false;
 
   for (int i = 0; i < _num_iterations; ++i) {
-    oneStep(total_chi, total_inliers);
+    oneStep(suppress_outliers);
     ++iter_cnt;
 
-    const real_ delta_total_chi = fabs(prev_total_chi - total_chi);
+    const real_ delta_total_chi = fabs(prev_total_chi - _total_chi);
     if (_kernel_threshold > delta_total_chi) {
-      oneStep(total_chi, total_inliers);
-      oneStep(total_chi, total_inliers);
-      oneStep(total_chi, total_inliers);
+      suppress_outliers = true;
+      oneStep(suppress_outliers);
+      oneStep(suppress_outliers);
+      oneStep(suppress_outliers);
       iter_cnt += 3;
       break;
     } else {
-      prev_total_chi = total_chi;
+      prev_total_chi = _total_chi;
     }
 
     if ( i == _num_iterations - 1) {
@@ -99,15 +100,15 @@ void SparseOptimizer::converge(void) {
   cerr << BOLDGREEN << "System converged in " << iter_cnt << " iterations" << RESET << endl;
 }
 
-void SparseOptimizer::oneStep(real_& step_chi, int& step_inliers){
+void SparseOptimizer::oneStep(bool suppress_outliers_){
   std::chrono::high_resolution_clock::time_point t_0, t_1;
   t_0 = std::chrono::high_resolution_clock::now();
-  step_chi = 0.0;
-  step_inliers = 0;
+  _total_chi = 0.0;
+  _total_inliers = 0;
 
-  linearizeFactor(step_chi, step_inliers);
-  cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << step_inliers << "\t" << BOLDWHITE
-      << "chi pose-pose = " << BOLDBLUE<< step_chi << RESET << endl;
+  linearizeFactor(_total_chi, _total_inliers, suppress_outliers_);
+  cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << _total_inliers << "\t" << BOLDWHITE
+      << "chi pose-pose = " << BOLDBLUE<< _total_chi << RESET << endl;
 
   //! Build and solve the linear system HdX = B;
   _jacobians_workspace(0,0) += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
@@ -156,7 +157,9 @@ void SparseOptimizer::updateVertices(void) {
 }
 
 
-void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
+void SparseOptimizer::linearizeFactor(real_& total_chi_,
+                                      int& inliers_,
+                                      bool suppress_outliers_){
   total_chi_ = 0.0;
   inliers_ = 0;
 
@@ -185,6 +188,8 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
     //! Robust kernel
     real_ chi = e.transpose() * omega * e;
     if(chi > _kernel_threshold) {
+      if (suppress_outliers_)
+        continue;
       omega *= sqrtf(_kernel_threshold / chi);
       chi = _kernel_threshold;
     } else {
@@ -210,8 +215,12 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_, int& inliers_){
 }
 
 
-void SparseOptimizer::errorAndJacobian(const Pose& xi, const Pose& xj,const PoseMeas& zr,
-    Vector12& error, Matrix12_6& Ji, Matrix12_6& Jj){
+void SparseOptimizer::errorAndJacobian(const Pose& xi,
+                                       const Pose& xj,
+                                       const PoseMeas& zr,
+                                       Vector12& error,
+                                       Matrix12_6& Ji,
+                                       Matrix12_6& Jj) {
   Matrix3 Rx0, Ry0, Rz0;
   Rx0 << 0,0,0,  0,0,-1,  0,1,0;
   Ry0 << 0,0,1,  0,0,0,   -1,0,0;
