@@ -17,7 +17,7 @@ namespace sparse {
 
 struct DenseBlockVector {
   int size;
-  DenseVectorContainer blocks;
+  IntDenseVectorBlockPtrMap blocks;
 
   inline void reset(void){
     for (int i = 0; i < size; ++i) {
@@ -40,10 +40,7 @@ struct DenseBlockVector {
   }
 };
 
-typedef std::vector<sparse::Vertex> VerticesVector;
-
-typedef std::map<int, SparseMatrixBlock*, std::less<int>,
-        Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > IntSparseMatrixBlockPtrMap;
+typedef std::vector<Vertex> VerticesVector;
 typedef std::vector<IntSparseMatrixBlockPtrMap> IntSparseMatrixBlockPtrMapVector;
 typedef std::vector<Factor> FactorsVector;
 
@@ -94,12 +91,12 @@ public:
   cs* toCs(void) const;
 
 protected:
-  SparseMatrixBlock scalarProd(const IntSparseMatrixBlockPtrMap& row1_,
-                               const IntSparseMatrixBlockPtrMap& row2_,
-                               const int max_pos_) const;
-  bool scalarProdStructure(const IntSparseMatrixBlockPtrMap& row1_,
-                           const IntSparseMatrixBlockPtrMap& row2_,
-                           const int max_pos_) const;
+  SparseMatrixBlock _scalarProd(const IntSparseMatrixBlockPtrMap& row1_,
+                                const IntSparseMatrixBlockPtrMap& row2_,
+                                const int max_pos_) const;
+  bool _scalarProdStructure(const IntSparseMatrixBlockPtrMap& row1_,
+                            const IntSparseMatrixBlockPtrMap& row2_,
+                            const int max_pos_) const;
 
   int _num_block_rows;
   int _num_block_cols;
@@ -110,8 +107,6 @@ protected:
   IntSparseMatrixBlockPtrMapVector _block_rows;
   Workspace _matrix_workspace;
 
-
-  //! TODO 	ORDERING
   //! TODO	Method to remove row/column
   //! TODO	Operator() overload
 

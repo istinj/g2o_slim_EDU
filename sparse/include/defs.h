@@ -29,23 +29,23 @@
 
 #define PRINT_VAR(x) std::cerr << #x << std::endl << x << std::endl;
 
-typedef double real_;
+typedef double Real;
 
-typedef Eigen::Matrix<real_, 2, 2> Matrix2;
-typedef Eigen::Matrix<real_, 3, 3> Matrix3;
-typedef Eigen::Matrix<real_, 6, 6> Matrix6;
-typedef Eigen::Matrix<real_, 3, 6> Matrix3_6;
-typedef Eigen::Matrix<real_, 6, 3> Matrix6_3;
-typedef Eigen::Matrix<real_, 2, 3> Matrix2_3;
-typedef Eigen::Matrix<real_, 2, 6> Matrix2_6;
-typedef Eigen::Matrix<real_, 12, 6> Matrix12_6;
-typedef Eigen::Matrix<real_, 6, 1> Vector6;
-typedef Eigen::Matrix<real_, 3, 1> Vector3;
-typedef Eigen::Matrix<real_, 2, 1> Vector2;
-typedef Eigen::Matrix<real_, 12, 1> Vector12;
-typedef Eigen::Transform<real_,3,Eigen::Isometry> Isometry3;
-typedef Eigen::AngleAxis<real_> AngleAxisReal;
-typedef Eigen::Quaternion<real_> QuaternionReal;
+typedef Eigen::Matrix<Real, 2, 2> Matrix2;
+typedef Eigen::Matrix<Real, 3, 3> Matrix3;
+typedef Eigen::Matrix<Real, 6, 6> Matrix6;
+typedef Eigen::Matrix<Real, 3, 6> Matrix3_6;
+typedef Eigen::Matrix<Real, 6, 3> Matrix6_3;
+typedef Eigen::Matrix<Real, 2, 3> Matrix2_3;
+typedef Eigen::Matrix<Real, 2, 6> Matrix2_6;
+typedef Eigen::Matrix<Real, 12, 6> Matrix12_6;
+typedef Eigen::Matrix<Real, 6, 1> Vector6;
+typedef Eigen::Matrix<Real, 3, 1> Vector3;
+typedef Eigen::Matrix<Real, 2, 1> Vector2;
+typedef Eigen::Matrix<Real, 12, 1> Vector12;
+typedef Eigen::Transform<Real,3,Eigen::Isometry> Isometry3;
+typedef Eigen::AngleAxis<Real> AngleAxisReal;
+typedef Eigen::Quaternion<Real> QuaternionReal;
 
 typedef Vector3 PointMeas;
 typedef Isometry3 PoseMeas;

@@ -21,7 +21,6 @@ namespace sparse {
 typedef std::vector<sparse::Vertex> VerticesVector;
 typedef std::vector<sparse::Edge> EdgesContainer;
 typedef std::vector<Factor> FactorsVector;
-typedef BlocksMap HessianBlocksMap;
 
 class SparseOptimizer {
 public:
@@ -31,21 +30,21 @@ public:
   //! This will allocate all the memory that will contain the Hessian, its Cholesky and the transposed
   //! of the Cholesky.
   void init(const VerticesVector& vertices_,
-            const EdgesContainer& edges_);
-  //! This function acutally computes all the stuff allocated during the INIT function
-  //|! TODO: converge with prev_error - total_error
+            const EdgesContainer& edges_,
+            const SolverType& type_);
   void converge(void);
   void updateGraph(Graph& graph_);
 
 protected:
-  void computeAMDPermutation(IntVector& permutation_AMD_,
+  void _computeAMDPermutation(IntVector& permutation_AMD_,
                              SparseBlockMatrix& matrix_);
-  void oneStep(bool suppress_outliers_);
-  void updateVertices(void);
-  void linearizeFactor(real_& total_chi,
+  //! This function acutally computes all the stuff allocated during the INIT function
+  void _oneStep(bool suppress_outliers_);
+  void _updateVertices(void);
+  void _linearizeFactor(Real& total_chi,
                        int& inliers_,
                        bool suppress_outliers_);
-  void errorAndJacobian(const Pose& xi,
+  void _errorAndJacobian(const Pose& xi,
                         const Pose& xj,
                         const PoseMeas& zr,
                         Vector12& error,
@@ -55,14 +54,9 @@ protected:
   VerticesVector _vertices;
   EdgesContainer _edges;
 
-  //! TODO: 	is this container for the matrices good? Do i need something more complex?
   Workspace _jacobians_workspace;
-  //! TODO:	A Factor contain just indices of the poses involved in the current factor
-  //!			determined by an edge (it creates 3/4 blocks of the H)
   FactorsVector _factors;
-  //! TODO:	How to create the ordered matrix given the blocks_pull and the factors?
-  //!			Do I need to modify those two structures??
-  IntVector _hessian_permutation;
+  IntVector _permutation;
 
   DenseBlockVector _B;
   DenseBlockVector _Y;
@@ -72,14 +66,11 @@ protected:
   SparseBlockMatrix _L;
   SparseBlockMatrix _U;
 
-  real_ _kernel_threshold;
-  real_ _convergence_threshold;
-  real_ _total_chi;
+  Real _kernel_threshold;
+  Real _convergence_threshold;
+  Real _total_chi;
   int _total_inliers;
   int _num_iterations;
-  //! TODO:	How to generate orderigs? How is structured the vector of ints containing
-  //! 		the ordering??
-  //! TODO	Initialize memory for L and U in the init function.
 
   inline Matrix3 skew(const Vector3& p)
   {

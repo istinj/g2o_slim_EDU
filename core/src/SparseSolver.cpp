@@ -25,7 +25,7 @@ SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
 		const LandmarkPointsContainer& land_points_,
 		const PosePoseEdgeContainer& zr_,
 		const PosePointEdgeContainer& zl_,
-		const real_ l_, const real_ epsilon_){
+		const Real l_, const Real epsilon_){
 	_robot_poses = robot_poses_;
 	_land_points = land_points_;
 	_Zr = zr_;
@@ -36,7 +36,7 @@ SparseSolver::SparseSolver(const PosesContainer& robot_poses_,
 	//! TODO how to solve this warning?
 }
 
-bool SparseSolver::linearizePosePoint(real_& total_chi_, int& inliers_){
+bool SparseSolver::linearizePosePoint(Real& total_chi_, int& inliers_){
 	Matrix3 Jl = Matrix3::Zero();
 	Matrix3_6 Jr = Matrix3_6::Zero();
 	Vector3 e = Vector3::Zero();
@@ -64,7 +64,7 @@ bool SparseSolver::linearizePosePoint(real_& total_chi_, int& inliers_){
 				it->data(),
 				e, Jl, Jr);
 
-		real_ chi = e.transpose() * e;
+		Real chi = e.transpose() * e;
 		if(chi > _threshold){
 			e *= sqrt(_threshold/chi);
 			chi = _threshold;
@@ -107,7 +107,7 @@ bool SparseSolver::linearizePosePoint(real_& total_chi_, int& inliers_){
 	return true;
 }
 
-void SparseSolver::linearizePosePose(real_& total_chi_, int& inliers_) {
+void SparseSolver::linearizePosePose(Real& total_chi_, int& inliers_) {
 	total_chi_ = 0.0;
 	inliers_ = 0;
 
@@ -115,7 +115,7 @@ void SparseSolver::linearizePosePose(real_& total_chi_, int& inliers_) {
 	Matrix12_6 Jj = Matrix12_6::Zero();
 	Vector12 e = Vector12::Zero();
 
-	Matrix<real_, 12, 12> Omega = Matrix<real_, 12, 12>::Identity();
+	Matrix<Real, 12, 12> Omega = Matrix<Real, 12, 12>::Identity();
 	Omega.block<9,9>(0,0) *= 1000.0;
 
 	//! For each Pose-Pose edge
@@ -140,7 +140,7 @@ void SparseSolver::linearizePosePose(real_& total_chi_, int& inliers_) {
 				e, Ji, Jj);
 
 		//! Evaluate statistics
-		real_ chi = e.transpose() * Omega * e;
+		Real chi = e.transpose() * Omega * e;
 		if (chi > _threshold) {
 			Omega *= sqrt(_threshold / chi);
 			chi = _threshold;
@@ -253,7 +253,7 @@ void SparseSolver::errorAndJacobianPosePose(const Pose& xi,
 	Matrix3 dR_y = Ri.transpose() * _Ry0 * Rj;
 	Matrix3 dR_z = Ri.transpose() * _Rz0 * Rj;
 
-	Matrix<real_, 9, 1> dr_x_flattened, dr_y_flattened, dr_z_flattened;
+	Matrix<Real, 9, 1> dr_x_flattened, dr_y_flattened, dr_z_flattened;
 	dr_x_flattened << dR_x.col(0), dR_x.col(1), dR_x.col(2);
 	dr_y_flattened << dR_y.col(0), dR_y.col(1), dR_y.col(2);
 	dr_z_flattened << dR_z.col(0), dR_z.col(1), dR_z.col(2);
@@ -293,7 +293,7 @@ void SparseSolver::updateGraph(Graph& graph_){
 
 
 void SparseSolver::oneStep(void){
-	real_ step_chi;
+	Real step_chi;
 	int step_inliers;
 
 	//! Allocate memory for Hessian and B

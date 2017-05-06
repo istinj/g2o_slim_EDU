@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]){
   graph->loadFromG2OFile(dataset_path);
 
   sparse::SparseOptimizer* optimizer = new sparse::SparseOptimizer();
-  optimizer->init(graph->vertices(), graph->edges());
+  optimizer->init(graph->vertices(), graph->edges(), PLAIN);
 
   optimizer->converge();
 

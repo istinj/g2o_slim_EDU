@@ -129,7 +129,7 @@ void SparseBlockMatrix::reorder(const IntVector& permutation_,
 //  }
 
   //! Set again the block-pointers to the right memory blocks
-  for (int i = 0; i < factors_.size(); ++i) {
+  for (Counter i = 0; i < factors_.size(); ++i) {
     const Factor& factor = factors_[i];
     int from_idx = permutation_[factor.from];
     int to_idx = permutation_[factor.to];
@@ -140,10 +140,10 @@ void SparseBlockMatrix::reorder(const IntVector& permutation_,
     int old_a = std::min(factor.from, factor.to);
     int old_b = std::max(factor.from, factor.to);
 
-    setBlock(a,a,workspace_.memory_map.at(Association(old_a,old_a)));
-    setBlock(a,b,workspace_.memory_map.at(Association(old_a,old_b)));
-    setBlock(b,a,workspace_.memory_map.at(Association(old_b,old_a)));
-    setBlock(b,b,workspace_.memory_map.at(Association(old_b,old_b)));
+    setBlock(a,a,workspace_.memory_map.at(IntPair(old_a,old_a)));
+    setBlock(a,b,workspace_.memory_map.at(IntPair(old_a,old_b)));
+    setBlock(b,a,workspace_.memory_map.at(IntPair(old_b,old_a)));
+    setBlock(b,b,workspace_.memory_map.at(IntPair(old_b,old_b)));
   }
 }
 
@@ -155,10 +155,10 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
   }
 
   cholesky_ = SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
-  std::vector<Association> indices;
+  std::vector<IntPair> indices;
 
   int nnz = 0;
-  for (int r = 0; r < _num_block_rows; ++r) {
+  for (Counter r = 0; r < _num_block_rows; ++r) {
     const IntSparseMatrixBlockPtrMap& block_row = _block_rows[r];
     IntSparseMatrixBlockPtrMap& chol_block_row = cholesky_._block_rows[r];
 
@@ -166,18 +166,18 @@ void SparseBlockMatrix::allocateCholesky(SparseBlockMatrix& cholesky_) {
       throw std::runtime_error("Something went wrong during the cholesky allocation");
     int starting_col_idx = block_row.begin()->first;
 
-    for (int c = starting_col_idx; c <= r; ++c) {
+    for (Counter c = starting_col_idx; c <= r; ++c) {
       bool not_empty = false;
       if(isNonZeroBlock(r,c)){
         not_empty = true;
       } else {
         IntSparseMatrixBlockPtrMap& chol_upper_row = cholesky_._block_rows[c];
-        not_empty = scalarProdStructure(chol_block_row, chol_upper_row, c-1);
+        not_empty = _scalarProdStructure(chol_block_row, chol_upper_row, c-1);
       }
       if(not_empty) {
-        indices.push_back(Association(r,c));
+        indices.push_back(IntPair(r,c));
         cholesky_._matrix_workspace.allocateOneBlock(r,c);
-        cholesky_.setBlock(r,c,cholesky_._matrix_workspace.memory_map[Association(r,c)]);
+        cholesky_.setBlock(r,c,cholesky_._matrix_workspace.memory_map[IntPair(r,c)]);
         ++nnz;
       }
     }
@@ -192,7 +192,7 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
 
   std::vector<SparseMatrixBlock, Eigen::aligned_allocator<SparseMatrixBlock> > inverse_diag_blocks(_num_block_rows);
 
-  for (int r = 0; r < _num_block_rows; ++r) {
+  for (Counter r = 0; r < _num_block_rows; ++r) {
     const IntSparseMatrixBlockPtrMap& block_row = _block_rows[r];
     IntSparseMatrixBlockPtrMap& chol_block_row = cholesky_._block_rows[r];
 
@@ -200,10 +200,10 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
       throw std::runtime_error("Something went wrong during the cholesky computation");
     int starting_col_idx = block_row.begin()->first;
 
-    for (int c = starting_col_idx; c <= r; ++c) {
+    for (Counter c = starting_col_idx; c <= r; ++c) {
 
       //! If this block has not been allocated then skip.
-      if(cholesky_._matrix_workspace.memory_map[Association(r,c)] == nullptr)
+      if(cholesky_._matrix_workspace.memory_map[IntPair(r,c)] == nullptr)
         continue;
 
       SparseMatrixBlock& chol_computed_block = cholesky_._matrix_workspace(r,c);
@@ -211,14 +211,14 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
       chol_computed_block.setZero();
 
       const IntSparseMatrixBlockPtrMap& chol_upper_row = cholesky_._block_rows[c];
-      accumulator = getBlock(r,c) - scalarProd(chol_block_row, chol_upper_row, c-1);
+      accumulator = getBlock(r,c) - _scalarProd(chol_block_row, chol_upper_row, c-1);
       if (r == c) {
         chol_computed_block = accumulator.llt().matrixL();
         inverse_diag_blocks[r] = chol_computed_block.inverse().transpose();
       } else {
         chol_computed_block = accumulator * inverse_diag_blocks[c];
       }
-      chol_block_row[c] = cholesky_._matrix_workspace.memory_map.at(Association(r,c));
+      chol_block_row[c] = cholesky_._matrix_workspace.memory_map.at(IntPair(r,c));
     }
   }
 }
@@ -226,21 +226,21 @@ void SparseBlockMatrix::computeCholesky(SparseBlockMatrix& cholesky_) {
 
 void SparseBlockMatrix::allocateTransposed(SparseBlockMatrix& transposed_) {
   transposed_ = SparseBlockMatrix(_num_block_rows, _num_block_cols, true);
-  std::vector<Association> indices;
+  std::vector<IntPair> indices;
 
-  for (int r = 0; r < _num_block_rows; ++r) {
+  for (Counter r = 0; r < _num_block_rows; ++r) {
     const IntSparseMatrixBlockPtrMap& block_row = _block_rows[r];
     if(block_row.empty())
       continue;
 //      throw std::runtime_error("Something went wrong during the allocation of the transpose");
-    for (int c = 0; c < _num_block_cols; ++c) {
+    for (Counter c = 0; c < _num_block_cols; ++c) {
       IntSparseMatrixBlockPtrMap& transposed_block_row = transposed_._block_rows[c];
 
       IntSparseMatrixBlockPtrMap::const_iterator it = block_row.find(c);
       if (it == block_row.end())
         continue;
       else{
-        indices.push_back(Association(c,r));
+        indices.push_back(IntPair(c,r));
       }
     }
   }
@@ -254,12 +254,12 @@ void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& transposed_) {
   if (!transposed_._is_initialized)
     throw std::runtime_error("Argument matrix must be already initialized");
 
-  for (int r = 0; r < _num_block_rows; ++r) {
+  for (Counter r = 0; r < _num_block_rows; ++r) {
     const IntSparseMatrixBlockPtrMap& block_row = _block_rows[r];
     if(block_row.empty())
       continue;
 //      throw std::runtime_error("Something went wrong during the transpose update");
-    for (int c = 0; c < _num_block_cols; ++c) {
+    for (Counter c = 0; c < _num_block_cols; ++c) {
       IntSparseMatrixBlockPtrMap& transposed_block_row = transposed_._block_rows[c];
 
       IntSparseMatrixBlockPtrMap::const_iterator it = block_row.find(c);
@@ -267,7 +267,7 @@ void SparseBlockMatrix::computeTranspose(SparseBlockMatrix& transposed_) {
         continue;
       else{
         transposed_._matrix_workspace(c,r) = it->second->transpose();
-        transposed_block_row[r] = transposed_._matrix_workspace.memory_map[Association(c,r)];
+        transposed_block_row[r] = transposed_._matrix_workspace.memory_map[IntPair(c,r)];
       }
     }
   }
@@ -284,10 +284,10 @@ void SparseBlockMatrix::forwSub(DenseBlockVector& rhs_vector_,
     result_.init(rhs_vector_.size);
   }
 
-  for (int r = 0; r < _num_block_rows; ++r) {
+  for (Counter r = 0; r < _num_block_rows; ++r) {
     DenseVectorBlock& res_block = (*result_.blocks[r]);
     res_block = (*rhs_vector_.blocks[r]);
-    for (int c = 0; c < r; ++c) {
+    for (Counter c = 0; c < r; ++c) {
       res_block.noalias() -= getBlock(r,c) * (*result_.blocks[c]);
     }
     res_block = getBlock(r,r).inverse() * res_block;
@@ -305,10 +305,10 @@ void SparseBlockMatrix::backSub(DenseBlockVector& rhs_vector_,
     result_.init(rhs_vector_.size);
   }
 
-  for (int r = _num_block_rows - 1; r >= 0; --r) {
+  for (Counter r = _num_block_rows - 1; r >= 0; --r) {
     DenseVectorBlock& res_block = (*result_.blocks[r]);
     res_block = (*rhs_vector_.blocks[r]);
-    for (int c = r + 1; c < _num_block_cols; ++c) {
+    for (Counter c = r + 1; c < _num_block_cols; ++c) {
       res_block.noalias() -= getBlock(r,c) * (*result_.blocks[c]);
     }
     res_block = getBlock(r,r).inverse() * res_block;
@@ -324,7 +324,7 @@ cs* SparseBlockMatrix::toCs(void) const {
   double* values = transposed_matrix->x;
 
   int counter=0;
-  for (size_t r = 0; r < _num_block_rows; ++r){
+  for (Counter r = 0; r < _num_block_rows; ++r){
     *row_pointers = counter;
     const IntSparseMatrixBlockPtrMap& row = _block_rows[r];
     for (IntSparseMatrixBlockPtrMap::const_iterator it = row.begin(); it != row.end(); ++it) {
@@ -357,14 +357,14 @@ void SparseBlockMatrix::printBlock(const int r_, const int c_) const {
 
 void SparseBlockMatrix::printMatrix(void) const {
   cerr << BOLDWHITE <<  "Printing sparse matrix..." << RESET << endl;
-  for (int i = 0; i < _num_block_rows; ++i) {
-    for (int j = 0; j < _num_block_cols; ++j)
+  for (Counter i = 0; i < _num_block_rows; ++i) {
+    for (Counter j = 0; j < _num_block_cols; ++j)
       if(isNonZeroBlock(i,j))
         printBlock(i,j);
   }
 }
 
-SparseMatrixBlock SparseBlockMatrix::scalarProd(const IntSparseMatrixBlockPtrMap& row1_,
+SparseMatrixBlock SparseBlockMatrix::_scalarProd(const IntSparseMatrixBlockPtrMap& row1_,
                                                 const IntSparseMatrixBlockPtrMap& row2_,
                                                 const int max_pos_) const {
 
@@ -391,7 +391,7 @@ SparseMatrixBlock SparseBlockMatrix::scalarProd(const IntSparseMatrixBlockPtrMap
   return result;
 }
 
-bool SparseBlockMatrix::scalarProdStructure(const IntSparseMatrixBlockPtrMap& row1_,
+bool SparseBlockMatrix::_scalarProdStructure(const IntSparseMatrixBlockPtrMap& row1_,
                                             const IntSparseMatrixBlockPtrMap& row2_,
                                             const int max_pos_) const {
 
@@ -415,8 +415,8 @@ bool SparseBlockMatrix::scalarProdStructure(const IntSparseMatrixBlockPtrMap& ro
 
 std::ostream& operator <<(std::ostream& os, const SparseBlockMatrix& m){
 //  os << m.numRows() << " " << m.numCols() << std::endl;
-  for (int r=0; r<m.numRows(); r++){
-    for (int c=0; c<m.numCols(); c++){
+  for (Counter r=0; r<m.numRows(); r++){
+    for (Counter c=0; c<m.numCols(); c++){
       if(m.isNonZeroBlock(r,c))
         os << 1 << " ";
       else

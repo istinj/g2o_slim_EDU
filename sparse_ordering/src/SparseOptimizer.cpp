@@ -28,15 +28,21 @@ SparseOptimizer::~SparseOptimizer() {
 }
 
 void SparseOptimizer::init(const VerticesVector& vertices_,
-                           const EdgesContainer& edges_){
+                           const EdgesContainer& edges_,
+                           const SolverType& type_){
+  if (type_ != AMD && type_ != PLAIN) {
+    cerr << BOLDRED << "You must specify a SolverType as third argument, that could be:" << endl;
+    cerr << BOLDYELLOW << "- PLAIN" << endl << "- AMD" << endl;
+    cerr << BOLDRED << "Aborting" << endl << RESET;
+    throw std::runtime_error("Unsupported Solver Type");
+  }
   cerr << BOLDWHITE << "Allocating memory for the optimizer" << endl << RESET;
 
   _vertices = vertices_;
   _edges = edges_;
 
   //! Create the Factors
-  HessianBlocksMap::iterator f_it;
-  for (int i = 0; i < _edges.size(); ++i) {
+  for (Counter i = 0; i < _edges.size(); ++i) {
     VerticesVector::const_iterator pose_i = std::find(_vertices.begin(),
         _vertices.end(), _edges[i].association().first);
     VerticesVector::const_iterator pose_j = std::find(_vertices.begin(),
@@ -58,9 +64,12 @@ void SparseOptimizer::init(const VerticesVector& vertices_,
     file_plain << _H << endl;
     file_plain.close();
   }
-  computeAMDPermutation(_hessian_permutation, _H);
-  _H.reorder(_hessian_permutation, _jacobians_workspace, _factors);
 
+  //! Hessian AMD permutation
+  if (type_ == AMD) {
+    _computeAMDPermutation(_permutation, _H);
+    _H.reorder(_permutation, _jacobians_workspace, _factors);
+  }
 
   if (exp) {
     ofstream file_amd("../data/h_AMD.txt");
@@ -86,10 +95,10 @@ void SparseOptimizer::init(const VerticesVector& vertices_,
     file_u.close();
   }
 
-  real_ fill_in_H = (_vertices.size()+(_edges.size()*2))/(real_)(_vertices.size()*_vertices.size());
-  real_ rate = _L.nnz()/(real_)(_H.nnz() - _factors.size());
+  Real fill_in_H = (_vertices.size()+(_edges.size()*2))/(Real)(_vertices.size()*_vertices.size());
+  Real rate = _L.nnz()/(Real)(_H.nnz() - _factors.size());
   cerr << BOLDWHITE << "Hessian fill-in rate: \t" << BOLDGREEN << fill_in_H << endl;
-  cerr << BOLDWHITE << "Cholesky fill-in rate: \t" << BOLDGREEN << rate * fill_in_H << endl << endl;
+  cerr << BOLDWHITE << "Cholesky fill-in rate: \t" << BOLDGREEN << rate * fill_in_H << endl << endl << RESET;
 
   _jacobians_workspace.clear();
 
@@ -104,20 +113,20 @@ void SparseOptimizer::init(const VerticesVector& vertices_,
 
 
 void SparseOptimizer::converge(void) {
-  real_ prev_total_chi = 0.0;
+  Real prev_total_chi = 0.0;
   int iter_cnt = 0;
   bool suppress_outliers = false;
 
-  for (int i = 0; i < _num_iterations; ++i) {
-    oneStep(suppress_outliers);
+  for (Counter i = 0; i < _num_iterations; ++i) {
+    _oneStep(suppress_outliers);
     ++iter_cnt;
 
-    const real_ delta_total_chi = fabs(prev_total_chi - _total_chi);
+    const Real delta_total_chi = fabs(prev_total_chi - _total_chi);
     if (_kernel_threshold > delta_total_chi) {
       suppress_outliers = true;
-      oneStep(suppress_outliers);
-      oneStep(suppress_outliers);
-      oneStep(suppress_outliers);
+      _oneStep(suppress_outliers);
+      _oneStep(suppress_outliers);
+      _oneStep(suppress_outliers);
       iter_cnt += 3;
       break;
     } else {
@@ -125,27 +134,27 @@ void SparseOptimizer::converge(void) {
     }
 
     if ( i == _num_iterations - 1) {
-      cerr << BOLDRED << "System did not converged| total error: " << delta_total_chi << RESET << endl;
+      cerr << BOLDRED << "System did not converge | " << UNDERLINEDRED << "total error: " << delta_total_chi << RESET << endl;
       return;
     }
   }
-  cerr << BOLDGREEN << "System converged in " << iter_cnt << " iterations" << RESET << endl;
+  cerr << BOLDWHITE << "System converged in " << UNDERLINEDGREEN << iter_cnt << " iterations" << RESET << endl;
 }
 
-void SparseOptimizer::oneStep(bool suppress_outliers_){
+void SparseOptimizer::_oneStep(bool suppress_outliers_){
   std::chrono::high_resolution_clock::time_point t_0, t_1;
   t_0 = std::chrono::high_resolution_clock::now();
   _total_chi = 0.0;
   _total_inliers = 0;
 
-  linearizeFactor(_total_chi, _total_inliers, suppress_outliers_);
+  _linearizeFactor(_total_chi, _total_inliers, suppress_outliers_);
   cerr << BOLDWHITE << "inliers pose-pose = " << BOLDBLUE << _total_inliers << "\t" << BOLDWHITE
       << "chi pose-pose = " << BOLDBLUE<< _total_chi << RESET << endl;
 
   //! Build and solve the linear system HdX = B;
   _jacobians_workspace(0,0) += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
+//  _jacobians_workspace(_permutation[0],_permutation[0]) += SparseMatrixBlock::Identity() * 1000000.0; //! Not good but ok for now
 
-  _U.printBlock(2,2);
   _H.computeCholesky(_L);
   _L.computeTranspose(_U);
 
@@ -153,7 +162,7 @@ void SparseOptimizer::oneStep(bool suppress_outliers_){
   _L.forwSub(_B, _Y);
   _U.backSub(_Y, _dX);
 
-  updateVertices();
+  _updateVertices();
 
   //! cleaning
   _dX.clear();
@@ -162,7 +171,7 @@ void SparseOptimizer::oneStep(bool suppress_outliers_){
 
   _jacobians_workspace.clear();
   t_1 = std::chrono::high_resolution_clock::now();
-  double execution_time = (std::chrono::duration_cast<std::chrono::microseconds>(t_1 - t_0).count() / 1e06);
+  Real execution_time = (std::chrono::duration_cast<std::chrono::microseconds>(t_1 - t_0).count() / 1e06);
   std::cerr << BOLDWHITE << "Step time:\t" << BOLDGREEN << execution_time << "s" << std::endl << RESET;
 }
 
@@ -173,14 +182,14 @@ void SparseOptimizer::updateGraph(Graph& graph_) {
   graph_.updateVertices(_vertices);
 }
 
-void SparseOptimizer::computeAMDPermutation(IntVector& permutation_AMD_,
+void SparseOptimizer::_computeAMDPermutation(IntVector& permutation_AMD_,
                                             SparseBlockMatrix& matrix_) {
   cs* cs_matrix = matrix_.toCs();
   int* amd_odering = cs_amd(1,cs_matrix);
 
   permutation_AMD_.resize(matrix_.numRows());
 
-  for (int i = 0; i < matrix_.numRows(); ++i) {
+  for (Counter i = 0; i < matrix_.numRows(); ++i) {
     permutation_AMD_[amd_odering[i]] = i;
   }
 
@@ -189,9 +198,9 @@ void SparseOptimizer::computeAMDPermutation(IntVector& permutation_AMD_,
 }
 
 
-void SparseOptimizer::updateVertices(void) {
+void SparseOptimizer::_updateVertices(void) {
   Pose new_pose;
-  for (int i = 0; i < _dX.size; ++i) {
+  for (Counter i = 0; i < _dX.size; ++i) {
     new_pose.setIdentity();
     new_pose = v2t(-(*_dX.blocks[i])) * _vertices[i].data();
     _vertices[i].setData(new_pose);
@@ -199,7 +208,7 @@ void SparseOptimizer::updateVertices(void) {
 }
 
 
-void SparseOptimizer::linearizeFactor(real_& total_chi_,
+void SparseOptimizer::_linearizeFactor(Real& total_chi_,
                                       int& inliers_,
                                       bool suppress_outliers_){
   total_chi_ = 0.0;
@@ -213,7 +222,7 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_,
   Vector12 e = Vector12::Zero();
 
   //! For each edge, compute - numerically - the relative factor
-  for (int i = 0; i < _edges.size(); ++i) {
+  for (Counter i = 0; i < _edges.size(); ++i) {
     const Edge& edge = _edges[i];
     VerticesVector::const_iterator pose_i = std::find(_vertices.begin(),
         _vertices.end(), edge.association().first);
@@ -224,11 +233,11 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_,
     int j_idx = pose_j->index();
 
     //! Compute error and jacobian
-    errorAndJacobian(pose_i->data(), pose_j->data(), _edges[i].data(),
+    _errorAndJacobian(pose_i->data(), pose_j->data(), _edges[i].data(),
         e, Ji, Jj);
 
     //! Robust kernel
-    real_ chi = e.transpose() * omega * e;
+    Real chi = e.transpose() * omega * e;
     if(chi > _kernel_threshold) {
       if (suppress_outliers_)
         continue;
@@ -248,16 +257,24 @@ void SparseOptimizer::linearizeFactor(real_& total_chi_,
     H_ji.noalias() += Jj.transpose() * omega * Ji;
     H_jj.noalias() += Jj.transpose() * omega * Jj;
 
+    //! REORDER OF THE B Vector??
     //! Compute the factor contribution to the rhs vector
-    DenseVectorBlock& b_i = (*_B.blocks[i_idx]);
-    DenseVectorBlock& b_j = (*_B.blocks[j_idx]);
-    b_i.noalias() +=  Ji.transpose() * omega * e;
-    b_j.noalias() +=  Jj.transpose() * omega * e;
+    if (_permutation.size() != 0) {
+      DenseVectorBlock& b_i = (*_B.blocks[_permutation[i_idx]]);
+      DenseVectorBlock& b_j = (*_B.blocks[_permutation[j_idx]]);
+      b_i.noalias() +=  Ji.transpose() * omega * e;
+      b_j.noalias() +=  Jj.transpose() * omega * e;
+    } else {
+      DenseVectorBlock& b_i = (*_B.blocks[i_idx]);
+      DenseVectorBlock& b_j = (*_B.blocks[j_idx]);
+      b_i.noalias() +=  Ji.transpose() * omega * e;
+      b_j.noalias() +=  Jj.transpose() * omega * e;
+    }
   }
 }
 
 
-void SparseOptimizer::errorAndJacobian(const Pose& xi,
+void SparseOptimizer::_errorAndJacobian(const Pose& xi,
                                        const Pose& xj,
                                        const PoseMeas& zr,
                                        Vector12& error,

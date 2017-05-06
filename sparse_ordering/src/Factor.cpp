@@ -19,7 +19,7 @@ bool Factor::operator ==(const Factor& other_) const {
   return false;
 }
 
-bool Factor::operator ==(const Association& factor_association_) const {
+bool Factor::operator ==(const IntPair& factor_association_) const {
   if (this->from == factor_association_.first && this->to == factor_association_.second)
     return true;
   return false;

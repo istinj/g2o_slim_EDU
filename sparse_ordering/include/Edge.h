@@ -17,21 +17,21 @@ public:
   Edge();
   virtual ~Edge();
 
-  void setEdge(const Association& association_,
+  void setEdge(const IntPair& association_,
       const PoseMeas& data_,
       const OmegaPose& omega_);
-  void setEdge(const Association& association_,
+  void setEdge(const IntPair& association_,
       const int& sensor_ID_,
       const PoseMeas& data_,
       const OmegaPose& omega_);
 
   inline const int sensorID(void) const {return _sensor_id;};
-  inline const Association& association(void) const {return _id_association;};
+  inline const IntPair& association(void) const {return _id_association;};
   inline const PoseMeas& data(void) const {return _data;};
   inline const OmegaPose& omega(void) const {return _omega;};
 
 protected:
-  Association _id_association;
+  IntPair _id_association;
   int _sensor_id;
 
   PoseMeas _data;

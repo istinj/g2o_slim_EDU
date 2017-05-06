@@ -42,15 +42,15 @@ public:
 			const LandmarkPointsContainer& land_points_,
 			const PosePoseEdgeContainer& zr_,
 			const PosePointEdgeContainer& zl_,
-			const real_ l_, const real_ epsilon_);
+			const Real l_, const Real epsilon_);
 	virtual ~SparseSolver();
 
 	void updateGraph(Graph& graph_);
 	void oneStep(void);
 
 private:
-	bool linearizePosePoint(real_& total_chi_, int& inliers_);
-	void linearizePosePose(real_& total_chi_, int& inliers_);
+	bool linearizePosePoint(Real& total_chi_, int& inliers_);
+	void linearizePosePose(Real& total_chi_, int& inliers_);
 	void errorAndJacobianPosePoint(const Pose& xr,
 			const PointXYZ& xl,
 			const PointMeas& zl,
@@ -93,8 +93,8 @@ private:
 	sparse::SparseBlockMatrix<Matrix6>* _pose_pose_Hessian;
 	sparse::DenseVector<Vector6>* _pose_pose_B;
 
-	real_ _lambda = 0.0;
-	real_ _threshold = 0.0;
+	Real _lambda = 0.0;
+	Real _threshold = 0.0;
 
 	Matrix3 _Rx0, _Ry0, _Rz0;
 

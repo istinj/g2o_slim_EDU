@@ -35,40 +35,40 @@ void Workspace::clear(void){
 }
 
 void Workspace::allocate(const std::vector<Factor>& factors_){
-  for (int i = 0; i < factors_.size(); ++i) {
+  for (Counter i = 0; i < factors_.size(); ++i) {
     int a = std::min(factors_[i].from, factors_[i].to);
     int b = std::max(factors_[i].from, factors_[i].to);
 
-    if(!memory_map.count(Association(a,a))){
+    if(!memory_map.count(IntPair(a,a))){
       SparseMatrixBlock* block = new SparseMatrixBlock();
       block->setIdentity();
-      memory_map.insert(std::make_pair(Association(a,a), block));
+      memory_map.insert(std::make_pair(IntPair(a,a), block));
     } else {
-      memory_map[Association(a,a)]->setIdentity();
+      memory_map[IntPair(a,a)]->setIdentity();
     }
 
-    if(!memory_map.count(Association(b,a))){
+    if(!memory_map.count(IntPair(b,a))){
       SparseMatrixBlock* block = new SparseMatrixBlock();
       block->setIdentity();
-      memory_map.insert(std::make_pair(Association(b,a), block));
+      memory_map.insert(std::make_pair(IntPair(b,a), block));
     } else {
-      memory_map[Association(b,a)]->setIdentity();
+      memory_map[IntPair(b,a)]->setIdentity();
     }
 
-    if(!memory_map.count(Association(a,b))){
+    if(!memory_map.count(IntPair(a,b))){
       SparseMatrixBlock* block = new SparseMatrixBlock();
       block->setIdentity();
-      memory_map.insert(std::make_pair(Association(a,b), block));
+      memory_map.insert(std::make_pair(IntPair(a,b), block));
     } else {
-      memory_map[Association(a,b)]->setIdentity();
+      memory_map[IntPair(a,b)]->setIdentity();
     }
 
-    if(!memory_map.count(Association(b,b))){
+    if(!memory_map.count(IntPair(b,b))){
       SparseMatrixBlock* block = new SparseMatrixBlock();
       block->setIdentity();
-      memory_map.insert(std::make_pair(Association(b,b), block));
+      memory_map.insert(std::make_pair(IntPair(b,b), block));
     } else {
-      memory_map[Association(b,b)]->setIdentity();
+      memory_map[IntPair(b,b)]->setIdentity();
     }
   }
 
@@ -76,35 +76,35 @@ void Workspace::allocate(const std::vector<Factor>& factors_){
 }
 
 
-void Workspace::allocate(const std::vector<Association>& indices_) {
-  for (int i = 0; i < indices_.size(); ++i) {
+void Workspace::allocate(const std::vector<IntPair>& indices_) {
+  for (Counter i = 0; i < indices_.size(); ++i) {
     const int& r = indices_[i].first;
     const int& c = indices_[i].second;
 
-    if(!memory_map.count(Association(r,c))){
+    if(!memory_map.count(IntPair(r,c))){
       SparseMatrixBlock* block = new SparseMatrixBlock();
       block->setIdentity();
-      memory_map.insert(std::make_pair(Association(r,c), block));
+      memory_map.insert(std::make_pair(IntPair(r,c), block));
     } else {
-      memory_map[Association(r,c)]->setIdentity();
+      memory_map[IntPair(r,c)]->setIdentity();
     }
   }
   dimension = memory_map.size();
 }
 
 void Workspace::allocateOneBlock(const int r_, const int c_) {
-  if(!memory_map.count(Association(r_,c_))){
+  if(!memory_map.count(IntPair(r_,c_))){
     SparseMatrixBlock* block = new SparseMatrixBlock();
     block->setIdentity();
-    memory_map.insert(std::make_pair(Association(r_,c_), block));
+    memory_map.insert(std::make_pair(IntPair(r_,c_), block));
   } else {
-    memory_map[Association(r_,c_)]->setIdentity();
+    memory_map[IntPair(r_,c_)]->setIdentity();
   }
   ++dimension;
 }
 
 
-void Workspace::allocateOneBlock(const Association& indices_) {
+void Workspace::allocateOneBlock(const IntPair& indices_) {
   if(!memory_map.count(indices_)){
     SparseMatrixBlock* block = new SparseMatrixBlock();
     block->setIdentity();
@@ -116,12 +116,12 @@ void Workspace::allocateOneBlock(const Association& indices_) {
 }
 
 
-SparseMatrixBlock& Workspace::operator ()(const Association& indices_) const {
+SparseMatrixBlock& Workspace::operator ()(const IntPair& indices_) const {
   return *memory_map.at(indices_);
 }
 
 SparseMatrixBlock& Workspace::operator ()(const int r_, const int c_) const {
-  return *memory_map.at(Association(r_,c_));
+  return *memory_map.at(IntPair(r_,c_));
 }
 
 

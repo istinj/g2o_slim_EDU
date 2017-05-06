@@ -59,7 +59,7 @@ public:
    template<typename VectorBlockType_>
    void backSubstitution(const DenseVector<VectorBlockType_>& B_vector_,
          DenseVector<VectorBlockType_>& result_);
-   void addDamping(const real_ damping_);
+   void addDamping(const Real damping_);
 
 
    void setBlock(const int r_, const int c_, DenseBlock block_);

@@ -15,7 +15,7 @@ namespace sparse {
 struct Factor {
   Factor(int from_=0, int to_=0): from(from_), to(to_){}
   bool operator==(const Factor& other_) const;
-  bool operator==(const Association& factor_association_) const;
+  bool operator==(const IntPair& factor_association_) const;
   void clear(void);
 
   int from;

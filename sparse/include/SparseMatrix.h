@@ -15,7 +15,7 @@
 
 //! Generic sparse matrix stored in a effient way
 namespace sparse {
-typedef std::map<int, real_> IntSparseMatrixBlockPtrMap;
+typedef std::map<int, Real> IntSparseMatrixBlockPtrMap;
 typedef std::vector<IntSparseMatrixBlockPtrMap> RowContainer;
 class SparseMatrix
 {
@@ -24,7 +24,7 @@ public:
    SparseMatrix(int num_rows_, int num_cols_);
    virtual ~SparseMatrix();
 
-   void setElement(const int r_, const int c_, const real_ value_);
+   void setElement(const int r_, const int c_, const Real value_);
    void resetMatrix(void);
    void resize(const int new_rows_, const int new_cols_);
    void loadFromTXT(const std::string& path_to_file_);
@@ -34,12 +34,12 @@ public:
          const IntSparseMatrixBlockPtrMap& row_2_, int max_pos_);
 
    void cholesky(SparseMatrix& cholesky_);
-   real_ scalarProd(const IntSparseMatrixBlockPtrMap& row_1_,
+   Real scalarProd(const IntSparseMatrixBlockPtrMap& row_1_,
          const IntSparseMatrixBlockPtrMap& row_2_, const int max_pos_);
 
    void printElement(const int r_, const int c_) const;
    bool isNonZeroElement(const int r_, const int c_) const;
-   real_ getElement(const int r_, const int c_) const;
+   Real getElement(const int r_, const int c_) const;
 
    inline const int numRows(void){return _num_rows;};
    inline const int numCols(void){return _num_cols;};

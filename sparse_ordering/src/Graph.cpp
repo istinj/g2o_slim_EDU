@@ -30,7 +30,7 @@ void Graph::addEdge(const Edge& e_){
 
 
 void Graph::updateVertices(const std::vector<Vertex>& new_vertices_){
-  for (int i = 0; i < _vertices.size(); ++i) {
+  for (Counter i = 0; i < _vertices.size(); ++i) {
     Vertex new_vertex = new_vertices_[i];
     _vertices[i].setData(new_vertex.data());
   }
@@ -43,7 +43,7 @@ void Graph::exportToG2OFile(const std::string& filename_) {
   ofstream file(filename_);
 
   //! Writing SE3 Vertices
-  for (int i = 0; i < _vertices.size(); ++i) {
+  for (Counter i = 0; i < _vertices.size(); ++i) {
     Vertex& v = _vertices[i];
 
     file << VERTEX_SE3 << " " << v.id() << " ";
@@ -58,7 +58,7 @@ void Graph::exportToG2OFile(const std::string& filename_) {
   file << endl << endl << endl;
 
   //! Writing SE3 Edge
-  for (int i = 0; i < _edges.size(); ++i) {
+  for (Counter i = 0; i < _edges.size(); ++i) {
     Edge& e = _edges[i];
 
     file << EDGE_SE3 << " " << e.association().first << " " << e.association().second << " ";
