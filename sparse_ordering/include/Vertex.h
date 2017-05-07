@@ -37,7 +37,7 @@ protected:
   int _id;
   int _index;
 private:
-  static int _index_counter;
+  static Counter _index_counter;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

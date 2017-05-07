@@ -185,16 +185,20 @@ void SparseOptimizer::updateGraph(Graph& graph_) {
 void SparseOptimizer::_computeAMDPermutation(IntVector& permutation_AMD_,
                                             SparseBlockMatrix& matrix_) {
   cs* cs_matrix = matrix_.toCs();
-  int* amd_odering = cs_amd(1,cs_matrix);
+  SparseBlockMatrix temp(matrix_.numRows(), matrix_.numCols(), true);
+  temp.fromCs(cs_matrix);
+  ofstream file_plain_cs("../data/h_PLAIN_CSFORMAT.txt");
+  file_plain_cs << temp << endl;
+  file_plain_cs.close();
 
+  int* amd_ordering = cs_amd(1,cs_matrix);
   permutation_AMD_.resize(matrix_.numRows());
-
   for (Counter i = 0; i < matrix_.numRows(); ++i) {
-    permutation_AMD_[amd_odering[i]] = i;
+    permutation_AMD_[amd_ordering[i]] = i;
   }
 
   cs_spfree(cs_matrix);
-  cs_free(amd_odering);
+  cs_free(amd_ordering);
 }
 
 

@@ -14,6 +14,7 @@
 #include <Eigen/Cholesky>
 #include <suitesparse/cs.h>
 #include <suitesparse/amd.h>
+#include <suitesparse/cholmod.h>
 #include <suitesparse/colamd.h>
 
 #define RESET   "\033[0m"
@@ -100,6 +101,7 @@ typedef std::map<int, SparseMatrixBlock*, std::less<int>,
         Eigen::aligned_allocator<std::pair<const int, SparseMatrixBlock*> > > IntSparseMatrixBlockPtrMap;
 typedef std::map<IntPair, SparseMatrixBlock*, std::less<std::pair<int, int> >,
         Eigen::aligned_allocator<std::pair<IntPair, SparseMatrixBlock*> > > IndicesSparseMatrixBlocksPtrMap;
+
 
 
 

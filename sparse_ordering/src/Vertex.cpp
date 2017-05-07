@@ -9,7 +9,7 @@
 
 namespace sparse {
 
-int Vertex::_index_counter = 0;
+Counter Vertex::_index_counter = 0;
 
 Vertex::Vertex() {
   _id = -1;

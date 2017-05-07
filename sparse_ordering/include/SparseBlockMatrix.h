@@ -89,6 +89,7 @@ public:
                DenseBlockVector& result_) const;
 
   cs* toCs(void) const;
+  void fromCs(const cs* src_);
 
 protected:
   SparseMatrixBlock _scalarProd(const IntSparseMatrixBlockPtrMap& row1_,

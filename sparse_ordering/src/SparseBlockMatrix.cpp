@@ -323,7 +323,7 @@ cs* SparseBlockMatrix::toCs(void) const {
   int* col_indices = transposed_matrix->i;
   double* values = transposed_matrix->x;
 
-  int counter=0;
+  Counter counter = 0;
   for (Counter r = 0; r < _num_block_rows; ++r){
     *row_pointers = counter;
     const IntSparseMatrixBlockPtrMap& row = _block_rows[r];
@@ -343,6 +343,28 @@ cs* SparseBlockMatrix::toCs(void) const {
   cs_spfree(transposed_matrix);
 
   return tm;
+}
+
+void SparseBlockMatrix::fromCs(const cs* src_) {
+  if(!_is_initialized)
+    throw std::runtime_error("Matrix must be initialized with right dimensions");
+
+  const int* col_pointers=src_->p;
+  const int* row_indices=src_->i;
+  double* values=src_->x;
+  int c=0;
+  int col_index=col_pointers[c+1];
+  int num_elements=src_->p[src_->n];
+  for (int i=0; i<num_elements; i++, row_indices++, values++){
+    double value=*values;
+    double r=*row_indices;
+    _matrix_workspace.allocateOneBlock(r,c);
+    setBlock(r,c,_matrix_workspace.memory_map[IntPair(r,c)]);
+    if (i>col_index){
+      c++;
+      col_index=col_pointers[c+1];
+    }
+  }
 }
 
 
@@ -426,9 +448,6 @@ std::ostream& operator <<(std::ostream& os, const SparseBlockMatrix& m){
   }
   return os;
 }
-
-
-
 
 
 
