@@ -90,7 +90,6 @@ void Graph::loadFromG2OFile(const std::string& filename_){
   cerr << BOLDYELLOW << "\t" << "Opening file " << filename_ << RESET << endl;
   fstream file(filename_);
 
-  int p_idx = 0;
   int l_idx = 0;
   string line;
   while(getline(file, line)){
@@ -133,10 +132,8 @@ void Graph::loadFromG2OFile(const std::string& filename_){
       T.linear() = q.matrix();
       T.translation() = t;
 
-      Vertex vertex_se3;
-      vertex_se3.setVertex(id, p_idx, T);
+      Vertex vertex_se3(id, T);
       addVertex(vertex_se3);
-      p_idx++;
     }
 
     if(element_type == EDGE_POSE_POINT){

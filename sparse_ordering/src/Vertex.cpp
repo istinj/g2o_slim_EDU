@@ -9,11 +9,13 @@
 
 namespace sparse {
 
+int Vertex::_index_counter = 0;
+
 Vertex::Vertex() {
   _id = -1;
-  _index = -1;
+  _index = _index_counter++;
   _data = Pose::Identity();
-  _fixed = false;
+  _fixed = false;;
 }
 
 Vertex::Vertex(const int& id_,
@@ -22,6 +24,14 @@ Vertex::Vertex(const int& id_,
   _index = index_;
   _data = data_;
   _fixed = false;
+  ++_index_counter;
+}
+
+Vertex::Vertex(const int& id_, const Pose& data_) {
+  _id = id_;
+  _data = data_;
+  _fixed = false;
+  _index = _index_counter++;
 }
 
 Vertex::~Vertex() {

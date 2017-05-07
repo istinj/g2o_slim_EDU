@@ -16,6 +16,7 @@ class Vertex {
 public:
   Vertex();
   Vertex(const int& id_, const int& index_, const Pose& data_);
+  Vertex(const int& id_, const Pose& data_);
   virtual ~Vertex();
 
   void setVertex(const int& id_, const int& index_, const Pose& data_);
@@ -32,10 +33,11 @@ public:
 
 protected:
   Pose _data;
-  int _id;
-  //! TODO STATIC index
-  int _index;
   bool _fixed;
+  int _id;
+  int _index;
+private:
+  static int _index_counter;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
