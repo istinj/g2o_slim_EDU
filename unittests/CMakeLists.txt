@@ -1,0 +1,3 @@
+add_executable(sparse_ordering_test ordering_test.cpp)
+target_link_libraries(sparse_ordering_test g2o_slim_EDU_library)
+set_target_properties( sparse_ordering_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin )
